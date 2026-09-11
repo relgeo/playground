@@ -1,4 +1,4 @@
-import type { RelGeoDocument, ResolvedScene } from 'relgeo-core';
+import type { RelGeoDocument, ResolvedScene } from '@relgeo/core';
 
 export interface PlaygroundRenderSnapshot {
   doc: RelGeoDocument | null;

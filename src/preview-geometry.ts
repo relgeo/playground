@@ -1,4 +1,4 @@
-import type { ResolvedScene } from 'relgeo-core';
+import type { ResolvedScene } from '@relgeo/core';
 
 export interface PreviewFrameSize {
   width: number;

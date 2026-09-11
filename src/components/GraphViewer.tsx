@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { getDependencyGraph } from 'relgeo-core';
-import type { RelGeoObject } from 'relgeo-core';
+import { getDependencyGraph } from '@relgeo/core';
+import type { RelGeoObject } from '@relgeo/core';
 
 interface GraphViewerProps {
   objects: Record<string, RelGeoObject>;
@@ -45,7 +45,7 @@ export function GraphViewer({
     const ids = Object.keys(objects ?? {});
     const levels: Record<string, number> = {};
 
-    // 1. Calculate dependency Graph map using relgeo-core's getDependencyGraph
+    // 1. Calculate dependency Graph map using @relgeo/core's getDependencyGraph
     const graphData = getDependencyGraph(objects);
     const dependencyGraph: Record<string, string[]> = {};
     graphData.forEach(item => {

@@ -7,10 +7,10 @@ export default defineConfig({
   base: '/playground/',
   resolve: {
     alias: {
-      'relgeo-core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
-      'relgeo-geometry': fileURLToPath(new URL('../geometry/src/index.ts', import.meta.url)),
-      'relgeo-renderer-svg': fileURLToPath(new URL('../renderer-svg/src/index.ts', import.meta.url)),
-      'relgeo-language-service': fileURLToPath(new URL('../language-service/src/index.ts', import.meta.url)),
+      '@relgeo/core': fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
+      '@relgeo/geometry': fileURLToPath(new URL('../geometry/src/index.ts', import.meta.url)),
+      '@relgeo/renderer-svg': fileURLToPath(new URL('../renderer-svg/src/index.ts', import.meta.url)),
+      '@relgeo/language-service': fileURLToPath(new URL('../language-service/src/index.ts', import.meta.url)),
     },
   },
   build: {

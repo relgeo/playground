@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { ResolvedScene } from 'relgeo-core';
+import type { ResolvedScene } from '@relgeo/core';
 import {
   computeFitZoomPercent,
   computePreviewScreenScale,

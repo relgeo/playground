@@ -4,7 +4,7 @@ import type { ViewMode, SidebarPosition } from '../types';
 import { EXAMPLES } from '../examples';
 import { getSheetPreviewEntryLabel, getSheetPreviewEntryTarget } from '../view-state';
 
-import type { RelGeoDocument } from 'relgeo-core';
+import type { RelGeoDocument } from '@relgeo/core';
 
 function formatZoomLabel(zoom: number): string {
   if (zoom >= 100) return `${Math.round(zoom)}%`;

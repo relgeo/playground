@@ -95,8 +95,8 @@ Playground adalah surface browser ringan yang task-centric.
 
 Secara konseptual, playground menggabungkan:
 
-1. `relgeo-core`
-2. `relgeo-language-service`
+1. `@relgeo/core`
+2. `@relgeo/language-service`
 3. renderer SVG aktif
 4. surface editor
 5. inspection overlays

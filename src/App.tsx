@@ -1,5 +1,5 @@
 import { startTransition, useDeferredValue, useEffect, useRef, useState } from 'react';
-// import { parseRelGeo, resolveGeometry, renderToSVG } from 'relgeo-core';
+// import { parseRelGeo, resolveGeometry, renderToSVG } from '@relgeo/core';
 import { DEFAULT_EXAMPLE_KEY, EXAMPLES } from './examples';
 
 // Components
@@ -36,8 +36,8 @@ import {
   shouldApplyWorkerResponse,
 } from './worker-sequencing';
 
-import { TECHNICAL_ROLES } from 'relgeo-core';
-import type { RelGeoDocument, ResolvedScene, RelGeoError } from 'relgeo-core';
+import { TECHNICAL_ROLES } from '@relgeo/core';
+import type { RelGeoDocument, ResolvedScene, RelGeoError } from '@relgeo/core';
 
 // Types
 import type { InspectorTab, DragState, ViewMode, SidebarPosition, SidebarPanels, WorkerRequest, WorkerResponse, PreviewLineMode } from './types';

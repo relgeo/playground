@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, type PointerEventHandler, type WheelEventHandler } from 'react';
-import { applyTransformPipeline, getObjectBoundingBox, calculateBoundingBox } from 'relgeo-core';
-import type { ConstraintViolation, ResolvedScene, ResolvedObject, ResolvedPath, ResolvedPolygon, ResolvedDimension, ResolvedAnnotation, ResolvedTransform } from 'relgeo-core';
+import { applyTransformPipeline, getObjectBoundingBox, calculateBoundingBox } from '@relgeo/core';
+import type { ConstraintViolation, ResolvedScene, ResolvedObject, ResolvedPath, ResolvedPolygon, ResolvedDimension, ResolvedAnnotation, ResolvedTransform } from '@relgeo/core';
 import type { DragState, OverlayConfig, PreviewLineMode } from '../types';
 import { ICONS } from './Icons';
 import { getPreviewToolbarHint, getPreviewToolbarLabel, getPreviewToolbarMode } from '../preview-toolbar';

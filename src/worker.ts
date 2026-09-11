@@ -1,5 +1,5 @@
-import { parseRelGeo, resolveGeometry } from 'relgeo-core';
-import { renderToSVG } from 'relgeo-renderer-svg';
+import { parseRelGeo, resolveGeometry } from '@relgeo/core';
+import { renderToSVG } from '@relgeo/renderer-svg';
 import type { WorkerRequest, WorkerResponse } from './types';
 
 const offscreenCanvas = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(0, 0) : null;

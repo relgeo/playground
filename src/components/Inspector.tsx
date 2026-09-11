@@ -1,7 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { ICONS } from './Icons';
 import type { InspectorTab } from '../types';
-import type { RelGeoDocument, ResolvedScene, RelGeoError, ResolvedObject, PathResolvedSegment, ConstraintViolation } from 'relgeo-core';
+import type { RelGeoDocument, ResolvedScene, RelGeoError, ResolvedObject, PathResolvedSegment, ConstraintViolation } from '@relgeo/core';
 import { getClosedShapeMetricLabel } from '../inspector-helpers';
 
 const GraphViewer = lazy(() => import('./GraphViewer').then((m) => ({ default: m.GraphViewer })));

@@ -1,4 +1,4 @@
-import type { RelGeoDocument } from 'relgeo-core';
+import type { RelGeoDocument } from '@relgeo/core';
 
 interface ProfilesCardProps {
   doc: RelGeoDocument | null | undefined;

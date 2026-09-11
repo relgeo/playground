@@ -1,4 +1,4 @@
-import type { RelGeoDocument } from 'relgeo-core';
+import type { RelGeoDocument } from '@relgeo/core';
 
 interface LeafParam {
   path: string; // e.g. "boltPattern.diameter" or "posisiAwal[0]"

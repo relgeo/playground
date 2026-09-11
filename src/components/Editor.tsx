@@ -2,7 +2,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { yaml } from '@codemirror/lang-yaml';
 import { linter } from '@codemirror/lint';
 import { autocompletion } from '@codemirror/autocomplete';
-import { RelGeoLanguageService } from 'relgeo-language-service';
+import { RelGeoLanguageService } from '@relgeo/language-service';
 import { EditorView, hoverTooltip } from '@codemirror/view';
 import React from 'react';
 

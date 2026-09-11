@@ -1,4 +1,4 @@
-import type { RelGeoDocument, ResolvedScene } from 'relgeo-core';
+import type { RelGeoDocument, ResolvedScene } from '@relgeo/core';
 
 export type InspectorTab = 'resolved' | 'values' | 'errors' | 'graph' | 'bom';
 export type DragState = { startX: number; startY: number; originX: number; originY: number } | null;

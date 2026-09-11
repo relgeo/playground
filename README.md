@@ -24,8 +24,8 @@ Pakai package ini jika Anda ingin:
 
 Jika yang Anda butuhkan berbeda:
 
-* gunakan `relgeo-cli` untuk workflow terminal
-* gunakan `relgeo-core` + `relgeo-renderer-svg` untuk integrasi kustom
+* gunakan `@relgeo/cli` untuk workflow terminal
+* gunakan `@relgeo/core` + `@relgeo/renderer-svg` untuk integrasi kustom
 * gunakan Flutter workbench untuk workspace lokal yang lebih kaya
 
 `relgeo-playground` is a lightweight geometry IDE designed for:
@@ -37,8 +37,8 @@ Jika yang Anda butuhkan berbeda:
 
 It combines:
 
-* the `relgeo-core` typed geometry runtime
-* the `relgeo-language-service`
+* the `@relgeo/core` typed geometry runtime
+* the `@relgeo/language-service`
 * a live SVG drafting environment
 
 into a single interactive workspace.
@@ -105,7 +105,7 @@ flowchart TD
     B --> D[Auto Completion]
     B --> E[Hover Intelligence]
 
-    A --> F[relgeo-core]
+    A --> F[@relgeo/core]
 
     F --> G[Parser]
     F --> H[Dependency Graph Resolver]
@@ -381,10 +381,10 @@ pnpm test
 
 The Playground is part of the RelGeo ecosystem:
 
-* `relgeo-core`
+* `@relgeo/core`
   → typed geometry runtime
 
-* `relgeo-language-service`
+* `@relgeo/language-service`
   → editor intelligence layer
 
 * `relgeo-playground`

@@ -21,9 +21,9 @@
     "codemirror": "^6.0.2",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "relgeo-core": "^0.4.0",
-    "relgeo-language-service": "^0.4.0",
-    "relgeo-renderer-svg": "^0.4.0"
+    "@relgeo/core": "^0.5.0",
+    "@relgeo/language-service": "^0.5.0",
+    "@relgeo/renderer-svg": "^0.5.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
