@@ -1,0 +1,136 @@
+version: 0.5
+meta:
+  name: 03. Path Join
+  description: Demonstrates path.join, explicit reverse, and closeWith as part of the active RelGeo v0.5 path composition surface.
+
+scene:
+  unit: mm
+  padding: 20
+  autoSize: true
+
+derived:
+  outlineLength: length(outline)
+  panelArea: area(panel)
+
+objects:
+  # Base segments authored as reusable geometry objects.
+  top_edge:
+    type: line
+    from: [0, 0]
+    to: [90, 0]
+    meta:
+      stroke: "#94a3b8"
+      width: 0.75
+      dash: "3 3"
+
+  right_edge:
+    type: line
+    from: [90, 0]
+    to: [90, 50]
+    meta:
+      stroke: "#94a3b8"
+      width: 0.75
+      dash: "3 3"
+
+  bottom_edge:
+    type: line
+    from: [90, 50]
+    to: [0, 50]
+    meta:
+      stroke: "#94a3b8"
+      width: 0.75
+      dash: "3 3"
+
+  left_edge_raw:
+    type: line
+    from: [0, 0]
+    to: [0, 50]
+    meta:
+      stroke: "#f59e0b"
+      width: 0.75
+      dash: "2 2"
+
+  # Explicit reverse is required: engine will not auto-reverse join targets.
+  left_edge:
+    type: reverse
+    target: left_edge_raw
+    meta:
+      visible: false
+
+  # Open composed path.
+  outline:
+    type: path
+    join:
+      - top_edge
+      - right_edge
+      - bottom_edge
+    meta:
+      stroke: "#2563eb"
+      width: 2
+      fill: none
+
+  # Closed composed path with closeWith helper and explicit reverse usage.
+  panel:
+    type: path
+    join:
+      - top_edge
+      - right_edge
+      - bottom_edge
+      - left_edge
+    closed: true
+    closeWith: line
+    meta:
+      fill: "rgba(37,99,235,0.10)"
+      stroke: "#1d4ed8"
+      width: 1.8
+
+  title:
+    type: text
+    content: "Path Join + Reverse + closeWith"
+    at: [45, -12]
+    anchor: bottomCenter
+    meta:
+      fontSize: 7
+      fill: "#0f172a"
+
+  join_note:
+    type: annotation
+    text: "Open join from reusable line objects"
+    target: outline
+    leader:
+      from: [45, 14]
+      to: [102, -6]
+    meta:
+      fontSize: 4.5
+      stroke: "#2563eb"
+
+  reverse_note:
+    type: annotation
+    text: "left_edge is explicit reverse(left_edge_raw)"
+    target: left_edge
+    leader:
+      from: [0, 26]
+      to: [-34, 36]
+    meta:
+      fontSize: 4.5
+      stroke: "#f59e0b"
+
+  width_dim:
+    type: dimension
+    kind: linear
+    from: panel.bottomLeft
+    to: panel.bottomRight
+    offset: 12
+    text: "Joined width = {distance}"
+    meta:
+      fontSize: 4.5
+      stroke: "#334155"
+
+  summary:
+    type: text
+    content: "length(outline) = {outlineLength} mm | area(panel) = {panelArea} mm²"
+    at: [45, 70]
+    anchor: topCenter
+    meta:
+      fontSize: 5
+      fill: "#334155"

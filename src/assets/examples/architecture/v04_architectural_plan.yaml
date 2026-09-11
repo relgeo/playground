@@ -1,0 +1,129 @@
+version: 0.5
+meta:
+  name: Architectural Floor Plan
+  description: A complete floor plan using active Components, Dimensions, and Layout.
+
+scene:
+  unit: cm
+  padding: 2
+  autoSize: true
+
+parameters:
+  width: { default: 8, label: "Building Width (m)" }
+  length: { default: 12, label: "Building Length (m)" }
+
+components:
+  door:
+    parameters:
+      width: { default: 0.9 }
+      openAngle: { default: 90deg }
+    objects:
+      hinge_pt:
+        type: point
+        at: [0, 0]
+        meta:
+          visible: false
+      latch_pt:
+        type: point
+        at: ["width", 0]
+        meta:
+          visible: false
+      frame:
+        type: line
+        from: hinge_pt
+        to: latch_pt
+        meta: { stroke: "#64748b", width: 0.5 }
+      panel_end:
+        type: point
+        from: hinge_pt
+        move:
+          angle: "openAngle"
+          distance: "width"
+        meta: { visible: false }
+      panel:
+        type: line
+        from: hinge_pt
+        to: panel_end
+        meta: { stroke: "#b45309", width: 0.5 }
+      swing_arc:
+        type: arc
+        center: hinge_pt
+        radius: "width"
+        startAngle: 0deg
+        endAngle: "openAngle"
+        meta: { stroke: "#94a3b8", dash: "0.1 0.1", fill: "none" }
+    exports:
+      hinge: hinge_pt
+      latch: latch_pt
+
+objects:
+  # Base Walls
+  exterior_walls:
+    type: rect
+    size: ["width", "length"]
+    place: { topLeft: [0, 0] }
+    meta: { fill: "none", stroke: "#1e293b", width: 0.2 }
+
+  # Rooms
+  master_bed:
+    type: rect
+    size: [4, 5]
+    place: { topLeft: exterior_walls.topLeft }
+    meta: { fill: "#f1f5f9", stroke: "#64748b", width: 0.1 }
+
+  bathroom:
+    type: rect
+    size: [2, 2.5]
+    place:
+      topRight: exterior_walls.topRight
+    meta: { fill: "#f0fdf4", stroke: "#166534", width: 0.1 }
+
+  # Doors using component
+  main_door:
+    type: component
+    use: door
+    params: { width: 1.2, openAngle: 45deg }
+    place:
+      bottomCenter: exterior_walls.bottomCenter
+    transform:
+      - rotate: 180deg
+
+  bed_door:
+    type: component
+    use: door
+    params: { width: 0.9, openAngle: 120deg }
+    place:
+      bottomRight: master_bed.bottomRight
+    transform:
+      - rotate: 180deg
+
+  # Floor Tiles (Grid Repeat)
+  bathroom_tiles:
+    type: repeat
+    item:
+      type: rect
+      size: [0.4, 0.4]
+      place: { topLeft: [bathroom.left + col * 0.4, bathroom.top + row * 0.4] }
+      meta: { fill: "none", stroke: "#bbf7d0", width: 0.5 }
+    grid:
+      rows: 6
+      cols: 5
+
+  # Architectural Dimensions
+  dim_overall_w:
+    type: dimension
+    kind: linear
+    from: exterior_walls.topLeft
+    to: exterior_walls.topRight
+    offset: -1
+    text: "Overall Width: {distance}"
+    meta: { stroke: "#334155", fontSize: 0.3 }
+
+  dim_overall_l:
+    type: dimension
+    kind: linear
+    from: exterior_walls.topLeft
+    to: exterior_walls.bottomLeft
+    offset: 1
+    text: "Overall Length: {distance}"
+    meta: { stroke: "#334155", fontSize: 0.3 }

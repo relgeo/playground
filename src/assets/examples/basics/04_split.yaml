@@ -1,0 +1,185 @@
+version: 0.5
+meta:
+  name: 04. Split
+  description: Demonstrates explicit split on open path-like targets, default collection result, and pick-based single-path result.
+
+scene:
+  unit: mm
+  padding: 24
+  autoSize: true
+
+derived:
+  firstHalfLen: length(first(split_outline))
+  lastHalfLen: length(last(split_outline))
+  pickedLen: length(head_only)
+  splitPointX: pointAt(first(split_outline), 1).x
+  splitPointY: pointAt(first(split_outline), 1).y
+
+metaPresets:
+  finalEdge:
+    stroke: "#0f172a"
+    strokeWidth: 2
+    fill: none
+  construction:
+    stroke: "#94a3b8"
+    strokeWidth: 0.9
+    dash: "4 3"
+    role: construction
+  firstPiece:
+    stroke: "#2563eb"
+    strokeWidth: 2.4
+  lastPiece:
+    stroke: "#dc2626"
+    strokeWidth: 2.4
+  highlight:
+    fill: "#0f172a"
+    stroke: "#0f172a"
+
+objects:
+  A:
+    type: point
+    at: [0, 0]
+
+  B:
+    type: point
+    at: [48, 0]
+
+  C:
+    type: point
+    at: [95, 30]
+
+  D:
+    type: point
+    at: [120, 30]
+
+  base_line:
+    type: line
+    from: A
+    to: B
+    meta:
+      visible: false
+
+  tail_curve:
+    type: quadratic
+    from: B
+    cp: C
+    to: D
+    meta:
+      visible: false
+
+  outline:
+    type: path
+    join:
+      - base_line
+      - tail_curve
+    metaPreset: finalEdge
+
+  cut_point:
+    type: point
+    at: pointAt(outline, 0.52)
+    metaPreset: highlight
+    meta:
+      pointShape: circle
+
+  split_outline:
+    type: split
+    target: outline
+    at: cut_point
+
+  head_only:
+    type: split
+    target: outline
+    at: cut_point
+    pick: first
+    meta:
+      visible: false
+
+  first_piece_label:
+    type: path
+    join:
+      - split_outline[0]
+    metaPreset: firstPiece
+
+  last_piece_label:
+    type: path
+    join:
+      - split_outline[1]
+    metaPreset: lastPiece
+
+  title:
+    type: text
+    content: "split(target, at) -> collection | split(..., pick: first) -> path"
+    at: [60, -14]
+    anchor: bottomCenter
+    meta:
+      fontSize: 6
+      fill: "#0f172a"
+
+  cut_note:
+    type: annotation
+    text: "Explicit split point"
+    target: cut_point
+    leader:
+      from: cut_point
+      to: [88, -6]
+    meta:
+      fontSize: 4.5
+      stroke: "#0f172a"
+
+  first_note:
+    type: annotation
+    text: "first(split_outline)"
+    target: split_outline[0]
+    leader:
+      from: [24, 0]
+      to: [8, -10]
+    meta:
+      fontSize: 4.5
+      stroke: "#2563eb"
+
+  last_note:
+    type: annotation
+    text: "last(split_outline)"
+    target: split_outline[1]
+    leader:
+      from: [95, 26]
+      to: [126, 10]
+    meta:
+      fontSize: 4.5
+      stroke: "#dc2626"
+
+  first_summary:
+    type: text
+    content: "length(first) = {round(firstHalfLen)} mm"
+    at: [12, 48]
+    anchor: topLeft
+    meta:
+      fontSize: 4.5
+      fill: "#2563eb"
+
+  last_summary:
+    type: text
+    content: "length(last) = {round(lastHalfLen)} mm"
+    at: [12, 56]
+    anchor: topLeft
+    meta:
+      fontSize: 4.5
+      fill: "#dc2626"
+
+  pick_summary:
+    type: text
+    content: "length(head_only) = {round(pickedLen)} mm"
+    at: [12, 64]
+    anchor: topLeft
+    meta:
+      fontSize: 4.5
+      fill: "#0f172a"
+
+  split_marker_label:
+    type: text
+    content: "split @ ({round(splitPointX)}, {round(splitPointY)})"
+    at: [12, 72]
+    anchor: topLeft
+    meta:
+      fontSize: 4.5
+      fill: "#334155"

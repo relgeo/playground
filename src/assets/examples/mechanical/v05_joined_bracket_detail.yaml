@@ -1,0 +1,163 @@
+version: 0.5
+meta:
+  name: Joined Bracket Detail
+  description: Technical drawing flavored example using path.join, explicit reverse, dimensions, and annotation.
+
+scene:
+  unit: mm
+  padding: 18
+  autoSize: true
+
+derived:
+  profileLength: length(profile)
+  profileArea: area(profile)
+
+objects:
+  top_edge:
+    type: line
+    from: [0, 0]
+    to: [70, 0]
+    meta:
+      visible: false
+
+  right_edge:
+    type: line
+    from: [70, 0]
+    to: [70, 42]
+    meta:
+      visible: false
+
+  bottom_edge:
+    type: line
+    from: [70, 42]
+    to: [12, 42]
+    meta:
+      visible: false
+
+  inner_drop_raw:
+    type: line
+    from: [12, 12]
+    to: [12, 42]
+    meta:
+      visible: false
+
+  lower_step:
+    type: line
+    from: [12, 12]
+    to: [0, 12]
+    meta:
+      visible: false
+
+  inner_drop:
+    type: reverse
+    target: inner_drop_raw
+    meta:
+      visible: false
+
+  profile:
+    type: path
+    join:
+      - top_edge
+      - right_edge
+      - bottom_edge
+      - inner_drop
+      - lower_step
+    closed: true
+    closeWith: line
+    meta:
+      fill: "#eef2ff"
+      stroke: "#1e293b"
+      width: 1.6
+
+  center_hole:
+    type: circle
+    radius: 6
+    center: [42, 21]
+    meta:
+      fill: "white"
+      stroke: "#1e293b"
+      width: 1.1
+
+  slot:
+    type: ellipse
+    center: [20, 27]
+    size: [16, 8]
+    rotation: 0
+    meta:
+      fill: "white"
+      stroke: "#1e293b"
+      width: 1
+
+  part_note:
+    type: annotation
+    target: profile
+    text: "Joined profile with step cut"
+    place:
+      left: profile.right + 12
+      top: profile.top + 4
+    meta:
+      fontSize: 4.5
+      stroke: "#475569"
+
+  hole_note:
+    type: annotation
+    target: center_hole
+    text: "Main fastener hole"
+    place:
+      left: center_hole.right + 10
+      centerY: center_hole.centerY
+    meta:
+      fontSize: 4.5
+      stroke: "#1d4ed8"
+
+  dim_width:
+    type: dimension
+    kind: linear
+    from: profile.topLeft
+    to: profile.topRight
+    offset: -10
+    meta:
+      fontSize: 4.5
+
+  dim_height:
+    type: dimension
+    kind: linear
+    from: profile.bottomRight
+    to: profile.topRight
+    offset: 10
+    meta:
+      fontSize: 4.5
+
+  dim_step:
+    type: dimension
+    kind: linear
+    from: lower_step.end
+    to: lower_step.start
+    offset: 8
+    meta:
+      fontSize: 4.5
+
+  dim_hole:
+    type: dimension
+    kind: diameter
+    target: center_hole
+    meta:
+      fontSize: 4.5
+
+  title:
+    type: text
+    content: "Joined Bracket Detail"
+    at: [35, -14]
+    anchor: bottomCenter
+    meta:
+      fontSize: 7
+      fill: "#0f172a"
+
+  summary:
+    type: text
+    content: "length = {profileLength} mm | area = {profileArea} mm²"
+    at: [35, 58]
+    anchor: topCenter
+    meta:
+      fontSize: 4.8
+      fill: "#334155"

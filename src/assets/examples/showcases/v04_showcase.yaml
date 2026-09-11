@@ -1,0 +1,172 @@
+version: "0.5"
+
+scene:
+  unit: mm
+  autoSize: true
+  padding: 15
+
+parameters:
+  spacing: { default: 20, min: 10, max: 40, step: 5, label: "Grid Spacing" }
+  grid:
+    rows: { default: 3, min: 1, max: 6, step: 1, label: "Grid Rows" }
+    cols: { default: 4, min: 1, max: 8, step: 1, label: "Grid Cols" }
+
+constants:
+  small_r: 2
+  grid_offset_x: 0
+  grid_offset_y: 115
+
+objects:
+  # ── 1. Polygon sebagai closed path shorthand dengan corner modifier ──
+  hex:
+    type: polygon
+    points:
+      - [20, 0]
+      - [40, 0]
+      - [50, 17]
+      - [40, 34]
+      - [20, 34]
+      - [10, 17]
+    corner:
+      all:
+        fillet: 3
+    meta:
+      fill: "#e0f2fe"
+      stroke: "#0284c7"
+      width: 1.5
+
+  # ── 2. Rect dengan polymorphic holes (koordinat absolut) ──
+  frame:
+    type: rect
+    size: [80, 80]
+    place:
+      topLeft: [70, 0]
+    holes:
+      - type: rect
+        size: [20, 20]
+        place:
+          center: [110, 40]
+      - type: circle
+        radius: 8
+        place:
+          center: [82, 12]
+      - type: circle
+        radius: 8
+        place:
+          center: [138, 12]
+    meta:
+      fill: "#f0fdf4"
+      stroke: "#16a34a"
+      width: 1.5
+
+  # ── 3. Path dengan points sebagai open path shorthand (polyline) ──
+  wave:
+    type: path
+    points:
+      - [0, 100]
+      - [20, 85]
+      - [40, 100]
+      - [60, 85]
+      - [80, 100]
+      - [100, 85]
+      - [120, 100]
+    meta:
+      stroke: "#dc2626"
+      width: 2
+      fill: none
+
+  # ── 4. Repeat (grid) — lingkaran kecil tersusun rapi menggunakan nested param ──
+  dot_grid:
+    type: repeat
+    item:
+      type: circle
+      center: ["grid_offset_x + item.x", "grid_offset_y + item.y"]
+      radius: "small_r"
+      meta:
+        fill: "#7c3aed"
+        stroke: none
+    grid:
+      rows: "grid.rows"
+      cols: "grid.cols"
+      gap: "spacing"
+
+  # ── 5. Garis sebagai target divide ──
+  measure_line:
+    type: line
+    from: [0, 50]
+    to: [60, 50]
+    meta:
+      stroke: "#94a3b8"
+      width: 0.5
+
+  # ── 6. Divide — 5 titik di sepanjang garis ──
+  div_points:
+    type: divide
+    target: measure_line
+    count: 5
+
+  # ── 7. Dimension — mengukur lebar frame ──
+  dim_width:
+    type: dimension
+    kind: linear
+    from: frame.topLeft
+    to: frame.topRight
+    meta:
+      stroke: "#475569"
+      fontSize: 5
+
+  # ── 8. Annotation ──
+  note_hex:
+    type: annotation
+    text: "Polygon + Fillet (closed path shorthand)"
+    target: hex
+    leader:
+      from: [10, 17]
+      to: [-5, 8]
+    meta:
+      fontSize: 5
+      stroke: "#0284c7"
+
+  # ── 9. Boolean Subtraction ──
+  base_circle:
+    type: circle
+    radius: 15
+    place:
+      center: [115, 140]
+    meta:
+      fill: none
+      stroke: "#94a3b8"
+      width: 0.5
+      dash: "2 2"
+
+  cutter_rect:
+    type: rect
+    size: [16, 16]
+    place:
+      center: [115, 140]
+    meta:
+      fill: none
+      stroke: "#94a3b8"
+      width: 0.5
+      dash: "2 2"
+
+  boolean_subtract:
+    type: boolean
+    operation: subtract
+    base: base_circle
+    tools:
+      - cutter_rect
+    meta:
+      fill: "#fae8ff"
+      stroke: "#d946ef"
+      width: 1.5
+
+  # ── 10. Label judul ──
+  title:
+    type: text
+    content: "RelGeo v0.5 Feature Showcase"
+    at: [60, -12]
+    anchor: bottomCenter
+    meta:
+      fontSize: 9
+      fill: "#1e293b"

@@ -1,0 +1,53 @@
+version: 0.2
+meta:
+  name: Transform Pipeline Demo
+  description: Menampilkan kekuatan Ordered Post-Geometry Transform Pipeline.
+
+scene:
+  unit: mm
+  autoSize: true
+  padding: 50
+
+objects:
+  kotakAsli:
+    type: rect
+    size: [100, 100]
+    meta: { stroke: "#ccc", dash: "2,2" }
+
+  # Test 1: Rotate THEN Translate
+  kotakA:
+    type: clone
+    of: kotakAsli
+    transform:
+      - rotate: 45deg
+      - translate: [200, 0]
+    meta: { stroke: "red", label: "Rotate -> Translate" }
+
+  # Test 2: Translate THEN Rotate
+  kotakB:
+    type: clone
+    of: kotakAsli
+    transform:
+      - translate: [200, 0]
+      - rotate: 45deg
+    meta: { stroke: "blue", label: "Translate -> Rotate" }
+
+  # Test 3: Scale with custom origin
+  kotakC:
+    type: clone
+    of: kotakAsli
+    place: { top: kotakA.bottom + 100, left: 0 }
+    transform:
+      - scale:
+          factor: 2
+          origin: [0, 0]
+    meta: { stroke: "green", label: "Scale from [0,0]" }
+
+  # Test 4: Shorthand compatibility (still works)
+  kotakD:
+    type: clone
+    of: kotakAsli
+    place: { top: kotakC.bottom + 100, left: 0 }
+    transform:
+      rotate: 30deg
+    meta: { stroke: "purple", label: "Shorthand Rotate (Center)" }

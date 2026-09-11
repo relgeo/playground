@@ -1,0 +1,47 @@
+version: 0.2
+meta:
+  name: Custom Named Anchors
+  description: Mendemonstrasikan pembuatan anchor kustom untuk komponen yang dapat digunakan kembali.
+
+objects:
+  # Komponen "Saku" (Pocket) dengan anchor kustom
+  saku:
+    type: group
+    children: [dasar, top_line]
+    anchors:
+      hook_point: [25, 0] # Anchor kustom di tengah atas
+      bottom_tip: [25, 60] # Anchor kustom di ujung bawah
+  
+  dasar:
+    type: rect
+    size: [50, 60]
+    place:
+      topLeft: [0, 0]
+  
+  top_line:
+    type: line
+    from: [0, 0]
+    to: [50, 0]
+
+  # Menggunakan anchor kustom dari luar grup
+  paku:
+    type: circle
+    center: saku.hook_point
+    radius: 3
+  
+  label_bawah:
+    type: text
+    at: saku.bottom_tip
+    content: "Ujung Saku"
+
+  # Memindahkan seluruh grup
+  # Anchor kustom ikut pindah secara visual
+  penanda:
+    type: group
+    children: [saku, paku, label_bawah]
+    transform:
+      - translate: [100, 100]
+      - rotate:
+          angle: 15deg
+          origin: [0, 0]
+        

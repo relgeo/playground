@@ -1,0 +1,102 @@
+version: 0.4
+meta:
+  name: Boolean CSG Operations
+  description: Demonstration of v0.4 Boolean Constructive Solid Geometry (union, subtract, intersect).
+
+scene:
+  unit: mm
+  autoSize: true
+  padding: 30
+
+objects:
+  # Base shapes to act as cutters or targets
+  base_circle:
+    type: circle
+    radius: 40
+    center: [50, 50]
+    meta: { visible: false }
+
+  cutter_rect:
+    type: rect
+    size: [40, 100]
+    place: { center: [50, 50] }
+    meta: { visible: false }
+    
+  cutter_rect2:
+    type: rect
+    size: [100, 40]
+    place: { center: [50, 50] }
+    meta: { visible: false }
+
+  # Operation 1: Subtract (Cross shape cutout from circle)
+  shape_subtract:
+    type: boolean
+    operation: subtract
+    base: base_circle
+    tools: [cutter_rect, cutter_rect2]
+    place: { topLeft: [0, 0] }
+    result: { mode: "multi" }
+    meta:
+      fill: "#ef4444"
+      stroke: "#991b1b"
+      width: 2
+
+  label1:
+    type: text
+    content: "Subtract"
+    place: { top: shape_subtract.bottom + 10, centerX: shape_subtract.centerX }
+    anchor: topCenter
+
+  # Base shapes for Union
+  circ1:
+    type: circle
+    radius: 30
+    center: [200, 40]
+    meta: { visible: false }
+
+  circ2:
+    type: circle
+    radius: 30
+    center: [230, 40]
+    meta: { visible: false }
+
+  circ3:
+    type: circle
+    radius: 30
+    center: [215, 65]
+    meta: { visible: false }
+
+  # Operation 2: Union (Cloud shape)
+  shape_union:
+    type: boolean
+    operation: union
+    shapes: [circ1, circ2, circ3]
+    meta:
+      fill: "#3b82f6"
+      stroke: "#1e40af"
+      width: 2
+
+  label2:
+    type: text
+    content: "Union"
+    place: { top: shape_union.bottom + 10, centerX: shape_union.centerX }
+    anchor: topCenter
+
+  # Operation 3: Intersect
+  shape_intersect:
+    type: boolean
+    operation: intersect
+    shapes: [circ1, circ2]
+    place:
+      left: shape_union.right + 40
+      top: 20
+    meta:
+      fill: "#10b981"
+      stroke: "#065f46"
+      width: 2
+
+  label3:
+    type: text
+    content: "Intersect"
+    place: { top: shape_intersect.bottom + 10, centerX: shape_intersect.centerX }
+    anchor: topCenter

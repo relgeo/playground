@@ -1,0 +1,82 @@
+version: 0.5
+meta:
+  name: 02. Ellipse Basics
+  description: Introduction to the active ellipse primitive: size/radii, rotation, pointAt, area, and holes.
+
+scene:
+  unit: mm
+  padding: 24
+  autoSize: true
+
+derived:
+  majorArea:
+    value: area(plate)
+  topPointX:
+    value: pointAt(plate, 0.25).x
+  topPointY:
+    value: pointAt(plate, 0.25).y
+
+metaPresets:
+  body:
+    fill: "#dbeafe"
+    stroke: "#1d4ed8"
+    strokeWidth: 1.5
+  guide:
+    stroke: "#94a3b8"
+    strokeWidth: 0.8
+    dash: "4 3"
+    role: construction
+
+objects:
+  plate:
+    type: ellipse
+    center: [80, 60]
+    size: [120, 70]
+    rotation: 0.35
+    metaPreset: body
+    holes:
+      - circle:
+          center: plate.center
+          radius: 10
+
+  major_axis:
+    type: line
+    from: plate.centerLeft
+    to: plate.centerRight
+    metaPreset: guide
+
+  minor_axis:
+    type: line
+    from: plate.topCenter
+    to: plate.bottomCenter
+    metaPreset: guide
+
+  top_marker:
+    type: point
+    at: [topPointX, topPointY]
+    meta:
+      pointShape: circle
+      stroke: "#0f172a"
+      fill: "#0f172a"
+
+  center_label:
+    type: text
+    content: "A = {round(majorArea)} mm2"
+    place:
+      centerX: plate.centerX
+      top: plate.bottom + 12
+    anchor: topCenter
+    meta:
+      fontSize: 5
+      fill: "#0f172a"
+
+  note:
+    type: text
+    content: "pointAt(plate, 0.25)"
+    place:
+      left: top_marker.right + 8
+      centerY: top_marker.centerY
+    anchor: centerLeft
+    meta:
+      fontSize: 4
+      fill: "#334155"

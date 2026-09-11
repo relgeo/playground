@@ -1,0 +1,35 @@
+version: 0.2
+scene:
+  unit: cm
+
+parameters:
+  lp: { default: 72, min: 60, max: 100, step: 1 }
+  lpg: { default: 96, min: 80, max: 120, step: 1 }
+  pr: { default: 60, min: 40, max: 100, step: 1 }
+  tp: { default: 18, min: 15, max: 22, step: 0.5 }
+
+derived:
+  w: "lp / 4 + 3"
+  h: "lpg / 4 + 1"
+
+objects:
+  P1: { type: point, at: [0, 0] }
+  
+  tm: 
+    type: line
+    from: P1
+    direction: down
+    length: pr
+    meta: { stroke: "black", width: 3 }
+  
+  P2: { type: point, on: { segment: [tm.start, tm.end], t: "tp / pr" } }
+  P3: { type: point, at: tm.end }
+  
+  W: { type: point, from: P1, move: { right: w } }
+  H: { type: point, from: P2, move: { right: h } }
+  B: { type: point, from: P3, move: { right: h } }
+
+  l1: { type: line, from: P1, to: W, meta: { stroke: "red", width: 2 } }
+  l2: { type: line, from: W, to: H, meta: { stroke: "red", width: 2 } }
+  l3: { type: line, from: H, to: B, meta: { stroke: "red", width: 2 } }
+  l4: { type: line, from: P3, to: B, meta: { stroke: "black", width: 2 } }

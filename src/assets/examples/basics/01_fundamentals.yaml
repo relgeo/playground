@@ -1,0 +1,73 @@
+version: 0.5
+meta:
+  name: 01. Fundamentals
+  description: An introduction to basic shapes, positioning, anchoring, and clones in the active RelGeo DSL surface.
+
+scene:
+  unit: mm
+  padding: 20
+  autoSize: true
+
+objects:
+  # 1. Absolute Positioning
+  base_rect:
+    type: rect
+    size: [100, 50]
+    place:
+      topLeft: [0, 0]
+    meta:
+      fill: "#e2e8f0"
+      stroke: "#64748b"
+
+  # 2. Relative Positioning (Anchors)
+  attached_circle:
+    type: circle
+    radius: 15
+    center: base_rect.centerRight
+    meta:
+      fill: "#bfdbfe"
+      stroke: "#2563eb"
+
+  # 3. Path & Polygon
+  roof_poly:
+    type: polygon
+    points:
+      - base_rect.topLeft
+      - [base_rect.centerX, base_rect.top - 30]
+      - base_rect.topRight
+    meta:
+      fill: "#fef08a"
+      stroke: "#ca8a04"
+      width: 2
+
+  # 4. Clone and Transform
+  roof_shadow:
+    type: clone
+    of: roof_poly
+    transform:
+      - translate: [5, 5]
+    meta:
+      fill: "rgba(0,0,0,0.1)"
+      stroke: none
+
+  # 5. Dimension
+  width_dim:
+    type: dimension
+    kind: linear
+    from: base_rect.bottomLeft
+    to: base_rect.bottomRight
+    offset: 15
+    text: "Width: {distance}"
+    meta:
+      fontSize: 5
+      stroke: "#475569"
+
+  # 6. Text Label
+  label:
+    type: text
+    content: "RelGeo Basic Shapes"
+    at: [base_rect.centerX, base_rect.bottom + 30]
+    anchor: topCenter
+    meta:
+      fontSize: 6
+      fill: "#1e293b"

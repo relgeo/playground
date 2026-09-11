@@ -1,0 +1,79 @@
+version: 0.2
+meta:
+  name: Clone & Component Demo
+  description: Menampilkan kekuatan fitur clone sebagai resolved virtual group.
+
+scene:
+  unit: mm
+  autoSize: true
+  padding: 100
+
+parameters:
+  chairSize: 400
+  backHeight: 450
+  legThickness: 40
+
+objects:
+  templateKursi:
+    type: group
+    children: [dudukan, sandaran, kakiDepan, kakiBelakang]
+    anchors:
+      tengahDudukan: [50%, 50%]
+      ujungAtas: [50%, 0%]
+
+  dudukan:
+    type: rect
+    size: [chairSize, chairSize]
+    meta: { fill: "#a8a29e" }
+
+  sandaran:
+    type: rect
+    size: [chairSize, backHeight]
+    place: { bottom: dudukan.top, centerX: dudukan.centerX }
+    meta: { fill: "#78716c" }
+
+  kakiDepan:
+    type: rect
+    size: [legThickness, 400]
+    place: { top: dudukan.bottom, left: dudukan.left }
+    meta: { fill: "#444" }
+
+  kakiBelakang:
+    type: rect
+    size: [legThickness, 400]
+    place: { top: dudukan.bottom, right: dudukan.right }
+    meta: { fill: "#444" }
+
+  kursiKiri:
+    type: clone
+    of: templateKursi
+    place: { left: 0, top: 0 }
+
+  kursiTengah:
+    type: clone
+    of: templateKursi
+    place: { left: kursiKiri.right + 200, top: kursiKiri.top }
+    transform:
+      - scale: 0.8
+      - rotate: 15deg
+
+  kursiKanan:
+    type: clone
+    of: templateKursi
+    place: { left: kursiTengah.right + 200, top: kursiKiri.top }
+    transform:
+      - mirror: x
+      - rotate: -10deg
+
+  penanda:
+    type: circle
+    radius: 20
+    place:
+      center: kursiTengah.ujungAtas
+    meta: { fill: "red", label: "Anchor via Clone" }
+
+  garisHubung:
+    type: line
+    from: kursiKiri.tengahDudukan
+    to: kursiKanan.tengahDudukan
+    meta: { stroke: "blue", dash: "5,5" }

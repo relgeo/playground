@@ -1,0 +1,167 @@
+version: "0.3"
+
+# RelGeo v0.3 Showcase: Faceplate / Panel Elektronik
+# Mendemonstrasikan:
+# 1. Path Modifiers (fillet & chamfer)
+# 2. Geometric Queries (area())
+# 3. Parameterisasi Penempatan Komponen (Relative & Expression)
+# 4. Fitur Scene (autoSize & padding) untuk bounding box dinamis
+# 5. Fitur Tipografi (fontSize, fontWeight, dll)
+
+scene:
+  unit: mm
+  autoSize: true
+  padding: 10
+
+parameters:
+  panelWidth: { default: 200, min: 100, max: 400, step: 1, label: "Lebar Panel" }
+  panelHeight: { default: 120, min: 80, max: 300, step: 1, label: "Tinggi Panel" }
+  cornerRadius: { default: 8, min: 0, max: 20, step: 0.5, label: "Radius Sudut" }
+
+constants:
+  mountingMargin: 10
+  mountingHoleRad: 2.5
+  knobRadius: 8
+  knobSpacing: 40
+  displayW: 80
+  displayH: 30
+
+objects:
+  # 1. Main Panel Outline
+  PanelOutline:
+    type: path
+    closed: true
+    points:
+      - [0, 0]
+      - ["panelWidth", 0]
+      - ["panelWidth", "panelHeight"]
+      - [0, "panelHeight"]
+    corner:
+      all:
+        fillet: cornerRadius
+    meta:
+      stroke: "#cbd5e1"
+      fill: "rgba(241, 245, 249, 0.5)"
+      width: 2
+
+  # 2. Mounting Holes (Relasional terhadap anchor PanelOutline)
+  MH_TL:
+    type: circle
+    center: ["PanelOutline.left + mountingMargin", "PanelOutline.top + mountingMargin"]
+    radius: "mountingHoleRad"
+    meta: { stroke: "#ef4444", fill: "#fee2e2" }
+
+  MH_TR:
+    type: circle
+    center: ["PanelOutline.right - mountingMargin", "PanelOutline.top + mountingMargin"]
+    radius: "mountingHoleRad"
+    meta: { stroke: "#ef4444", fill: "#fee2e2" }
+
+  MH_BL:
+    type: circle
+    center: ["PanelOutline.left + mountingMargin", "PanelOutline.bottom - mountingMargin"]
+    radius: "mountingHoleRad"
+    meta: { stroke: "#ef4444", fill: "#fee2e2" }
+
+  MH_BR:
+    type: circle
+    center: ["PanelOutline.right - mountingMargin", "PanelOutline.bottom - mountingMargin"]
+    radius: "mountingHoleRad"
+    meta: { stroke: "#ef4444", fill: "#fee2e2" }
+
+  # 3. Display Cutout
+  # Menggunakan PanelOutline.center.x untuk menjaga posisi di tengah panel
+  DisplayCutout:
+    type: path
+    closed: true
+    points: [[0,0], [displayW, 0], [displayW, displayH], [0, displayH]]
+    place:
+      topCenter: [PanelOutline.center.x, PanelOutline.top + 25]
+    corner:
+      all:
+        chamfer: 4
+    meta:
+      stroke: "#3b82f6"
+      fill: "rgba(59, 130, 246, 0.1)"
+      width: 1.5
+
+  # 4. Potentiometer Knobs
+  # KnobGuideLine diletakkan relatif terhadap bagian bawah DisplayCutout
+  KnobGuideLine:
+    type: line
+    from: [PanelOutline.center.x - knobSpacing, (PanelOutline.bottom + DisplayCutout.bottom) / 2]
+    to: [PanelOutline.center.x + knobSpacing, (PanelOutline.bottom + DisplayCutout.bottom) / 2]
+    meta:
+      stroke: "#94a3b8"
+      dash: "4 4"
+      width: 1
+
+  Knob1:
+    type: circle
+    center: "KnobGuideLine.start"
+    radius: "knobRadius"
+    meta: { stroke: "#10b981", fill: "rgba(16, 185, 129, 0.1)", width: 1.5 }
+
+  Knob2:
+    type: circle
+    center: "KnobGuideLine.center"
+    radius: "knobRadius"
+    meta: { stroke: "#10b981", fill: "rgba(16, 185, 129, 0.1)", width: 1.5 }
+
+  Knob3:
+    type: circle
+    center: "KnobGuideLine.end"
+    radius: "knobRadius"
+    meta: { stroke: "#10b981", fill: "rgba(16, 185, 129, 0.1)", width: 1.5 }
+
+  # Indikator orientasi Knob (Relasional terhadap posisi knob)
+  Knob1_Mark:
+    type: line
+    from: "Knob1.center"
+    to: ["Knob1.center.x + knobRadius * 0.5", "Knob1.center.y - knobRadius"]
+    meta: { stroke: "#059669", width: 2 }
+
+  Knob2_Mark:
+    type: line
+    from: "Knob2.center"
+    to: ["Knob2.center.x", "Knob2.center.y - knobRadius"]
+    meta: { stroke: "#059669", width: 2 }
+
+  Knob3_Mark:
+    type: line
+    from: "Knob3.center"
+    to: ["Knob3.center.x - knobRadius * 0.5", "Knob3.center.y - knobRadius"]
+    meta: { stroke: "#059669", width: 2 }
+
+  # 5. Label Teks
+  Title:
+    type: text
+    content: "RELGEO AUDIO CONTROLLER"
+    anchor: "bottomCenter"
+    at: [PanelOutline.center.x, PanelOutline.top - 20]
+    meta:
+      fontSize: 18
+      fontWeight: "bold"
+      fontFamily: "system-ui, sans-serif"
+      fill: "#1e293b"
+
+  DimensionInfo:
+    type: text
+    content: "Dimensi: {panelWidth}x{panelHeight} mm\nLuas Material: {area(PanelOutline)} mm²"
+    anchor: "centerLeft"
+    at: [PanelOutline.left - 20, PanelOutline.bottom + 20]
+    meta:
+      fontSize: 7
+      fontFamily: "sans-serif"
+      fill: "#64748b"
+      lineHeight: 1.5
+
+  ScaleInfo:
+    type: text
+    content: "SKALA 1:1"
+    anchor: "centerRight"
+    at: [PanelOutline.right + 20, PanelOutline.bottom + 20]
+    meta:
+      fontSize: 7
+      fill: "#64748b"
+      lineHeight: 1.5

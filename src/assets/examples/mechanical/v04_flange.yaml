@@ -1,0 +1,105 @@
+version: "0.5"
+
+scene:
+  unit: mm
+  autoSize: true
+  padding: 20
+
+parameters:
+  bolt_radius: { default: 3, min: 1, max: 6, step: 0.5, label: "Bolt Hole Radius" }
+  bolt_count: { default: 6, min: 3, max: 12, step: 1, label: "Bolt Count" }
+  flange_r: { default: 40, min: 20, max: 80, step: 5, label: "Flange Radius" }
+  shaft_r: { default: 10, min: 5, max: 25, step: 1, label: "Shaft Bore Radius" }
+
+constants:
+  cx: 50
+  cy: 50
+  pcd_ratio: 0.7
+
+objects:
+  # Main flange face
+  flange:
+    type: circle
+    radius: "flange_r"
+    center: ["cx", "cy"]
+    meta:
+      fill: "#f1f5f9"
+      stroke: "#334155"
+      width: 2
+
+  # Shaft bore
+  shaft_bore:
+    type: circle
+    radius: "shaft_r"
+    center: ["cx", "cy"]
+    meta:
+      fill: "#e2e8f0"
+      stroke: "#64748b"
+      width: 1.5
+
+  # PCD reference circle (dashed)
+  pcd_circle:
+    type: circle
+    radius: "flange_r * pcd_ratio"
+    center: ["cx", "cy"]
+    meta:
+      stroke: "#94a3b8"
+      width: 0.5
+      dash: "3 3"
+      fill: none
+
+  # Bolt holes — polar repeat (center given as string expressions)
+  bolt_holes:
+    type: repeat
+    item:
+      type: circle
+      center: item
+      radius: "bolt_radius"
+      meta:
+        fill: white
+        stroke: "#475569"
+        width: 1
+    polar:
+      count: "bolt_count"
+      radius: "flange_r * pcd_ratio"
+      center: ["cx", "cy"]
+
+  # Dimension: flange radius
+  dim_flange:
+    type: dimension
+    kind: radius
+    target: flange
+    meta:
+      stroke: "#334155"
+      fontSize: 5
+
+  # Dimension: shaft bore diameter
+  dim_shaft:
+    type: dimension
+    kind: diameter
+    target: shaft_bore
+    meta:
+      stroke: "#475569"
+      fontSize: 5
+
+  # Annotation callout
+  note_pcd:
+    type: annotation
+    text: "PCD — {bolt_count}x bolt holes"
+    target: pcd_circle
+    leader:
+      from: [50, 22]
+      to: [75, 8]
+    meta:
+      fontSize: 5
+      stroke: "#64748b"
+
+  # Title
+  title:
+    type: text
+    content: "Mechanical Flange — v0.5 Polar Repeat"
+    at: ["cx", "cy + flange_r + 8"]
+    anchor: topCenter
+    meta:
+      fontSize: 7
+      fill: "#1e293b"

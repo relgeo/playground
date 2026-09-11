@@ -1,0 +1,101 @@
+version: "0.3"
+
+# RelGeo v0.3 Showcase
+# Demonstrating: Path Modifiers, Geometric Queries, and Generalized Intersections
+
+constants:
+  margin: 5
+  cornerRad: 10
+
+objects:
+  # 1. Base Geometry
+  C1:
+    type: circle
+    center: [100, 150]
+    radius: 40
+    meta:
+      stroke: "#94a3b8"
+      dash: "4 4"
+  
+  C2:
+    type: circle
+    center: [140, 150]
+    radius: 40
+    meta:
+      stroke: "#94a3b8"
+      dash: "4 4"
+      
+  # 2. Generalized Intersection with Selectors
+  # Find intersection of two circles. 'first' selects top intersection, 'last' selects bottom.
+  TopInt:
+    type: point
+    at: intersection(C1, C2, first)
+    meta:
+      label: "Top"
+  
+  BotInt:
+    type: point
+    at: intersection(C1, C2, last)
+    meta:
+      label: "Bottom"
+      
+  # 3. Reference point for nearest() selector
+  RefPt:
+    type: point
+    at: [300, 150]
+    meta:
+      label: "Ref"
+      
+  # 4. Tangent lines and Arcs
+  OuterLine:
+    type: line
+    from: TopInt
+    to: RefPt
+    meta:
+      stroke: "#38bdf8"
+      
+  # 5. Path Modifiers (Fillet and Chamfer)
+  # A path that utilizes corner modifiers
+  ModPath:
+    type: path
+    closed: true
+    points: [ [50, 250], [250, 250], [250, 350], [50, 350] ]
+    corners:
+      # Apply fillet (rounded corner) to corners 0 and 3
+      0: { fillet: cornerRad }
+      3: { fillet: cornerRad }
+      # Apply chamfer (straight cut) to corner 1
+      1: { chamfer: 15 }
+    meta:
+      stroke: "#f43f5e"
+      fill: "rgba(244, 63, 94, 0.1)"
+      width: 2
+      
+  # 6. Offset Path
+  # Creating a margin around the modified path
+  OffsetPath:
+    type: path
+    offset:
+      from: ModPath
+      distance: margin
+      side: outside
+    meta:
+      stroke: "#a855f7"
+      dash: "2 2"
+      
+  # 7. Geometric Queries
+  # Placing a point at 50% along the path using pointAt()
+  MidPoint:
+    type: point
+    at: pointAt(OuterLine, 0.5)
+    meta:
+      label: "50%"
+
+  # 8. Derived Properties usage
+  InfoBox:
+    type: text
+    content: "Path Area: {area(ModPath)}\nLength: {length(OuterLine)}"
+    place:
+      topLeft: [50, 380]
+    meta:
+      fill: "#64748b"

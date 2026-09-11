@@ -1,0 +1,24 @@
+version: "0.4"
+
+scene:
+  unit: mm
+  autoSize: true
+
+components:
+  test_comp:
+    parameters:
+      width: { default: 100 }
+    derived:
+      half_width: "width / 2"
+      double_width: "width * 2"
+    objects:
+      box:
+        type: rect
+        size: [half_width, double_width]
+
+objects:
+  inst1:
+    type: component
+    use: test_comp
+    params:
+      width: 50

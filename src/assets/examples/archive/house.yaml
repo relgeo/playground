@@ -1,0 +1,55 @@
+version: 0.2
+meta:
+  name: Denah Rumah Sederhana (v0.2)
+  description: Contoh layout menggunakan v0.2 dengan penempatan relatif dan place.inside.
+scene:
+  unit: cm
+
+parameters:
+  lebarTanah: { type: length, default: 8m }
+  panjangTanah: { type: length, default: 12m }
+  lebarBangunan: { type: length, default: 6m }
+
+objects:
+  tanah:
+    type: rect
+    size: [lebarTanah, panjangTanah]
+    meta: { fill: "#f8fafc", stroke: "#cbd5e1" }
+
+  utama:
+    type: rect
+    size: [lebarBangunan, 7m]
+    place: 
+      centerX: tanah.centerX
+      bottom: tanah.bottom - 2m
+    meta: { fill: "#f1f5f9", stroke: "#64748b", width: 2 }
+
+  kamar1:
+    type: rect
+    size: [3m, 3.5m]
+    place: { topLeft: utama.topLeft }
+    meta: { fill: "#e0f2fe", stroke: "#0369a1" }
+
+  kamar2:
+    type: rect
+    size: [3m, 3.5m]
+    place: { topRight: utama.topRight }
+    meta: { fill: "#e0f2fe", stroke: "#0369a1" }
+
+  toilet:
+    type: rect
+    size: [1.5m, 2m]
+    place: { centerX: utama.centerX, top: utama.top }
+    meta: { fill: "#f0fdf4", stroke: "#166534" }
+
+  ruangTamu:
+    type: rect
+    size: [lebarBangunan, 3.5m]
+    place: { left: utama.left, bottom: utama.bottom }
+    meta: { fill: "#fff7ed", stroke: "#9a3412" }
+
+  pintu:
+    type: rect
+    size: [90, 10]
+    place: { centerX: ruangTamu.centerX, bottom: ruangTamu.bottom }
+    meta: { fill: "#451a03" }

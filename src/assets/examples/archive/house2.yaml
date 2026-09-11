@@ -1,0 +1,250 @@
+version: 0.2
+
+scene:
+  unit: cm
+  orientation: y-down
+  autoSize: true
+  padding: 50
+
+parameters:
+  lebarRumah:
+    type: length
+    default: 1200
+
+  tinggiRumah:
+    type: length
+    default: 800
+
+  tebalDinding:
+    type: length
+    default: 15
+
+  marginDalam:
+    type: length
+    default: 20
+
+  lebarPintu:
+    type: length
+    default: 90
+
+  tinggiPintu:
+    type: length
+    default: 210
+
+profiles:
+  kecil:
+    lebarRumah: 900
+    tinggiRumah: 650
+
+  besar:
+    lebarRumah: 1500
+    tinggiRumah: 1000
+
+derived:
+  setengahLebar:
+    value: lebarRumah / 2
+
+  setengahTinggi:
+    value: tinggiRumah / 2
+
+objects:
+
+  tanah:
+    type: rect
+    size: [1800, 1400]
+
+  rumah:
+    type: rect
+    size: [lebarRumah, tinggiRumah]
+
+    place:
+      center: tanah.center
+
+    anchors:
+      pintuUtama: [50%, 100%]
+      tengahAtas: [50%, 0%]
+      tengahKiri: [0, 50%]
+      tengahKanan: [100%, 50%]
+
+    meta:
+      stroke: black
+      fill: none
+
+  ruangTamu:
+    type: rect
+    size: [setengahLebar - 30, 300]
+
+    place:
+      inside: rumah
+      margin: marginDalam
+
+    meta:
+      stroke: blue
+
+  kamar1:
+    type: rect
+    size: [300, 300]
+
+    place:
+      top: ruangTamu.bottom + 20
+      left: rumah.left + marginDalam
+
+    meta:
+      stroke: green
+
+  kamar2:
+    type: rect
+    size: [300, 300]
+
+    place:
+      top: kamar1.top
+      left: kamar1.right + 20
+
+    meta:
+      stroke: green
+
+  dapur:
+    type: rect
+    size: [350, 250]
+
+    place:
+      right: rumah.right - marginDalam
+      bottom: rumah.bottom - marginDalam
+
+    meta:
+      stroke: orange
+
+  mejaMakan:
+    type: circle
+    radius: 60
+
+    place:
+      center: dapur.center
+
+    meta:
+      stroke: brown
+
+  pintuUtamaKiri:
+    type: point
+    from: rumah.pintuUtama
+    move:
+      left: lebarPintu / 2
+
+  pintuUtamaKanan:
+    type: point
+    from: rumah.pintuUtama
+    move:
+      right: lebarPintu / 2
+
+  garisPintu:
+    type: line
+    from: pintuUtamaKiri
+    to: pintuUtamaKanan
+
+  arahBukaan:
+    type: point
+    from: pintuUtamaKiri
+    move:
+      angle: -45deg
+      distance: 120
+
+  arcPintu:
+    type: path
+    points:
+      - pintuUtamaKiri
+      - arahBukaan
+      - pintuUtamaKanan
+
+  garisVertikal:
+    type: line
+    from: rumah.topLeft
+    direction: down
+    length: tinggiRumah
+
+  garisHorizontal:
+    type: line
+    from: rumah.tengahKiri
+    to: rumah.tengahKanan
+
+  titikPotong:
+    type: point
+    at: intersection(garisVertikal, garisHorizontal)
+
+  labelRumah:
+    type: text
+    content: "RUMAH"
+
+    place:
+      centerX: rumah.centerX
+      top: rumah.top - 40
+
+  labelTamu:
+    type: text
+    content: "RUANG TAMU"
+
+    place:
+      center: ruangTamu.center
+
+  labelKamar1:
+    type: text
+    content: "KAMAR 1"
+
+    place:
+      center: kamar1.center
+
+  labelKamar2:
+    type: text
+    content: "KAMAR 2"
+
+    place:
+      center: kamar2.center
+
+  labelDapur:
+    type: text
+    content: "DAPUR"
+
+    place:
+      center: dapur.center
+
+  grid:
+    type: group
+
+    children:
+      - garisGrid1
+      - garisGrid2
+
+    transform:
+      rotate: 5deg
+
+  garisGrid1:
+    type: line
+    from: tanah.topLeft
+    to: tanah.bottomRight
+
+    meta:
+      role: guide
+
+  garisGrid2:
+    type: line
+    from: tanah.topRight
+    to: tanah.bottomLeft
+
+    meta:
+      role: guide
+
+constraints:
+
+  - equal:
+      - kamar1.width
+      - kamar2.width
+
+  - equal:
+      - kamar1.height
+      - kamar2.height
+
+  - parallel:
+      - garisGrid1
+      - garisGrid1
+
+meta:
+  author: "RelGeo Test"

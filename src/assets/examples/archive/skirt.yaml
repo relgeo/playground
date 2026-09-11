@@ -1,0 +1,50 @@
+version: 0.2
+scene:
+  unit: cm
+
+parameters:
+  lingkarPinggang: 72
+  lingkarPanggul: 96
+  panjangRok: 60
+  tinggiPanggul: 18
+profiles:
+  S:
+    lingkarPinggang: 68
+    lingkarPanggul: 92
+  M:
+    lingkarPinggang: 72
+    lingkarPanggul: 96
+  L:
+    lingkarPinggang: 80
+    lingkarPanggul: 104
+
+derived:
+  lebarPinggang: "lingkarPinggang / 4 + 3"
+  lebarPanggul: "lingkarPanggul / 4 + 1"
+
+objects:
+  # Titik-titik Dasar
+  P1: { type: point, at: [0, 0] }
+  
+  # Garis Tengah Muka (menggunakan direction + length)
+  tengahMuka: 
+    type: line
+    from: P1
+    direction: down
+    length: panjangRok
+    meta: { stroke: "black", width: 3 }
+  
+  # Ambil titik-titik dari garis tengah muka
+  P2: { type: point, on: { segment: [tengahMuka.start, tengahMuka.end], t: "tinggiPanggul / panjangRok" } }
+  P3: { type: point, at: tengahMuka.end }
+  
+  # Lebar Pinggang & Panggul
+  W: { type: point, from: P1, move: { right: lebarPinggang } }
+  H: { type: point, from: P2, move: { right: lebarPanggul } }
+  B: { type: point, from: P3, move: { right: lebarPanggul } }
+
+  # Garis Kontur
+  pinggang: { type: line, from: P1, to: W, meta: { stroke: "red", width: 2 } }
+  sisiAtas: { type: line, from: W, to: H, meta: { stroke: "red", width: 2 } }
+  sisiBawah: { type: line, from: H, to: B, meta: { stroke: "red", width: 2 } }
+  bawah: { type: line, from: P3, to: B, meta: { stroke: "black", width: 2 } }

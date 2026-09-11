@@ -1,0 +1,45 @@
+version: 0.2
+scene:
+  unit: cm
+  origin: center
+
+parameters:
+  r1: { type: length, default: 2cm, min: 1cm, max: 5cm, label: "Radius Utama" }
+  r2: { type: length, default: 1cm, min: 0.5cm, max: 3cm, label: "Radius Satelit" }
+  jarak: { type: length, default: 4cm, min: 2cm, max: 8cm, label: "Jarak Antar Pusat" }
+
+objects:
+  pusat:
+    type: point
+    at: origin
+    meta: { visible: false }
+
+  lingkaranUtama:
+    type: circle
+    center: pusat
+    radius: r1
+    meta: { fill: "#f0fdf4", stroke: "#166534", width: 2, label: "Utama" }
+
+  titikSatelit:
+    type: point
+    from: pusat
+    move: { right: jarak }
+    meta: { visible: false }
+
+  lingkaranSatelit:
+    type: circle
+    center: titikSatelit
+    radius: r2
+    meta: { fill: "#eff6ff", stroke: "#1d4ed8", width: 2, label: "Satelit" }
+
+  penghubung:
+    type: line
+    from: lingkaranUtama.center
+    to: lingkaranSatelit.center
+    meta: { stroke: "#94a3b8", dash: "4 4", label: "Relasi" }
+
+  orbit:
+    type: circle
+    center: pusat
+    through: titikSatelit
+    meta: { stroke: "#e20000", dash: "2 2" }

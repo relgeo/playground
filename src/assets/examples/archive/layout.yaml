@@ -1,0 +1,51 @@
+version: 0.2
+scene:
+  unit: px
+  padding: 40
+
+parameters:
+  sidebarWidth: 240
+  headerHeight: 64
+  gap: 16
+
+objects:
+  # Container utama (simulasi layar)
+  screen:
+    type: rect
+    size: [1024, 768]
+    place: { left: 0, top: 0 }
+    meta: { stroke: "#ddd", width: 1 }
+
+  # Sidebar
+  sidebar:
+    type: rect
+    size: [sidebarWidth, "screen.height"]
+    place: { left: 0, top: 0 }
+    meta: { fill: "#f4f4f4", stroke: "#ccc" }
+
+  # Header
+  header:
+    type: rect
+    size: ["screen.width - sidebarWidth - gap", headerHeight]
+    place: { left: "sidebar.right + gap", top: 0 }
+    meta: { fill: "#fff", stroke: "#ccc" }
+
+  # Main Content Area
+  content:
+    type: rect
+    size: ["header.width", "screen.height - headerHeight - gap"]
+    place: { left: "header.left", top: "header.bottom + gap" }
+    meta: { fill: "#fff", stroke: "#ccc" }
+
+  # Kartu-kartu di dalam content (simulasi grid)
+  card1:
+    type: rect
+    size: ["(content.width - gap) / 2", 200]
+    place: { left: "content.left", top: "content.top" }
+    meta: { fill: "#eef", stroke: "#aaf" }
+
+  card2:
+    type: rect
+    size: ["card1.width", "card1.height"]
+    place: { right: "content.right", top: "content.top" }
+    meta: { fill: "#eef", stroke: "#aaf" }

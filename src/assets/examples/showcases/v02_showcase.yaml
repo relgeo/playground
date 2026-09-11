@@ -1,0 +1,108 @@
+version: 0.2
+meta:
+  name: RelGeo v0.2 Delta Showcase
+  description: Menampilkan fitur terbaru v0.2 termasuk Polar Move, Intersection, Path, dan Text.
+
+parameters:
+  radius: 100
+  angle: 45deg
+  clock_time: 10
+
+objects:
+  # 1. Polar Movement
+  center:
+    type: point
+    at: [200, 200]
+  
+  rim:
+    type: circle
+    center: center
+    radius: radius
+  
+  hand_tip:
+    type: point
+    from: center
+    move:
+      angle: angle
+      distance: radius
+  
+  hand_line:
+    type: line
+    from: center
+    to: hand_tip
+
+  # 2. Text Primitive
+  label:
+    type: text
+    at: center
+    content: "RelGeo v0.2"
+
+  # 3. Path Primitive (Polyline)
+  zigzag:
+    type: path
+    points:
+      - [50, 50]
+      - [80, 20]
+      - [110, 50]
+      - [140, 20]
+
+  # 4. Intersection
+  line1:
+    type: line
+    from: [50, 300]
+    to: [300, 350]
+  
+  line2:
+    type: line
+    from: [100, 400]
+    to: [250, 250]
+  
+  intersect_pt:
+    type: point
+    at: intersection(line1, line2)
+  
+  highlight:
+    type: circle
+    center: intersect_pt
+    radius: 5
+
+  # 5. Group Transforms
+  module:
+    type: group
+    children: [rect1, inner_pt]
+    transform:
+      - translate: [350, 50]
+      - rotate:
+          angle: 30deg
+          origin: [0, 0]
+        
+  
+  rect1:
+    type: rect
+    size: [50, 50]
+    place:
+      topLeft: [0, 0]
+  
+  inner_pt:
+    type: point
+    at: [25, 25]
+
+  # 6. External Anchor Access (Transformed)
+  connector:
+    type: line
+    from: [350, 50]
+    to: inner_pt
+
+  # 7. Place Inside
+  box:
+    type: rect
+    size: [100, 100]
+    place: { left: 50, top: 450 }
+  
+  nested:
+    type: rect
+    size: [40, 40]
+    place:
+      inside: box
+      margin: 10
+    meta: { fill: "#f0f", opacity: 0.5 }

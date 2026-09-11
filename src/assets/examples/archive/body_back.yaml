@@ -1,0 +1,68 @@
+version: 0.2
+
+# Pola Dasar Badan Belakang (Parametrik)
+
+scene:
+  unit: cm
+  orientation: y-down
+
+parameters:
+  LB: { default: 92, min: 80, max: 120, step: 1 }      # Lingkar Badan
+  LP: { default: 68, min: 60, max: 100, step: 1 }      # Lingkar Pinggang
+  PP: { default: 38, min: 34, max: 45, step: 0.5 }    # Panjang Punggung
+  PB: { default: 13, min: 10, max: 16, step: 0.5 }    # Panjang Bahu
+  ease: { default: 4, min: 0, max: 10, step: 1 }       # Kelonggaran
+
+derived:
+  quarter: (LB + ease) / 4
+  leher: (LB / 12) # Standar lebar setengah leher belakang
+  turunBahu: 3
+  pinggangBack: (LP / 4) + 3
+  bustLineY: PP * 0.55
+
+objects:
+  O: { type: point, at: origin }
+
+  # Garis tengah belakang
+  centerBack:
+    type: line
+    from: O
+    direction: down
+    length: PP
+    meta: { stroke: "#64748b", width: 2 }
+
+  # Titik-titik utama
+  shoulderNeck:
+    type: point
+    from: O
+    move: { right: leher, up: 1.5 } # Lebar leher belakang
+
+  shoulderTip:
+    type: point
+    from: shoulderNeck
+    move: { right: PB, down: turunBahu } # Bahu dimulai dari leher
+
+  bustPoint:
+    type: point
+    from: O
+    move: { right: quarter, down: bustLineY }
+
+  waistPoint:
+    type: point
+    at: centerBack.end
+
+  sideWaist:
+    type: point
+    from: waistPoint
+    move: { right: pinggangBack }
+
+  # Garis-garis pola
+  neckLine: { type: line, from: O, to: shoulderNeck, meta: { stroke: "red", width: 2 } }
+  shoulderLine: { type: line, from: shoulderNeck, to: shoulderTip, meta: { stroke: "red", width: 3 } }
+  
+  # Kerung Lengan (Armhole) - Sederhana
+  armholeSide: { type: line, from: shoulderTip, to: bustPoint, meta: { stroke: "red", width: 2 } }
+  
+  # Garis Samping & Bawah
+  sideSeam: { type: line, from: bustPoint, to: sideWaist, meta: { stroke: "red", width: 2 } }
+  waistLine: { type: line, from: waistPoint, to: sideWaist, meta: { stroke: "red", width: 2 } }

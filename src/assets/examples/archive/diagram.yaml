@@ -1,0 +1,43 @@
+version: 0.2
+scene:
+  unit: px
+  padding: 50
+
+parameters:
+  boxSize: 120
+  distance: 200
+
+objects:
+  # Box A
+  A:
+    type: rect
+    size: [boxSize, boxSize]
+    place: {top: 0, left: 0}
+    meta: { fill: "#fff", stroke: "#333", width: 2, label: "Node A" }
+
+  # Box B (relatif terhadap A)
+  B:
+    type: rect
+    size: [boxSize, boxSize]
+    place: { left: "A.right + distance", centerY: "A.centerY" }
+    meta: { fill: "#fff", stroke: "#333", width: 2, label: "Node B" }
+
+  # Garis penghubung antar Center
+  koneksi:
+    type: line
+    from: A.center
+    to: B.center
+    meta: { stroke: "#666", width: 1, dash: "5,5" }
+
+  # Titik di tengah koneksi
+  labelPoint:
+    type: point
+    on: { line: koneksi, t: 0.5 }
+    meta: { visible: false }
+
+  # Label di tengah
+  info:
+    type: rect
+    size: [80, 30]
+    place: { center: labelPoint }
+    meta: { fill: "#eee", stroke: "#999", label: "Relasi" }

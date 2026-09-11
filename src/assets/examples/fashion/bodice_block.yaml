@@ -1,0 +1,221 @@
+version: 0.4
+
+scene:
+  unit: cm
+  autoSize: true
+  padding: 5cm
+  origin: top-left
+  orientation: y-down
+
+parameters:
+  # Ukuran Tubuh Standar (Bisa diubah-ubah)
+  lingkar_badan: 84
+  lingkar_pinggang: 66
+  panjang_punggung: 38
+  lebar_punggung: 34
+  lebar_bahu: 12
+  turun_bahu: 3
+
+derived:
+  # Rumus-rumus pembuatan pola
+  lebar_leher: "lingkar_badan / 20 + 2"
+  turun_leher_depan: "lebar_leher + 2"
+  turun_leher_belakang: "2"
+  turun_dada: "panjang_punggung / 2 + 1" 
+  lebar_blok_belakang: "lingkar_badan / 4 - 1"
+  lebar_blok_muka: "lingkar_badan / 4 + 1"
+  kupnat_belakang: "3" # cm
+  jarak_kupnat_belakang: "lingkar_pinggang / 10 + 1"
+
+components:
+  badan_belakang:
+    objects:
+      # Titik-titik utama
+      A: { type: point, at: [0, 0], meta: { role: point } } # Titik Tengkuk
+      B: { type: point, at: [0, turun_dada], meta: { role: hidden } } # Garis Dada
+      C: { type: point, at: [0, panjang_punggung], meta: { role: point } } # Titik Pinggang Tengah Belakang
+      
+      # Garis Tengah Belakang (Center Back)
+      tengah_belakang: 
+        type: line
+        from: A
+        to: C
+        meta: { role: final }
+
+      # Garis Dada
+      D: { type: point, at: [lebar_blok_belakang, turun_dada], meta: { role: point } }
+      garis_dada: { type: line, from: B, to: D, meta: { role: guide } }
+      
+      # Kerung Leher Belakang
+      A1: { type: point, at: [lebar_leher, 0], meta: { role: point } }
+      A2: { type: point, at: [0, turun_leher_belakang], meta: { role: point } }
+      kerung_leher: 
+        type: quadratic
+        from: A1
+        cp: [lebar_leher, turun_leher_belakang]
+        to: A2
+        meta: { role: final }
+      
+      # Garis Bahu
+      A3: { type: point, at: [lebar_bahu, turun_bahu], meta: { role: point } }
+      garis_bahu: 
+        type: line
+        from: A1
+        to: A3
+        meta: { role: final }
+      
+      # Kerung Lengan Belakang
+      D1: { type: point, at: [lebar_punggung / 2, turun_dada / 2], meta: { role: hidden } }
+      kerung_lengan:
+        type: cubic
+        from: A3
+        cp1: [lebar_bahu, turun_dada / 4]
+        cp2: D1
+        to: D
+        meta: { role: final }
+
+      # Pinggang dan Sisi
+      C1: { type: point, at: [(lingkar_pinggang / 4 - 1) + kupnat_belakang, panjang_punggung], meta: { role: point } }
+      garis_pinggang:
+        type: line
+        from: C
+        to: C1
+        meta: { role: final }
+      
+      garis_sisi:
+        type: line
+        from: D
+        to: C1
+        meta: { role: final }
+
+      # Kupnat Belakang
+      K1: { type: point, at: [jarak_kupnat_belakang, panjang_punggung], meta: { role: hidden } }
+      K2: { type: point, at: [jarak_kupnat_belakang + kupnat_belakang, panjang_punggung], meta: { role: hidden } }
+      K_Top: { type: point, at: [jarak_kupnat_belakang + kupnat_belakang / 2, turun_dada + 2], meta: { role: hidden } }
+      
+      kupnat:
+        type: path
+        points:
+          - K1
+          - K_Top
+          - K2
+        meta: { role: final }
+
+      # Label
+      label_cb:
+        type: annotation
+        text: "Tengah Belakang"
+        target: tengah_belakang
+        meta: { fontSize: "14px" }
+
+    exports:
+      batas_kanan: "D.x"
+
+  badan_muka:
+    objects:
+      # Titik-titik utama muka
+      A: { type: point, at: [0, 0], meta: { role: hidden } } 
+      B: { type: point, at: [0, turun_dada], meta: { role: hidden } } 
+      C: { type: point, at: [0, panjang_punggung + 2], meta: { role: point } } 
+      
+      # Garis Tengah Muka (Center Front)
+      tengah_muka: 
+        type: line
+        from: A
+        to: C
+        meta: { role: final }
+
+      # Garis Dada
+      D: { type: point, at: [lebar_blok_muka, turun_dada], meta: { role: point } }
+      garis_dada: { type: line, from: B, to: D, meta: { role: guide } }
+      
+      # Kerung Leher Depan
+      A1: { type: point, at: [lebar_leher, 0], meta: { role: point } }
+      A2: { type: point, at: [0, turun_leher_depan], meta: { role: point } }
+      kerung_leher: 
+        type: cubic
+        from: A1
+        cp1: [lebar_leher, turun_leher_depan * 0.7]
+        cp2: [lebar_leher * 0.7, turun_leher_depan]
+        to: A2
+        meta: { role: final }
+      
+      # Garis Bahu
+      A3: { type: point, at: [lebar_bahu, turun_bahu], meta: { role: point } }
+      garis_bahu: 
+        type: line
+        from: A1
+        to: A3
+        meta: { role: final }
+      
+      # Kerung Lengan Depan
+      D1: { type: point, at: [lebar_punggung / 2 - 1, turun_dada / 2], meta: { role: hidden } }
+      kerung_lengan:
+        type: cubic
+        from: A3
+        cp1: [lebar_bahu, turun_dada / 4]
+        cp2: D1
+        to: D
+        meta: { role: final }
+
+      # Pinggang dan Sisi
+      C1: { type: point, at: [(lingkar_pinggang / 4 + 1) + kupnat_belakang, panjang_punggung + 2], meta: { role: point } }
+      garis_pinggang:
+        type: line
+        from: C
+        to: C1
+        meta: { role: final }
+      
+      garis_sisi:
+        type: line
+        from: D
+        to: C1
+        meta: { role: final }
+
+      # Kupnat Depan
+      K1: { type: point, at: [jarak_kupnat_belakang, panjang_punggung + 2], meta: { role: hidden } }
+      K2: { type: point, at: [jarak_kupnat_belakang + kupnat_belakang, panjang_punggung + 2], meta: { role: hidden } }
+      K_Top: { type: point, at: [jarak_kupnat_belakang + kupnat_belakang / 2, turun_dada + 4], meta: { role: hidden } }
+      
+      kupnat:
+        type: path
+        points:
+          - K1
+          - K_Top
+          - K2
+        meta: { role: final }
+      
+      # Label
+      label_cf:
+        type: annotation
+        text: "Tengah Muka (Lipatan)"
+        target: tengah_muka
+        meta: { fontSize: "14px" }
+
+objects:
+  inst_belakang:
+    type: component
+    use: badan_belakang
+    place: { left: 0, top: 0 }
+    
+  inst_muka:
+    type: component
+    use: badan_muka
+    place: { left: "inst_belakang.batas_kanan + 10", top: 0 }
+
+  semua_pola:
+    type: group
+    children: [inst_belakang, inst_muka]
+
+views:
+  main_view:
+    target: semua_pola
+    scale: 1
+
+sheets:
+  print_layout:
+    size: A1
+    orientation: landscape
+    views:
+      - use: main_view
+        place: { left: 10, top: 10 }

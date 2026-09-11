@@ -1,0 +1,105 @@
+version: 0.5
+meta:
+  name: Electronic Faceplate (CSG)
+  description: A complex mechanical faceplate using Boolean operations, Repeat for ventilation, and Dimensions.
+
+scene:
+  unit: mm
+  padding: 10
+  autoSize: true
+
+parameters:
+  width: { default: 120 }
+  height: { default: 80 }
+  corner_radius: { default: 5 }
+
+objects:
+  # 1. Base Plate Shape
+  base_rect:
+    type: rect
+    size: ["width", "height"]
+    meta: { visible: false }
+
+  # 2. Cutouts (Tools)
+  screen_cutout:
+    type: rect
+    size: [60, 40]
+    place:
+      left: 10
+      centerY: "height / 2"
+    meta: { visible: false }
+
+  button_cutout:
+    type: circle
+    radius: 8
+    place:
+      right: "width - 20"
+      centerY: "height / 2"
+    meta: { visible: false }
+
+  usb_cutout:
+    type: rect
+    size: [12, 6]
+    place:
+      bottom: "height - 5"
+      centerX: "width / 2"
+    meta: { visible: false }
+
+  # 3. Speaker Vent Array
+  speaker_vents:
+    type: repeat
+    item:
+      type: rect
+      size: [2, 10]
+      place:
+        top: 10
+        right: "width - 10"
+      meta: { visible: true, fill: "white", stroke: "#475569" }
+    grid:
+      rows: 1
+      cols: 6
+      gap: 3
+    meta: { visible: true }
+
+  # 4. Perform CSG Boolean Subtraction
+  finished_plate:
+    type: boolean
+    operation: subtract
+    base: base_rect
+    tools: [screen_cutout, button_cutout, usb_cutout]
+    meta:
+      fill: "#e2e8f0"
+      stroke: "#475569"
+      width: 1.5
+
+  # 5. Technical Dimensions
+  dim_w:
+    type: dimension
+    kind: linear
+    from: base_rect.topLeft
+    to: base_rect.topRight
+    offset: -8
+    meta: { fontSize: 4 }
+
+  dim_h:
+    type: dimension
+    kind: linear
+    from: base_rect.bottomRight
+    to: base_rect.topRight
+    offset: 8
+    meta: { fontSize: 4 }
+
+  dim_btn:
+    type: dimension
+    kind: diameter
+    target: button_cutout
+    meta: { fontSize: 4 }
+
+  note_screen:
+    type: annotation
+    target: screen_cutout
+    text: "OLED Display Area"
+    place:
+      bottom: screen_cutout.top - 5
+      centerX: screen_cutout.centerX
+    meta: { fontSize: 4, stroke: "#3b82f6" }

@@ -1,0 +1,34 @@
+version: 0.2
+scene:
+  unit: mm
+
+parameters:
+  tinggiRak: 1800
+  lebarRak: 800
+  tebalKayu: 18
+
+objects:
+  sideL: { type: rect, size: [tebalKayu, tinggiRak], place: { left: 0, top: 0 }, meta: { fill: "#78350f" } }
+  sideR: { type: rect, size: [tebalKayu, tinggiRak], place: { left: "sideL.right + lebarRak", top: sideL.top }, meta: { fill: "#78350f" } }
+  
+  top:
+    type: rect
+    size: ["lebarRak + tebalKayu * 2", tebalKayu]
+    place: { topLeft: sideL.topLeft }
+    meta: { fill: "#92400e" }
+    
+  bottom:
+    type: rect
+    size: ["lebarRak + tebalKayu * 2", tebalKayu]
+    place: { bottomLeft: sideL.bottomLeft }
+    meta: { fill: "#92400e" }
+
+  shelf1: { type: rect, size: [lebarRak, tebalKayu], place: { centerX: "sideL.right + lebarRak/2", centerY: "tinggiRak * 0.25" }, meta: { fill: "#b45309" } }
+  shelf2: { type: rect, size: [lebarRak, tebalKayu], place: { centerX: "sideL.right + lebarRak/2", centerY: "tinggiRak * 0.5" }, meta: { fill: "#b45309" } }
+  shelf3: { type: rect, size: [lebarRak, tebalKayu], place: { centerX: "sideL.right + lebarRak/2", centerY: "tinggiRak * 0.75" }, meta: { fill: "#b45309" } }
+  
+  back:
+    type: rect
+    size: [lebarRak, "tinggiRak - tebalKayu * 2"]
+    place: { centerX: "top.centerX", top: "top.bottom" }
+    meta: { fill: "#d97706", opacity: 0.3 }

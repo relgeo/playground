@@ -1,0 +1,124 @@
+version: 0.5
+meta:
+  name: Full Assembly
+  description: Showcase of Reusable Components, Repeat along Path, and Sheet Composition.
+
+scene:
+  unit: mm
+  padding: 15
+
+components:
+  bolt:
+    parameters:
+      diameter: 5
+      length: 15
+    objects:
+      head:
+        type: circle
+        center: [0, 0]
+        radius: diameter * 1.5
+        meta:
+          fill: "#475569"
+      shaft:
+        type: line
+        from: [0, 0]
+        to: [0, length]
+        meta:
+          width: diameter
+          stroke: "#94a3b8"
+      thread:
+        type: line
+        from: [0, length * 0.2]
+        to: [0, length]
+        meta:
+          role: hidden
+          dash: "2, 1"
+          stroke: "#334155"
+          width: diameter * 0.8
+    exports:
+      centerPoint: head.center
+      tip: shaft.end
+
+objects:
+  plate:
+    type: rect
+    place:
+      center: [0, 0]
+    size: [100, 50]
+    meta:
+      fill: "#f1f5f9"
+      stroke: "#334155"
+      width: 2
+
+  hole_path:
+    type: path
+    points:
+      - [-40, -15]
+      - [40, -15]
+      - [40, 15]
+      - [-40, 15]
+    meta:
+      role: construction
+
+  hole_centers:
+    type: divide
+    target: hole_path
+    count: 6
+
+  bolts:
+    type: repeat
+    each: hole_centers
+    item:
+      type: component
+      use: bolt
+      params:
+        diameter: 4
+        length: 12
+      on:
+        point:
+          at: item
+          anchor: centerPoint
+      transform:
+        - rotate:
+            angle: index * 45deg
+            origin: centerPoint
+      
+  dim_length:
+    type: dimension
+    kind: linear
+    from: plate.topLeft
+    to: plate.topRight
+    offset: -10
+
+  dim_width:
+    type: dimension
+    kind: linear
+    from: plate.topLeft
+    to: plate.bottomLeft
+    offset: 10
+
+  title_text:
+    type: text
+    content: "MAIN ASSEMBLY PLATE"
+    at: [0, 40]
+    anchor: center
+    meta:
+      fontSize: 8
+
+  main_assembly:
+    type: collection
+    children: [plate, hole_path, hole_centers, bolts, dim_length, dim_width, title_text]
+
+views:
+  main_view:
+    target: main_assembly
+    scale: "1:1"
+
+sheets:
+  A4_Layout:
+    size: A4
+    orientation: landscape
+    views:
+      - use: main_view
+        place:
+          center: [148.5, 105]

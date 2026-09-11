@@ -1,0 +1,90 @@
+version: 0.3
+meta:
+  name: Mechanical Faceplate
+  description: Showcase of path holes, corner rounding, and multi-boundary intersection.
+objects:
+  # Outer boundary of the plate
+  plate:
+    type: path
+    segments:
+      - line: { from: [0, 0], to: [160, 0] }
+      - line: { to: [160, 100] }
+      - line: { to: [0, 100] }
+      - line: { to: [0, 0] }
+    closed: true
+    corner:
+      all:
+        fillet: 8
+    holes:
+      # Main cutout for an LCD display (using segments as per spec)
+      - segments:
+          - line: { from: [40, 30], to: [120, 30] }
+          - line: { to: [120, 70] }
+          - line: { to: [40, 70] }
+          - line: { to: [40, 30] }
+      
+      # Cutout for a circular knob (using segments)
+      - segments:
+          - line: { from: [30, 50], to: [30, 50] }
+          - arc: { through: [20, 60], to: [10, 50] }
+          - arc: { through: [20, 40], to: [30, 50] }
+      
+      # Mounting holes (using segments)
+      - segments:
+          - line: { from: [10, 8], to: [10, 8] }
+          - arc: { through: [8, 10], to: [6, 8] }
+          - arc: { through: [8, 6], to: [10, 8] }
+      - segments:
+          - line: { from: [154, 8], to: [154, 8] }
+          - arc: { through: [152, 10], to: [150, 8] }
+          - arc: { through: [152, 6], to: [154, 8] }
+      - segments:
+          - line: { from: [154, 92], to: [154, 92] }
+          - arc: { through: [152, 94], to: [150, 92] }
+          - arc: { through: [152, 90], to: [154, 92] }
+      - segments:
+          - line: { from: [10, 92], to: [10, 92] }
+          - arc: { through: [8, 94], to: [6, 92] }
+          - arc: { through: [8, 90], to: [10, 92] }
+    meta: { fill: "#f3f4f6", stroke: "#374151", width: 2 }
+
+  # Horizontal scanning line to demonstrate intersection with holes
+  scan_h:
+    type: line
+    from: [-10, 50]
+    to: [170, 50]
+    meta: { stroke: "#94a3b8", dash: "4 4" }
+
+  # Vertical scanning line
+  scan_v:
+    type: line
+    from: [80, -10]
+    to: [80, 110]
+    meta: { stroke: "#94a3b8", dash: "4 4" }
+
+  # Intersection points on outer and inner boundaries
+  p1:
+    type: point
+    at: intersection(scan_h, plate, 0)
+  p2:
+    type: point
+    at: intersection(scan_h, plate, 1)
+  p3:
+    type: point
+    at: intersection(scan_h, plate, 2)
+  p4:
+    type: point
+    at: intersection(scan_h, plate, 3)
+  p5:
+    type: point
+    at: intersection(scan_h, plate, 4)
+  p6:
+    type: point
+    at: intersection(scan_h, plate, 5)
+
+  # Text indicators for coordinate display
+  label:
+    type: text
+    at: [80, 20]
+    content: "Relational Diagnostics"
+    meta: { size: 14, weight: 600, family: "Inter" }
