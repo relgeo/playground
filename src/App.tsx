@@ -1,16 +1,9 @@
-import { startTransition, useDeferredValue, useEffect, useRef, useState } from 'react';
+import { lazy, startTransition, Suspense, useDeferredValue, useEffect, useRef, useState } from 'react';
 // import { parseRelGeo, resolveGeometry, renderToSVG } from '@relgeo/core';
 import { DEFAULT_EXAMPLE_KEY, EXAMPLES } from './examples';
 
 // Components
-import { Editor } from './components/Editor';
-import { Preview } from './components/Preview';
-import { Inspector } from './components/Inspector';
 import { Navbar } from './components/Navbar';
-import { Sidebar } from './components/Sidebar';
-import { ProfilesCard } from './components/Sidebar/ProfilesCard';
-import { MetaPresetsCard } from './components/Sidebar/MetaPresetsCard';
-import { ParametersCard } from './components/Sidebar/ParametersCard';
 import {
   getEffectiveSheetId,
   getExportFileName,
@@ -36,11 +29,19 @@ import {
   shouldApplyWorkerResponse,
 } from './worker-sequencing';
 
-import { TECHNICAL_ROLES } from '@relgeo/core';
 import type { RelGeoDocument, ResolvedScene, RelGeoError } from '@relgeo/core';
 
 // Types
 import type { InspectorTab, DragState, ViewMode, SidebarPosition, SidebarPanels, WorkerRequest, WorkerResponse, PreviewLineMode } from './types';
+
+const Editor = lazy(() => import('./components/Editor').then((module) => ({ default: module.Editor })));
+const Preview = lazy(() => import('./components/Preview').then((module) => ({ default: module.Preview })));
+const Inspector = lazy(() => import('./components/Inspector').then((module) => ({ default: module.Inspector })));
+const Sidebar = lazy(() => import('./components/Sidebar').then((module) => ({ default: module.Sidebar })));
+const ProfilesCard = lazy(() => import('./components/Sidebar/ProfilesCard').then((module) => ({ default: module.ProfilesCard })));
+const MetaPresetsCard = lazy(() => import('./components/Sidebar/MetaPresetsCard').then((module) => ({ default: module.MetaPresetsCard })));
+const ParametersCard = lazy(() => import('./components/Sidebar/ParametersCard').then((module) => ({ default: module.ParametersCard })));
+const LayersCard = lazy(() => import('./components/Sidebar/LayersCard').then((module) => ({ default: module.LayersCard })));
 
 const DEFAULT_HIDDEN_ROLES = new Set<string>(['construction']);
 const MIN_PREVIEW_ZOOM = 0.01;
@@ -458,6 +459,7 @@ function App() {
       />
 
       <div className={`main-area ${sidebarPosition === 'right' ? 'sidebar-right' : ''}`}>
+        <Suspense fallback={<aside className="sidebar component-loading" role="status">Loading sidebar…</aside>}>
         <Sidebar
           visible={sidebarVisible}
           position={sidebarPosition}
@@ -472,28 +474,35 @@ function App() {
         >
           {{
             profiles: (
-              <ProfilesCard
-                doc={displayDoc}
-                selectedProfile={selectedProfile}
-                setSelectedProfile={setSelectedProfile}
-                setParamOverrides={setParamOverrides}
-              />
+              <Suspense fallback={<div className="component-loading" role="status">Loading profiles…</div>}>
+                <ProfilesCard
+                  doc={displayDoc}
+                  selectedProfile={selectedProfile}
+                  setSelectedProfile={setSelectedProfile}
+                  setParamOverrides={setParamOverrides}
+                />
+              </Suspense>
             ),
             parameters: (
-              <ParametersCard
-                doc={displayDoc}
-                paramOverrides={paramOverrides}
-                onParamChange={handleParamChange}
-                onReset={() => setParamOverrides({})}
-                collapsed={false}
-                setCollapsed={() => {}}
-                resolvedValues={displayResolvedData?.values ?? {}}
-              />
+              <Suspense fallback={<div className="component-loading" role="status">Loading parameters…</div>}>
+                <ParametersCard
+                  doc={displayDoc}
+                  paramOverrides={paramOverrides}
+                  onParamChange={handleParamChange}
+                  onReset={() => setParamOverrides({})}
+                  collapsed={false}
+                  setCollapsed={() => {}}
+                  resolvedValues={displayResolvedData?.values ?? {}}
+                />
+              </Suspense>
             ),
             metaPresets: (
-              <MetaPresetsCard doc={displayDoc} />
+              <Suspense fallback={<div className="component-loading" role="status">Loading presets…</div>}>
+                <MetaPresetsCard doc={displayDoc} />
+              </Suspense>
             ),
             inspector: (
+              <Suspense fallback={<div className="component-loading" role="status">Loading inspector…</div>}>
               <Inspector
                 tab={inspectorTab}
                 setTab={setInspectorTab}
@@ -509,28 +518,16 @@ function App() {
                 onSelectObject={setSelectedObjectId}
                 onJumpToLine={handleJumpToLine}
               />
+              </Suspense>
             ),
             layers: (
-              <div style={{ padding: '0.75rem' }}>
-                {TECHNICAL_ROLES.map(role => (
-                  <label key={role} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', fontSize: '13px' }}>
-                    <input
-                      type="checkbox"
-                      checked={!hiddenRoles.has(role)}
-                      onChange={(e) => {
-                        const newHidden = new Set(hiddenRoles);
-                        if (e.target.checked) newHidden.delete(role);
-                        else newHidden.add(role);
-                        setHiddenRoles(newHidden);
-                      }}
-                    />
-                    {role.charAt(0).toUpperCase() + role.slice(1)}
-                  </label>
-                ))}
-              </div>
+              <Suspense fallback={<div className="component-loading" role="status">Loading layers…</div>}>
+                <LayersCard hiddenRoles={hiddenRoles} setHiddenRoles={setHiddenRoles} />
+              </Suspense>
             )
           }}
         </Sidebar>
+        </Suspense>
 
         <div className={`workspace-split ${viewMode === 'split-v' ? 'is-vertical' : ''}`}>
           {viewMode !== 'preview-only' && (
@@ -538,7 +535,9 @@ function App() {
               className="split-panel editor-side" 
               style={{ flex: viewMode === 'editor-only' ? '1 1 0%' : `0 0 ${splitRatio}%` }}
             >
-              <Editor code={code} onChange={setCode} editorRef={editorRef} />
+              <Suspense fallback={<div className="editor-loading" role="status">Loading editor…</div>}>
+                <Editor code={code} onChange={setCode} editorRef={editorRef} />
+              </Suspense>
             </div>
           )}
 
@@ -554,6 +553,7 @@ function App() {
               className="split-panel preview-side" 
               style={{ flex: viewMode === 'preview-only' ? '1 1 0%' : '1 1 0%' }}
             >
+              <Suspense fallback={<div className="component-loading" role="status">Loading preview…</div>}>
               <Preview
                 svgContent={displaySvgContent}
                 zoom={zoom}
@@ -593,6 +593,7 @@ function App() {
                 selectedObjectId={visibleSelectedObjectId}
                 onSelectObject={setSelectedObjectId}
               />
+              </Suspense>
             </div>
           )}
         </div>

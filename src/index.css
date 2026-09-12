@@ -199,6 +199,24 @@ button:disabled {
   position: relative;
 }
 
+.editor-loading {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  color: var(--muted);
+  background: linear-gradient(180deg, rgba(255, 251, 245, 0.95), rgba(249, 244, 235, 0.95));
+  font-size: 0.82rem;
+}
+
+.component-loading {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  color: var(--muted);
+  background: rgba(255, 250, 242, 0.68);
+  font-size: 0.82rem;
+}
+
 .split-resizer {
   background: var(--line);
   z-index: 10;
