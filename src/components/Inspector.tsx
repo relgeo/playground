@@ -423,13 +423,14 @@ export function Inspector({
                 <span style={{ ...labelStyle, fontSize: '0.68rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>IDs (Click to drill down)</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2rem' }}>
                   {children.slice(0, 16).map((cid: string) => (
-                    <code 
+                    <button
+                      type="button"
                       key={cid} 
                       onClick={() => toggleExpand(cid)}
-                      style={{ fontSize: '0.64rem', background: 'var(--brand-soft)', color: 'var(--brand)', padding: '0.1rem 0.3rem', borderRadius: '3px', cursor: 'pointer', fontWeight: 'bold' }}
+                      style={{ fontSize: '0.64rem', fontFamily: 'var(--font-mono)', background: 'var(--brand-soft)', color: 'var(--brand)', padding: '0.1rem 0.3rem', borderRadius: '3px', border: 0, cursor: 'pointer', fontWeight: 'bold' }}
                     >
                       {cid}
-                    </code>
+                    </button>
                   ))}
                   {children.length > 16 && <code style={{ fontSize: '0.64rem', color: 'var(--muted)' }}>+{children.length - 16} more</code>}
                 </div>
@@ -456,13 +457,14 @@ export function Inspector({
                 <span style={{ ...labelStyle, fontSize: '0.68rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>Children (Click to drill down)</span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2rem' }}>
                   {compChildren.map((cid: string) => (
-                    <code 
+                    <button
+                      type="button"
                       key={cid} 
                       onClick={() => toggleExpand(cid)}
-                      style={{ fontSize: '0.64rem', background: 'var(--brand-soft)', color: 'var(--brand)', padding: '0.1rem 0.3rem', borderRadius: '3px', cursor: 'pointer', fontWeight: 'bold' }}
+                      style={{ fontSize: '0.64rem', fontFamily: 'var(--font-mono)', background: 'var(--brand-soft)', color: 'var(--brand)', padding: '0.1rem 0.3rem', borderRadius: '3px', border: 0, cursor: 'pointer', fontWeight: 'bold' }}
                     >
                       {cid.replace(`${obj.id}.`, '')}
-                    </code>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -643,7 +645,19 @@ export function Inspector({
               }}
             >
               {/* Header Card */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => toggleExpand(id)}>
+              <div
+                role="button"
+                tabIndex={0}
+                aria-label={`${isExpanded ? 'Collapse' : 'Expand'} and select object ${id}`}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                onClick={() => toggleExpand(id)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggleExpand(id);
+                  }
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <button
                     type="button"

@@ -148,7 +148,8 @@ export function ParametersCard({
     <div className="parameters-list">
       {hasOverrides && onReset && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
-          <button 
+          <button
+            type="button"
             className="action-button secondary" 
             onClick={onReset}
             style={{ fontSize: '11px', padding: '2px 8px' }}

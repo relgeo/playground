@@ -291,7 +291,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Sidebar headers menjadi disclosure controls semantic.
 - [x] Split/sidebar resizer menjadi keyboard-accessible separator; preset layout masih tersisa.
 - [ ] Inspector search, count, selected-only filter, dan generated-object grouping sudah ada; selection preview/inspector/graph ke source definition sudah tersambung, sedangkan related-object synchronization dan cross-surface collapse behavior masih tersisa.
-- [ ] Sinkronkan selection preview ↔ inspector ↔ graph ↔ code definition.
+- [x] Sinkronkan selection preview ↔ inspector ↔ graph ↔ code definition untuk object yang dipilih langsung; related-object synchronization masih tersisa.
 - [ ] Jadikan seluruh error summary/actions keyboard-accessible dan `role=alert`.
 - [x] Inspector tabs memiliki tablist/tab/tabpanel semantics.
 - [x] Graph node dapat difokuskan, diberi nama, dan dipilih dengan Enter/Space; graph focus/filter masih tersisa.
@@ -369,13 +369,14 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U08 — selection dari preview, inspector, dan graph kini memusatkan source definition di editor; related-object synchronization masih tersisa.
 - [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
 - [x] U09 — error preview/error tab meneruskan error code, punya tombol ke source bila ada object id atau path, dan recovery ke draft sukses terakhir bila fallback tersedia.
+- [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
 - [x] U14 — toolbar groups diberi semantic label; konsolidasi visual dan pengurangan duplikasi masih tersisa.
 
 ### Batch berikutnya yang sebagian sudah diterapkan
 
 - [ ] U08 — inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, dan source jump lintas surface; related-object synchronization serta grouping lanjutan masih belum.
 - [ ] U09 — first-error umum dan recovery saat belum ada draft sukses sebelumnya masih belum; error path dan recovery ke draft sukses terakhir sudah tersedia setelah fallback terbentuk.
-- [ ] U11 — audit seluruh control, termasuk affordance yang belum disentuh, masih perlu.
+- [ ] U11 — sebagian besar control utama sudah diaudit; audit seluruh affordance dan verifikasi real screen reader masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
