@@ -309,7 +309,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Phase 4 — Verification dan release gate
 
-- [ ] Jalankan typecheck, lint, unit test, dan production build.
+- [x] Jalankan typecheck, lint, unit test, dan production build.
 - [ ] Uji keyboard traversal penuh untuk navbar, editor, preview, sidebar, inspector, graph, error, dan dialog.
 - [ ] Uji AX names, roles, expanded/selected/pressed/value states, dan alert announcements.
 - [x] Tambahkan reduced-motion rule; verifikasi recording/computed style masih perlu dilakukan.
@@ -365,12 +365,14 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U10 — graph nodes memiliki role, accessible name, dan keyboard activation.
 - [x] U11 — Navbar, preview toggles, dan inspector tabs memiliki state semantics pada bagian yang sudah disentuh.
 - [x] U17 — empty state fluid dan tidak lagi memaksa minimum 400px.
+- [x] U09 — error preview memiliki alert semantics dan tombol langsung ke source untuk error yang memiliki object id.
+- [x] U14 — toolbar groups diberi semantic label; konsolidasi visual dan pengurangan duplikasi masih tersisa.
 
 ### Batch berikutnya yang sebagian sudah diterapkan
 
 - [ ] U08 — inspector sekarang memiliki search, jumlah hasil, dan selected-only filter; grouping dan sinkronisasi lanjutan belum.
-- [ ] U09 — error banner/tab memakai alert semantics dan action buttons; first-error recovery serta seluruh error affordance belum.
-- [ ] U11 — state semantics sudah diterapkan pada Navbar, preview toggles, dan inspector tabs; audit seluruh control masih perlu.
+- [ ] U09 — first-error umum dan recovery untuk error tanpa object id belum.
+- [ ] U11 — audit seluruh control, termasuk affordance yang belum disentuh, masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
@@ -380,9 +382,9 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Belum dikerjakan
 
-- [ ] U01 — camera fit/recenter dan first-run framing.
+- [ ] U01 — camera fit/recenter untuk seluruh sheet dan frame ekstrem.
 - [ ] U02 — konsolidasi toolbar dan kepadatan desktop.
-- [ ] U08 — inspector search/group/filter.
+- [ ] U08 — inspector grouping dan sinkronisasi preview/source/graph.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
 - [ ] U18–U21 — CSS cleanup, persistence disclosure, README license, dan graph focus/legend.
 - [ ] Uji handset fisik.
