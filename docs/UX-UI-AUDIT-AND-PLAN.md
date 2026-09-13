@@ -381,6 +381,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U09 — error preview/error tab meneruskan error code, punya tombol ke source bila ada object id atau path, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
 - [x] U11 — object card Inspector tidak lagi memakai `div role="button"` yang membungkus button lain; chevron, nama object, dan source jump kini menjadi kontrol sibling yang semantik.
+- [x] U11/U13 — baseline token CSS untuk radius control/card/pill, round control, dan focus ring sudah ditambahkan; tokenisasi spacing/type/elevation secara menyeluruh masih terbuka.
 - [x] U11 — tab Inspector memakai roving `tabIndex`, navigasi Arrow/Home/End, dan memindahkan fokus ke tab aktif.
 - [x] U08/U11 — clear selection mengembalikan daftar object penuh; Escape membersihkan selection dan menutup mobile drawer lebih dulu.
 - [x] U08 — group inspector dapat di-collapse, generated group default tertutup, dan group selection otomatis dibuka serta di-scroll ke object terkait.
