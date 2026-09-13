@@ -383,6 +383,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U08/U11 — clear selection mengembalikan daftar object penuh; Escape membersihkan selection dan menutup mobile drawer lebih dulu.
 - [x] U08 — group inspector dapat di-collapse, generated group default tertutup, dan group selection otomatis dibuka serta di-scroll ke object terkait.
 - [x] U08 — detail object menampilkan dependency/dependent yang tersedia; related object dapat dipilih untuk navigasi inspector dan source definition.
+- [x] U09/U11 — toggle disclosure pada Inspector tidak lagi crash saat React event sudah tidak memiliki `currentTarget`; state `open` ditangkap sebelum state updater dijalankan dan browser mount/toggle sudah terverifikasi.
 - [x] U02 — aksi sekunder source dan sidebar placement dipindahkan ke menu More; kepadatan toolbar global pada 1024px masih perlu verifikasi.
 - [x] U14 — toolbar preview kini dipisah menjadi kelompok overlay dan line rendering serta wrap aman di mobile; pemisahan global-vs-contextual dan pengurangan duplikasi masih tersisa.
 

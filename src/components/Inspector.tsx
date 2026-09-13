@@ -671,9 +671,10 @@ export function Inspector({
             open={groupIsForcedOpen || !groupIsCollapsed}
             onToggle={(event) => {
               if (groupIsForcedOpen) return;
+              const isOpen = event.currentTarget.open;
               setCollapsedGroups((prev) => ({
                 ...prev,
-                [group]: !event.currentTarget.open,
+                [group]: !isOpen,
               }));
             }}
             className="inspector-object-group"
