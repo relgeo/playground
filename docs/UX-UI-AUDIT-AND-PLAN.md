@@ -376,6 +376,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U09 — tab Errors menampilkan jumlah diagnostics dan tombol Go to first error menuju object atau path pertama yang actionable.
 - [x] U11 — icon controls Navbar memiliki button type/label, zoom diumumkan saat berubah, dan profile/example controls menyatakan pressed/expanded state.
 - [x] U18 — menu More menjelaskan modified draft, penyimpanan lokal browser, dan bahwa share link membawa source melalui URL hash.
+- [x] U02 — Navbar memiliki mode compact pada viewport menengah: selector menyusut dengan ellipsis, status detail diringkas, dan preview controls dapat discroll tanpa menghilangkan fungsi.
 - [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
 - [x] U09 — error preview/error tab meneruskan error code, punya tombol ke source bila ada object id atau path, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
@@ -400,7 +401,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 ### Belum dikerjakan
 
 - [ ] U01 — verifikasi camera fit/recenter untuk seluruh sheet, frame ekstrem nyata, resize viewport, dan handset.
-- [ ] U02 — konsolidasi toolbar global dan verifikasi kepadatan desktop 1024px; aksi sekunder sudah dipindahkan ke menu More.
+- [ ] U02 — verifikasi visual kepadatan desktop 1024px setelah mode compact; aksi sekunder sudah dipindahkan ke menu More.
 - [ ] U08 — advanced generated-object grouping dan opsi kedalaman relasi yang lebih eksplisit.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
 - [ ] U18–U21 — CSS cleanup dan README license.

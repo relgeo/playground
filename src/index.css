@@ -1406,6 +1406,66 @@ input[type='range'] {
     flex-wrap: wrap;
     justify-content: flex-end;
   }
+
+  .navbar {
+    gap: 0.45rem;
+    padding-inline: 0.65rem;
+  }
+
+  .navbar-left,
+  .navbar-center,
+  .navbar-right {
+    min-width: 0;
+    gap: 0.45rem;
+  }
+
+  .navbar-left {
+    flex: 1 1 19rem;
+  }
+
+  .navbar-left .example-select {
+    width: 8.5rem !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .navbar-left .sheet-select {
+    width: 7.5rem !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .navbar-center {
+    flex: 1 1 auto;
+  }
+
+  .navbar-center .status-indicator {
+    min-width: 0;
+    max-width: 8rem;
+  }
+
+  .navbar-center .status-indicator span:last-child {
+    display: none;
+  }
+
+  .navbar-center > .control-group {
+    min-width: 0;
+    max-width: min(33vw, 25rem);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .navbar-center > .control-group::-webkit-scrollbar {
+    display: none;
+  }
+
+  .navbar-right .navbar-layout-group {
+    gap: 0;
+  }
+
+  .navbar-right .navbar-layout-group button {
+    padding-inline: 0.38rem;
+  }
 }
 
 @media (max-width: 940px) {
