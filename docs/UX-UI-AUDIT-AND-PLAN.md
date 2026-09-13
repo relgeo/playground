@@ -317,6 +317,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [x] Jalankan typecheck, lint, unit test, dan production build.
 - [x] Browser smoke pada viewport aktif 1280×720 tidak menemukan horizontal overflow; audit DOM terhadap 196 control terlihat menemukan nama/label pada seluruh control.
+- [x] Keyboard smoke pada viewport aktif 812×667: drawer sidebar mempertahankan fokus sampai ditutup, lalu 90 Tab stops workspace yang terobservasi seluruhnya terlihat dan bernama; kontrol layout desktop yang tersembunyi tidak masuk Tab order.
 - [ ] Uji keyboard traversal penuh untuk navbar, editor, preview, sidebar, inspector, graph, error, dan dialog.
 - [ ] Uji AX names, roles, expanded/selected/pressed/value states, dan alert announcements.
 - [x] Tambahkan reduced-motion rule; verifikasi recording/computed style masih perlu dilakukan.
@@ -419,11 +420,11 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [x] U08 — Inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, related-object highlight lintas surface, dan Related depth 1/2/3 levels.
 - [ ] U09 — audit seluruh clickable affordance dan diagnostics tanpa target source masih belum; first-error actionable, recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia.
-- [ ] U11 — control utama dan state yang tersentuh sudah diaudit, termasuk roving focus pada graph; inventaris seluruh affordance dan verifikasi real screen reader masih perlu.
+- [ ] U11 — control utama, state yang tersentuh, drawer focus trap, dan roving focus graph sudah diaudit di browser; inventaris seluruh affordance dan verifikasi real screen reader masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
-- [ ] U03 — responsive CSS, surface switch, dan drawer/sidebar mobile sudah ditambahkan serta gate teknis lulus; viewport matrix dan touch nyata belum selesai.
+- [ ] U03 — responsive CSS, surface switch, dan drawer/sidebar mobile sudah ditambahkan serta gate teknis lulus; viewport 812×667 sudah di-smoke-test tanpa overflow, tetapi viewport matrix dan touch nyata belum selesai.
 - [ ] U09 — alert/error actions, error code/path, fallback restore, reset tanpa fallback, dan first-error actionable sudah tersedia; seluruh clickable affordance dan diagnostics tanpa target source belum selesai.
 - [ ] U12 — `touch-action` sudah diperlonggar, tetapi gesture contract belum diuji pada touch nyata.
 
