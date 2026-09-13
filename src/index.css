@@ -1122,6 +1122,48 @@ input[type='range'] {
   color: var(--brand);
 }
 
+.inspector-related-objects {
+  margin-top: 0.5rem;
+  padding-top: 0.45rem;
+  border-top: 1px dashed var(--line);
+}
+
+.inspector-related-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.inspector-related-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.inspector-related-list button {
+  max-width: 100%;
+  padding: 0.16rem 0.3rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inspector-related-list button:hover {
+  background: var(--panel-strong);
+  transform: none;
+  box-shadow: none;
+}
+
 .inspector-code {
   flex: 1;
   margin: 0;

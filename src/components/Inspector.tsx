@@ -1,6 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { ICONS } from './Icons';
 import type { InspectorTab } from '../types';
+import { getDependencyGraph } from '@relgeo/core';
 import type { RelGeoDocument, ResolvedScene, RelGeoError, ResolvedObject, PathResolvedSegment, ConstraintViolation } from '@relgeo/core';
 import { getClosedShapeMetricLabel } from '../inspector-helpers';
 
@@ -603,6 +604,19 @@ export function Inspector({
       groupEntries.push(entry);
       groupedEntries.set(group, groupEntries);
     }
+    const dependencyGraph = doc?.objects ? getDependencyGraph(doc.objects) : [];
+    const getRelatedObjectIds = (objectId: string): string[] => {
+      const baseObjectId = objectId.split('[')[0];
+      const graphObjectId = dependencyGraph.some((item) => item.id === objectId)
+        ? objectId
+        : baseObjectId;
+      const dependencies = dependencyGraph.find((item) => item.id === graphObjectId)?.deps ?? [];
+      const dependents = dependencyGraph
+        .filter((item) => item.deps.includes(graphObjectId))
+        .map((item) => item.id);
+      return Array.from(new Set([...dependencies, ...dependents]))
+        .filter((relatedId) => relatedId !== graphObjectId && rData.objects[relatedId]);
+    };
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
@@ -674,6 +688,7 @@ export function Inspector({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '0.35rem' }}>
         {entries.map(([id, obj]: [string, ResolvedObject]) => {
           const isExpanded = !!expandedObjects[id];
+          const relatedObjectIds = getRelatedObjectIds(id);
           return (
             <div
               key={id}
@@ -790,6 +805,23 @@ export function Inspector({
                                   : '?'}
                             </span>
                           </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {relatedObjectIds.length > 0 && (
+                    <div className="inspector-related-objects">
+                      <span className="inspector-related-label">Related objects</span>
+                      <div className="inspector-related-list">
+                        {relatedObjectIds.map((relatedId) => (
+                          <button
+                            key={relatedId}
+                            type="button"
+                            onClick={() => handleJump(relatedId)}
+                            aria-label={`Select related object ${relatedId}`}
+                          >
+                            {relatedId}
+                          </button>
                         ))}
                       </div>
                     </div>

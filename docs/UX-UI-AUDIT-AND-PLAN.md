@@ -290,7 +290,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [x] Sidebar headers menjadi disclosure controls semantic.
 - [x] Split/sidebar resizer menjadi keyboard-accessible separator; preset layout masih tersisa.
-- [ ] Inspector search, count, selected-only filter, generated-object grouping, dan cross-surface collapse behavior sudah ada; selection preview/inspector/graph ke source definition sudah tersambung, sedangkan related-object synchronization dan grouping lanjutan masih tersisa.
+- [ ] Inspector search, count, selected-only filter, generated-object grouping, cross-surface collapse behavior, dan related-object navigation sudah ada; automatic related-object selection/highlight dan grouping lanjutan masih tersisa.
 - [x] Sinkronkan selection preview ↔ inspector ↔ graph ↔ code definition untuk object yang dipilih langsung; related-object synchronization masih tersisa.
 - [ ] Jadikan seluruh error summary/actions keyboard-accessible dan `role=alert`.
 - [x] Inspector tabs memiliki tablist/tab/tabpanel semantics.
@@ -372,6 +372,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
 - [x] U08/U11 — clear selection mengembalikan daftar object penuh; Escape membersihkan selection dan menutup mobile drawer lebih dulu.
 - [x] U08 — group inspector dapat di-collapse, generated group default tertutup, dan group selection otomatis dibuka serta di-scroll ke object terkait.
+- [x] U08 — detail object menampilkan dependency/dependent yang tersedia; related object dapat dipilih untuk navigasi inspector dan source definition.
 - [x] U02 — aksi sekunder source dan sidebar placement dipindahkan ke menu More; kepadatan toolbar global pada 1024px masih perlu verifikasi.
 - [x] U14 — toolbar preview kini dipisah menjadi kelompok overlay dan line rendering serta wrap aman di mobile; pemisahan global-vs-contextual dan pengurangan duplikasi masih tersisa.
 
@@ -391,7 +392,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [ ] U01 — camera fit/recenter untuk seluruh sheet dan frame ekstrem.
 - [ ] U02 — konsolidasi toolbar global dan verifikasi kepadatan desktop 1024px; aksi sekunder sudah dipindahkan ke menu More.
-- [ ] U08 — related-object synchronization dan grouping lanjutan.
+- [ ] U08 — automatic related-object selection/highlight dan grouping lanjutan.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
 - [ ] U18–U21 — CSS cleanup, persistence disclosure, README license, dan graph focus/legend.
 - [ ] Uji handset fisik.
