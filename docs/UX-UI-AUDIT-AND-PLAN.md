@@ -277,7 +277,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Phase 1 — Unblock daily loop
 
-- [ ] Perbaiki camera fit/recenter; gambar default langsung terlihat.
+- [x] Verifikasi camera fit/recenter pada default model desktop; gambar tampil utuh dan terpusat setelah resolve. Multi-sheet/mobile masih perlu matrix test.
 - [ ] Pisahkan global controls dan preview contextual controls.
 - [ ] Pastikan example selector tidak memotong nama penting.
 - [x] Status utama diberi `role=status` dan live announcement.
@@ -290,7 +290,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [x] Sidebar headers menjadi disclosure controls semantic.
 - [x] Split/sidebar resizer menjadi keyboard-accessible separator; preset layout masih tersisa.
-- [ ] Tambahkan inspector search, grouping, count, selected/related filter, dan collapse behavior.
+- [ ] Inspector search, count, dan selected-only filter sudah ada; grouping, selected/related synchronization, dan collapse behavior masih tersisa.
 - [ ] Sinkronkan selection preview ↔ inspector ↔ graph ↔ code definition.
 - [ ] Jadikan seluruh error summary/actions keyboard-accessible dan `role=alert`.
 - [x] Inspector tabs memiliki tablist/tab/tabpanel semantics.
@@ -357,6 +357,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Selesai pada batch implementasi saat ini
 
+- [x] U01 — default model desktop terverifikasi tampil terpusat setelah resolve; pengujian semua frame masih tersisa.
 - [x] U04 — sidebar panel headers menjadi disclosure semantic.
 - [x] U05 — split/sidebar resizer memiliki separator semantics dan keyboard adjustment.
 - [x] U06 — reduced-motion override tersedia.
@@ -364,6 +365,12 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U10 — graph nodes memiliki role, accessible name, dan keyboard activation.
 - [x] U11 — Navbar, preview toggles, dan inspector tabs memiliki state semantics pada bagian yang sudah disentuh.
 - [x] U17 — empty state fluid dan tidak lagi memaksa minimum 400px.
+
+### Batch berikutnya yang sebagian sudah diterapkan
+
+- [ ] U08 — inspector sekarang memiliki search, jumlah hasil, dan selected-only filter; grouping dan sinkronisasi lanjutan belum.
+- [ ] U09 — error banner/tab memakai alert semantics dan action buttons; first-error recovery serta seluruh error affordance belum.
+- [ ] U11 — state semantics sudah diterapkan pada Navbar, preview toggles, dan inspector tabs; audit seluruh control masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 

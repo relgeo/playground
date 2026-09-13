@@ -38,6 +38,8 @@ export function Inspector({
   onJumpToLine,
 }: InspectorProps) {
   const [expandedObjects, setExpandedObjects] = useState<Record<string, boolean>>({});
+  const [objectQuery, setObjectQuery] = useState('');
+  const [showSelectedOnly, setShowSelectedOnly] = useState(false);
 
   const toggleExpand = (objectId: string) => {
     onSelectObject?.(objectId);
@@ -564,9 +566,45 @@ export function Inspector({
       );
     }
 
+    const normalizedQuery = objectQuery.trim().toLowerCase();
+    const objectEntries = (Object.entries(rData.objects) as [string, ResolvedObject][]).filter(([id, obj]) => {
+      const matchesQuery = !normalizedQuery
+        || id.toLowerCase().includes(normalizedQuery)
+        || obj.type.toLowerCase().includes(normalizedQuery);
+      const matchesSelection = !showSelectedOnly || id === selectedObjectId;
+      return matchesQuery && matchesSelection;
+    });
+
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', overflowY: 'auto', flex: 1, paddingRight: '2px' }}>
-        {Object.entries(rData.objects).map(([id, obj]: [string, ResolvedObject]) => {
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
+        <div className="inspector-filter" style={{ display: 'grid', gap: '0.4rem', padding: '0 0 0.65rem' }}>
+          <label htmlFor="inspector-object-filter" style={{ fontSize: '0.68rem', color: 'var(--muted)', fontWeight: 700 }}>
+            Find object
+          </label>
+          <input
+            id="inspector-object-filter"
+            type="search"
+            value={objectQuery}
+            onChange={(event) => setObjectQuery(event.target.value)}
+            placeholder="Name or type…"
+            aria-label="Find object by name or type"
+            style={{ width: '100%', minWidth: 0 }}
+          />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.7rem', color: 'var(--muted)' }}>
+            <input
+              type="checkbox"
+              checked={showSelectedOnly}
+              onChange={(event) => setShowSelectedOnly(event.target.checked)}
+              aria-label="Show selected object only"
+            />
+            Selected only
+          </label>
+          <span role="status" aria-live="polite" style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>
+            Showing {objectEntries.length} of {Object.keys(rData.objects).length} objects
+          </span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', overflowY: 'auto', flex: 1, paddingRight: '2px' }}>
+        {objectEntries.map(([id, obj]: [string, ResolvedObject]) => {
           const isExpanded = !!expandedObjects[id];
           return (
             <div
@@ -679,6 +717,12 @@ export function Inspector({
             </div>
           );
         })}
+        {objectEntries.length === 0 && (
+          <div style={{ padding: '1rem 0.4rem', color: 'var(--muted)', fontSize: '0.76rem' }}>
+            No objects match this filter.
+          </div>
+        )}
+        </div>
       </div>
     );
   };
