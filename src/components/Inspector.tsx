@@ -1023,6 +1023,21 @@ export function Inspector({
     const rData = data;
     const rError = fullError;
     const hasViolations = rData?.violations && rData.violations.length > 0;
+    const firstViolation = rData?.violations?.[0];
+    const firstErrorObjectId = rError?.objectId ?? firstViolation?.objectId;
+    const firstErrorPath = !firstErrorObjectId ? rError?.path : undefined;
+    const hasFirstErrorTarget = Boolean(firstErrorObjectId || firstErrorPath);
+    const errorCount = (rError ? 1 : 0) + (rData?.violations?.length ?? 0);
+
+    const handleJumpToFirstError = () => {
+      if (firstErrorObjectId) {
+        handleJump(firstErrorObjectId);
+        return;
+      }
+      if (firstErrorPath && onJumpToPath) {
+        onJumpToPath(firstErrorPath);
+      }
+    };
 
     if (!rError && !hasViolations) {
       return (
@@ -1034,6 +1049,22 @@ export function Inspector({
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', overflowY: 'auto', flex: 1 }}>
+        <div
+          className="inspector-error-summary"
+          role="status"
+          aria-live="polite"
+        >
+          <span>{errorCount} diagnostic{errorCount === 1 ? '' : 's'} found</span>
+          {hasFirstErrorTarget && (
+            <button
+              type="button"
+              onClick={handleJumpToFirstError}
+              aria-label="Jump to first error"
+            >
+              Go to first error
+            </button>
+          )}
+        </div>
         {rError && (
           <div
             role="alert"

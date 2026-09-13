@@ -169,7 +169,7 @@ Severity: **P0** memblokir tugas utama; **P1** mengganggu penggunaan normal, aks
 
 #### U09 — Error recovery belum menjadi alur ringkas
 
-**Observasi:** error banner dan sebagian dependency/object affordance masih menggunakan `span`/`code` yang clickable. Belum ada “Go to first error” dan recovery summary.
+**Observasi:** error banner dan sebagian dependency/object affordance masih perlu audit affordance menyeluruh. Ringkasan diagnostics dan “Go to first error” kini tersedia di Inspector, tetapi target navigasi tetap bergantung pada path/object id yang diberikan resolver.
 
 **Perbaikan:** `role="alert"` untuk error baru, ringkasan jumlah error, tombol first-error, action semantic untuk object/dependency link, dan pesan recovery dengan lokasi source.
 
@@ -372,6 +372,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U08 — group yang memuat object terpilih atau terkait otomatis terbuka dan summary group kini menjelaskan jumlah selected/related secara ringkas.
 - [x] U10 — graph Inspector memiliki filter object/type, focus selection berbasis neighborhood, empty state filter, dan legend visual yang responsif.
 - [x] U07/U09 — error tanpa fallback kini menjelaskan bahwa belum ada preview sukses dan menyediakan reset ke selected example; fallback tetap menawarkan restore draft sukses terakhir.
+- [x] U09 — tab Errors menampilkan jumlah diagnostics dan tombol Go to first error menuju object atau path pertama yang actionable.
 - [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
 - [x] U09 — error preview/error tab meneruskan error code, punya tombol ke source bila ada object id atau path, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
@@ -384,13 +385,13 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 ### Batch berikutnya yang sebagian sudah diterapkan
 
 - [ ] U08 — inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, dan related-object highlight lintas surface; grouping lanjutan masih belum.
-- [ ] U09 — first-error umum dan audit seluruh clickable affordance masih belum; recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia.
+- [ ] U09 — audit seluruh clickable affordance dan diagnostics tanpa target source masih belum; first-error actionable, recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia.
 - [ ] U11 — sebagian besar control utama sudah diaudit; audit seluruh affordance dan verifikasi real screen reader masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
 - [ ] U03 — responsive CSS, surface switch, dan drawer/sidebar mobile sudah ditambahkan serta gate teknis lulus; viewport matrix dan touch nyata belum selesai.
-- [ ] U09 — alert/error actions, error code/path, fallback restore, dan reset tanpa fallback sudah tersedia; first-error umum dan seluruh clickable affordance belum selesai.
+- [ ] U09 — alert/error actions, error code/path, fallback restore, reset tanpa fallback, dan first-error actionable sudah tersedia; seluruh clickable affordance dan diagnostics tanpa target source belum selesai.
 - [ ] U12 — `touch-action` sudah diperlonggar, tetapi gesture contract belum diuji pada touch nyata.
 
 ### Belum dikerjakan

@@ -1289,6 +1289,28 @@ input[type='range'] {
   text-align: center;
 }
 
+.inspector-error-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--line);
+  background: var(--panel-strong);
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.inspector-error-summary button {
+  padding: 0.24rem 0.4rem;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--brand);
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
 @media (max-width: 720px) {
   .graph-viewer-controls {
     grid-template-columns: minmax(0, 1fr) auto;
