@@ -78,6 +78,7 @@ export function Navbar({
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const hasSheets = !!doc?.sheets && Object.keys(doc.sheets).length > 0;
+  const selectedExampleName = EXAMPLES[selectedExample as keyof typeof EXAMPLES]?.name || selectedExample;
   const sheetIds = doc?.sheets ? Object.keys(doc.sheets) : [];
   const sheetPreviewEntryTarget = getSheetPreviewEntryTarget(
     sheetIds,
@@ -117,6 +118,7 @@ export function Navbar({
         <select
           className="example-select"
           aria-label="Choose example"
+          title={`Current example: ${selectedExampleName}. Open to choose another example.`}
           style={{ width: '150px', marginTop: 0 }}
           value={selectedExample}
           onChange={(e) => onExampleChange(e.target.value)}
