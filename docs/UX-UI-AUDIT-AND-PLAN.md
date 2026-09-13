@@ -367,7 +367,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U17 — empty state fluid dan tidak lagi memaksa minimum 400px.
 - [x] U08 — object hasil generated repeat kini dikelompokkan dan group dapat dibuka/tutup; sinkronisasi selection lintas surface masih tersisa.
 - [x] U08 — selection dari preview, inspector, dan graph kini memusatkan source definition di editor; related-object synchronization masih tersisa.
-- [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
+- [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
 - [x] U09 — error preview memiliki alert semantics, tombol langsung ke source bila ada object id, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U14 — toolbar groups diberi semantic label; konsolidasi visual dan pengurangan duplikasi masih tersisa.
 
@@ -379,7 +379,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
-- [ ] U03 — responsive CSS, surface switch, dan drawer/sidebar mobile sudah ditambahkan; viewport matrix dan touch nyata belum selesai.
+- [ ] U03 — responsive CSS, surface switch, dan drawer/sidebar mobile sudah ditambahkan serta gate teknis lulus; viewport matrix dan touch nyata belum selesai.
 - [ ] U09 — alert/error actions sudah sebagian semantic dan fallback restore sudah tersedia, tetapi first-error umum, recovery tanpa fallback, dan seluruh clickable affordance belum selesai.
 - [ ] U12 — `touch-action` sudah diperlonggar, tetapi gesture contract belum diuji pada touch nyata.
 
