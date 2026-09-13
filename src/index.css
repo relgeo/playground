@@ -427,6 +427,74 @@ button:disabled {
   margin: 0 0.25rem;
 }
 
+.navbar-secondary-actions {
+  position: relative;
+  z-index: 40;
+}
+
+.navbar-secondary-actions summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  user-select: none;
+}
+
+.navbar-secondary-actions summary::-webkit-details-marker {
+  display: none;
+}
+
+.navbar-secondary-actions summary::after {
+  content: ' +' ;
+  color: var(--brand);
+}
+
+.navbar-secondary-actions[open] summary::after {
+  content: ' −';
+}
+
+.navbar-secondary-actions summary:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.navbar-secondary-menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  min-width: 13rem;
+  padding: 0.65rem;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  box-shadow: 0 0.8rem 2rem rgba(15, 23, 42, 0.14);
+}
+
+.navbar-menu-section + .navbar-menu-section {
+  margin-top: 0.7rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+}
+
+.navbar-menu-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.navbar-action-confirmation {
+  margin-left: 0.25rem;
+  color: var(--ready);
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
 .control-group {
   display: flex;
   align-items: center;

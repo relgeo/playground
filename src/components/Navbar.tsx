@@ -236,26 +236,73 @@ export function Navbar({
           </>
         )}
 
-        {/* Editor Toolbar (Visible if Editor is not collapsed) */}
-        {viewMode !== 'preview-only' && (
-          <>
-            <div className="navbar-divider" />
-            <div className="control-group" role="group" aria-label="Source actions">
-              <button onClick={handleCopyCode} title="Copy Code" aria-label="Copy source code">
-                {ICONS.Copy}
-                {copiedCode && <span style={{ fontSize: '0.65rem', color: 'var(--ready)', marginLeft: '2px', fontWeight: 'bold' }}>Copied!</span>}
-              </button>
-              <button onClick={handleShareLink} title="Copy Share Link" aria-label="Copy share link">
-                {ICONS.Share}
-                {copiedLink && <span style={{ fontSize: '0.65rem', color: 'var(--ready)', marginLeft: '2px', fontWeight: 'bold' }}>Link Copied!</span>}
-              </button>
-              <button onClick={onReset} title="Reset Code" aria-label="Reset source code">{ICONS.Reset}</button>
-            </div>
-          </>
-        )}
       </div>
 
       <div className="navbar-right">
+        <details className="navbar-secondary-actions">
+          <summary>More</summary>
+          <div className="navbar-secondary-menu">
+            {viewMode !== 'preview-only' && (
+              <div className="navbar-menu-section">
+                <span className="navbar-menu-label">Source actions</span>
+                <div className="control-group" role="group" aria-label="Source actions">
+                  <button type="button" onClick={handleCopyCode} title="Copy Code" aria-label="Copy source code">
+                    {ICONS.Copy}
+                    {copiedCode && <span className="navbar-action-confirmation">Copied!</span>}
+                  </button>
+                  <button type="button" onClick={handleShareLink} title="Copy Share Link" aria-label="Copy share link">
+                    {ICONS.Share}
+                    {copiedLink && <span className="navbar-action-confirmation">Link copied!</span>}
+                  </button>
+                  <button type="button" onClick={onReset} title="Reset Code" aria-label="Reset source code">{ICONS.Reset}</button>
+                </div>
+              </div>
+            )}
+
+            <div className="navbar-menu-section">
+              <span className="navbar-menu-label">Sidebar placement</span>
+              <div className="control-group" role="group" aria-label="Sidebar placement">
+                <button
+                  type="button"
+                  className={sidebarVisible && sidebarPosition === 'left' ? 'active' : ''}
+                  onClick={() => {
+                    setSidebarPosition('left');
+                    if (!sidebarVisible) setSidebarVisible(true);
+                  }}
+                  title="Sidebar Left"
+                  aria-label="Show sidebar on left"
+                  aria-pressed={sidebarVisible && sidebarPosition === 'left'}
+                >
+                  {ICONS.SidebarLeft}
+                </button>
+                <button
+                  type="button"
+                  className={sidebarVisible && sidebarPosition === 'right' ? 'active' : ''}
+                  onClick={() => {
+                    setSidebarPosition('right');
+                    if (!sidebarVisible) setSidebarVisible(true);
+                  }}
+                  title="Sidebar Right"
+                  aria-label="Show sidebar on right"
+                  aria-pressed={sidebarVisible && sidebarPosition === 'right'}
+                >
+                  {ICONS.SidebarRight}
+                </button>
+                <button
+                  type="button"
+                  className={!sidebarVisible ? 'active' : ''}
+                  onClick={() => setSidebarVisible(false)}
+                  title="Hide Sidebar"
+                  aria-label="Hide sidebar"
+                  aria-pressed={!sidebarVisible}
+                >
+                  {ICONS.SidebarHide}
+                </button>
+              </div>
+            </div>
+          </div>
+        </details>
+
         {/* Layout Toggles */}
         <div className="control-group navbar-layout-group" role="group" aria-label="Workspace layout">
           <button
@@ -296,44 +343,6 @@ export function Navbar({
           </button>
         </div>
 
-        <div className="navbar-divider" />
-
-        {/* Sidebar Toggles */}
-        <div className="control-group" role="group" aria-label="Sidebar placement">
-          <button
-            className={sidebarVisible && sidebarPosition === 'left' ? 'active' : ''}
-            onClick={() => {
-              setSidebarPosition('left');
-              if (!sidebarVisible) setSidebarVisible(true);
-            }}
-            title="Sidebar Left"
-            aria-label="Show sidebar on left"
-            aria-pressed={sidebarVisible && sidebarPosition === 'left'}
-          >
-            {ICONS.SidebarLeft}
-          </button>
-          <button
-            className={sidebarVisible && sidebarPosition === 'right' ? 'active' : ''}
-            onClick={() => {
-              setSidebarPosition('right');
-              if (!sidebarVisible) setSidebarVisible(true);
-            }}
-            title="Sidebar Right"
-            aria-label="Show sidebar on right"
-            aria-pressed={sidebarVisible && sidebarPosition === 'right'}
-          >
-            {ICONS.SidebarRight}
-          </button>
-          <button
-            className={!sidebarVisible ? 'active' : ''}
-            onClick={() => setSidebarVisible(false)}
-            title="Hide Sidebar"
-            aria-label="Hide sidebar"
-            aria-pressed={!sidebarVisible}
-          >
-            {ICONS.SidebarHide}
-          </button>
-        </div>
       </div>
       <div className="mobile-surface-switcher" role="group" aria-label="Mobile workspace surface">
         <button
