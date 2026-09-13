@@ -787,6 +787,7 @@ export function Preview({
         <div role="group" aria-label="Preview overlays and line mode" style={{ display: 'flex', gap: '0.35rem' }}>
           {toolbarMode === 'model' && (
             <>
+              <div className="preview-toolset" role="group" aria-label="Model overlays">
               <button
                 onClick={() => setOverlay(p => ({ ...p, showSegments: !p.showSegments }))}
                 className={overlay.showSegments ? 'active' : ''}
@@ -867,6 +868,8 @@ export function Preview({
               >
                 {ICONS.Labels}
               </button>
+              </div>
+              <div className="preview-toolset" role="group" aria-label="Line rendering">
               <button
                 onClick={() => setPreviewLineMode('static')}
                 className={previewLineMode === 'static' ? 'active' : ''}
@@ -903,10 +906,12 @@ export function Preview({
               >
                 Relative
               </button>
+              </div>
             </>
           )}
           {toolbarMode === 'physical' && (
             <>
+              <div className="preview-toolset" role="group" aria-label="Physical drawing overlays">
               <button
                 onClick={() => setShowAnchors(!showAnchors)}
                 className={showAnchors ? 'active' : ''}
@@ -1007,6 +1012,7 @@ export function Preview({
               >
                 {ICONS.Annotations}
               </button>
+              </div>
             </>
           )}
         </div>

@@ -460,6 +460,18 @@ button:disabled {
   display: none;
 }
 
+.preview-toolset {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.25rem;
+  border-left: 1px solid var(--line);
+}
+
+.preview-toolset:first-child {
+  border-left: 0;
+}
+
 .status-indicator {
   font-size: 0.75rem;
   font-weight: 600;
@@ -1303,6 +1315,27 @@ input[type='range'] {
 
   .navbar-layout-group {
     display: none;
+  }
+
+  .overlay-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .overlay-toolbar > div[role="group"] {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .preview-toolset {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 0.25rem 0;
+  }
+
+  .preview-toolset:first-child {
+    border-top: 0;
   }
 
   .mobile-surface-switcher {

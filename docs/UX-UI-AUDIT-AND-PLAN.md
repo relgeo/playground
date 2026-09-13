@@ -370,7 +370,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
 - [x] U09 — error preview/error tab meneruskan error code, punya tombol ke source bila ada object id atau path, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
-- [x] U14 — toolbar groups diberi semantic label; konsolidasi visual dan pengurangan duplikasi masih tersisa.
+- [x] U14 — toolbar preview kini dipisah menjadi kelompok overlay dan line rendering serta wrap aman di mobile; pemisahan global-vs-contextual dan pengurangan duplikasi masih tersisa.
 
 ### Batch berikutnya yang sebagian sudah diterapkan
 
@@ -387,7 +387,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 ### Belum dikerjakan
 
 - [ ] U01 — camera fit/recenter untuk seluruh sheet dan frame ekstrem.
-- [ ] U02 — konsolidasi toolbar dan kepadatan desktop.
+- [ ] U02 — konsolidasi toolbar global dan kepadatan desktop; contextual preview grouping sudah diperbaiki.
 - [ ] U08 — related-object synchronization, cross-surface collapse, dan grouping lanjutan.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
 - [ ] U18–U21 — CSS cleanup, persistence disclosure, README license, dan graph focus/legend.
