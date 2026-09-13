@@ -399,6 +399,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U18 — metadata lisensi Playground diverifikasi konsisten: `package.json` memakai `MIT`, README memiliki bagian License, dan file LICENSE adalah MIT dengan copyright Agus Made.
 - [x] U18/U21 — selector CSS orphan dari layout lama sudah diaudit dan dibersihkan; selector status dinamis dan class CodeMirror dipertahankan, sehingga stylesheet turun sekitar 10% (1.846 → 1.659 baris).
 - [x] U16 — strategi typography eksplisit: UI memakai IBM Plex Sans dengan Segoe UI fallback, kode memakai IBM Plex Mono dengan SFMono-Regular/Cascadia Code fallback, dan worker memakai metrik sans-serif yang tidak bergantung pada webfont runtime.
+- [x] U01 — kontrak camera-fit didokumentasikan lewat helper/test: sheet terpilih mengalahkan bbox, frame logical dipakai untuk geometry dan physical untuk screen scale, frame/container invalid menghasilkan `null`, dan zoom dibatasi `0.01–10000`.
 - [x] U11 — mode drawer tablet memindahkan fokus ke panel pertama saat dibuka dan menyimpan kontrol pemicu untuk focus-return saat ditutup; behavior diterapkan untuk Escape, backdrop, dan Hide.
 - [x] U11 — drawer tablet kini memiliki focus trap Tab/Shift+Tab di antara control yang terlihat; siklus fokus browser terverifikasi dari kontrol terakhir ke header PARAMETERS dan kembali ke kontrol terakhir.
 - [x] U06 — reduced-motion stylesheet menonaktifkan keyframe, transition, delay, dan smooth scrolling; emulasi preference browser nyata masih tersisa.
