@@ -14,6 +14,7 @@ interface SidebarProps {
   isResizing?: boolean;
   onResizeStart?: () => void;
   onResizeKeyboard?: (delta: number) => void;
+  onClose?: () => void;
   children: {
     profiles: ReactNode;
     parameters: ReactNode;
@@ -35,20 +36,30 @@ export function Sidebar({
   isResizing,
   onResizeStart,
   onResizeKeyboard,
+  onClose,
   children,
 }: SidebarProps) {
   const sidebarWidth = visible ? width : 0;
   const sidebarClass = `sidebar ${!visible ? 'is-hidden' : ''}`;
 
   return (
-    <aside 
-      className={sidebarClass}
-      style={{ 
-        width: `${sidebarWidth}px`,
-        transition: isResizing ? 'none' : 'width 0.2s ease',
-        position: 'relative'
-      }}
-    >
+    <>
+      {visible && onClose && (
+        <button
+          type="button"
+          className="sidebar-backdrop"
+          aria-label="Close sidebar"
+          onClick={onClose}
+        />
+      )}
+      <aside 
+        className={sidebarClass}
+        style={{ 
+          width: `${sidebarWidth}px`,
+          transition: isResizing ? 'none' : 'width 0.2s ease',
+          position: 'relative'
+        }}
+      >
       <div className="sidebar-content">
         {hasProfiles && (
           <SidebarPanel 
@@ -145,7 +156,8 @@ export function Sidebar({
           onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
         />
       )}
-    </aside>
+      </aside>
+    </>
   );
 }
 

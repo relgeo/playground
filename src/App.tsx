@@ -568,6 +568,7 @@ function App() {
           isResizing={isResizingSidebar}
           onResizeStart={() => setIsResizingSidebar(true)}
           onResizeKeyboard={(delta) => setSidebarWidth((width) => Math.max(240, Math.min(600, width + delta)))}
+          onClose={() => setSidebarVisible(false)}
         >
           {{
             profiles: (
