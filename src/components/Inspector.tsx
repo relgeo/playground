@@ -574,6 +574,17 @@ export function Inspector({
       const matchesSelection = !showSelectedOnly || id === selectedObjectId;
       return matchesQuery && matchesSelection;
     });
+    const groupedEntries = new Map<string, [string, ResolvedObject][]>();
+    for (const entry of objectEntries) {
+      const group = entry[0].includes('[')
+        ? `${entry[0].split('[')[0]} (generated)`
+        : entry[0].includes('.')
+          ? entry[0].split('.')[0]
+          : 'Top-level';
+      const groupEntries = groupedEntries.get(group) ?? [];
+      groupEntries.push(entry);
+      groupedEntries.set(group, groupEntries);
+    }
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
@@ -604,7 +615,18 @@ export function Inspector({
           </span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', overflowY: 'auto', flex: 1, paddingRight: '2px' }}>
-        {objectEntries.map(([id, obj]: [string, ResolvedObject]) => {
+        {Array.from(groupedEntries.entries()).map(([group, entries]) => (
+          <details
+            key={group}
+            open={!group.endsWith('(generated)') || Boolean(normalizedQuery) || showSelectedOnly}
+            className="inspector-object-group"
+          >
+            <summary className="inspector-object-group-summary">
+              <span>{group}</span>
+              <span>{entries.length}</span>
+            </summary>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '0.35rem' }}>
+        {entries.map(([id, obj]: [string, ResolvedObject]) => {
           const isExpanded = !!expandedObjects[id];
           return (
             <div
@@ -717,6 +739,9 @@ export function Inspector({
             </div>
           );
         })}
+            </div>
+          </details>
+        ))}
         {objectEntries.length === 0 && (
           <div style={{ padding: '1rem 0.4rem', color: 'var(--muted)', fontSize: '0.76rem' }}>
             No objects match this filter.

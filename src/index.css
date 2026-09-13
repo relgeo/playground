@@ -994,6 +994,28 @@ input[type='range'] {
   flex-direction: column;
 }
 
+.inspector-object-group {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+
+.inspector-object-group-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.15rem;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.inspector-object-group-summary span:last-child {
+  color: var(--brand);
+}
+
 .inspector-code {
   flex: 1;
   margin: 0;
