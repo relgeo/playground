@@ -302,7 +302,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] Definisikan tokens warna, border, spacing, radius, type, elevation, dan focus ring.
 - [ ] Kurangi rounded default; gunakan radius berdasarkan fungsi.
 - [ ] Satukan style control yang tersebar di inline styles/CSS.
-- [ ] Putuskan strategi font IBM Plex yang eksplisit.
+- [x] Putuskan strategi font IBM Plex yang eksplisit; token font dan fallback runtime sudah didefinisikan.
 - [ ] Hapus selector legacy setelah regression check.
 - [ ] Pecah stylesheet hanya pada batas concern yang membantu perawatan.
 - [x] README, `package.json`, dan `LICENSE` sudah menyatakan MIT secara konsisten; penyelarasan metadata dasar selesai.
@@ -425,7 +425,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] U01 — verifikasi camera fit/recenter untuk seluruh sheet, frame ekstrem nyata, resize viewport, dan handset.
 - [ ] U02 — verifikasi visual kepadatan desktop 1024px setelah mode compact; aksi sekunder sudah dipindahkan ke menu More.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
-- [ ] U18–U21 — CSS cleanup dan README license.
+- [ ] U18–U21 — cleanup CSS lanjutan dan penghapusan seluruh selector legacy; README/license sudah selesai.
 - [ ] Uji handset fisik.
 - [ ] Uji screen reader nyata dengan VoiceOver/TalkBack.
 - [ ] Verifikasi penuh camera-fit dan responsive contract.
