@@ -367,19 +367,19 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U17 — empty state fluid dan tidak lagi memaksa minimum 400px.
 - [x] U08 — object hasil generated repeat kini dikelompokkan dan group dapat dibuka/tutup; sinkronisasi selection lintas surface masih tersisa.
 - [x] U08 — selection dari preview, inspector, dan graph kini memusatkan source definition di editor; related-object synchronization masih tersisa.
-- [x] U09 — error preview memiliki alert semantics dan tombol langsung ke source untuk error yang memiliki object id.
+- [x] U09 — error preview memiliki alert semantics, tombol langsung ke source bila ada object id, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U14 — toolbar groups diberi semantic label; konsolidasi visual dan pengurangan duplikasi masih tersisa.
 
 ### Batch berikutnya yang sebagian sudah diterapkan
 
 - [ ] U08 — inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, dan source jump lintas surface; related-object synchronization serta grouping lanjutan masih belum.
-- [ ] U09 — first-error umum dan recovery untuk error tanpa object id belum.
+- [ ] U09 — first-error umum dan recovery saat belum ada draft sukses sebelumnya masih belum; recovery ke draft sukses terakhir sudah tersedia setelah fallback terbentuk.
 - [ ] U11 — audit seluruh control, termasuk affordance yang belum disentuh, masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
 - [ ] U03 — responsive CSS aktif sudah ditambahkan, tetapi viewport matrix dan surface switch/drawer belum selesai.
-- [ ] U09 — alert/error actions sudah sebagian semantic, tetapi first-error recovery dan seluruh clickable affordance belum selesai.
+- [ ] U09 — alert/error actions sudah sebagian semantic dan fallback restore sudah tersedia, tetapi first-error umum, recovery tanpa fallback, dan seluruh clickable affordance belum selesai.
 - [ ] U12 — `touch-action` sudah diperlonggar, tetapi gesture contract belum diuji pada touch nyata.
 
 ### Belum dikerjakan

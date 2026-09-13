@@ -129,6 +129,7 @@ function App() {
   const [doc, setDoc] = useState<RelGeoDocument | null>(null);
   const [lastSuccessfulRender, setLastSuccessfulRender] =
     useState<PlaygroundRenderSnapshot | null>(null);
+  const [lastSuccessfulCode, setLastSuccessfulCode] = useState<string | null>(null);
   const [paramOverrides, setParamOverrides] = useState<Record<string, number>>({});
   const [zoom, setZoom] = useState(100);
   const [showDimensions, setShowDimensions] = useState(true);
@@ -167,6 +168,7 @@ function App() {
 
   const workerRef = useRef<Worker | null>(null);
   const latestRequestIdRef = useRef(0);
+  const requestCodeByIdRef = useRef(new Map<number, string>());
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
   const deferredCode = useDeferredValue(code);
@@ -335,6 +337,8 @@ function App() {
 
     worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
       const res = e.data;
+      const requestCode = requestCodeByIdRef.current.get(res.requestId);
+      requestCodeByIdRef.current.delete(res.requestId);
       if (!shouldApplyWorkerResponse(res.requestId, latestRequestIdRef.current)) {
         return;
       }
@@ -347,6 +351,9 @@ function App() {
           resolvedData: res.data.resolvedData,
           svgContent: res.data.svgContent,
         });
+        if (requestCode !== undefined) {
+          setLastSuccessfulCode(requestCode);
+        }
         setError(null);
         setErrorPath(null);
         setFullError(null);
@@ -377,6 +384,7 @@ function App() {
     setIsResolving(true);
     const requestId = getNextWorkerRequestId(latestRequestIdRef.current);
     latestRequestIdRef.current = requestId;
+    requestCodeByIdRef.current.set(requestId, deferredCode);
     const reqPayload: WorkerRequest = {
       requestId,
       code: deferredCode,
@@ -416,6 +424,22 @@ function App() {
 
   const handleParamChange = (key: string, value: number) => {
     setParamOverrides((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleRestoreLastSuccessful = () => {
+    if (!lastSuccessfulCode || lastSuccessfulCode === code) {
+      setActionFeedback({ tone: 'error', message: 'No earlier successful draft is available to restore.' });
+      return;
+    }
+    if (!window.confirm('Restore the last successful draft and replace the current source?')) {
+      return;
+    }
+    setCode(lastSuccessfulCode);
+    setSelectedObjectId(null);
+    setError(null);
+    setErrorPath(null);
+    setFullError(null);
+    setActionFeedback({ tone: 'success', message: 'Restored the last successful draft.' });
   };
 
   const handleExport = () => {
@@ -668,6 +692,8 @@ function App() {
                 errorHint={previewErrorHint}
                 fullError={fullError}
                 onJumpToObject={handleJumpToObject}
+                isShowingFallback={isShowingFallback}
+                onRestoreLastSuccessful={handleRestoreLastSuccessful}
                 violations={displayResolvedData?.violations}
                 dragState={dragState}
                 setDragState={setDragState}
