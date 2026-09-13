@@ -31,6 +31,18 @@
   box-sizing: border-box;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 html,
 body,
 #root {
@@ -1213,6 +1225,20 @@ input[type='range'] {
   color: var(--muted);
   font-size: 0.76rem;
   text-align: center;
+}
+
+.graph-viewer-empty-state {
+  padding: 1rem;
+}
+
+.graph-viewer-outer {
+  width: 100%;
+  overflow: auto;
+  background: transparent;
+}
+
+.graph-viewer-canvas {
+  display: block;
 }
 
 .navbar-persistence-note {

@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { getDependencyGraph } from '@relgeo/core';
 import type { RelGeoObject } from '@relgeo/core';
+import { getGraphNavigationTarget } from '../graph-navigation';
 
 interface GraphViewerProps {
   objects: Record<string, RelGeoObject>;
@@ -68,24 +69,11 @@ export function GraphViewer({
   const handleNodeKeyDown = (event: KeyboardEvent<SVGGElement>, nodeId: string) => {
     if (!onNodeSelect) return;
 
-    const currentIndex = visibleObjectIds.indexOf(nodeId);
-    if (currentIndex < 0 || visibleObjectIds.length === 0) return;
-
-    let nextIndex: number | null = null;
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-      nextIndex = (currentIndex + 1) % visibleObjectIds.length;
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-      nextIndex = (currentIndex - 1 + visibleObjectIds.length) % visibleObjectIds.length;
-    } else if (event.key === 'Home') {
-      nextIndex = 0;
-    } else if (event.key === 'End') {
-      nextIndex = visibleObjectIds.length - 1;
-    }
-
-    if (nextIndex === null) return;
+    const nextNodeId = getGraphNavigationTarget(visibleObjectIds, nodeId, event.key);
+    if (!nextNodeId) return;
 
     event.preventDefault();
-    graphNodeRefs.current[visibleObjectIds[nextIndex]]?.focus();
+    graphNodeRefs.current[nextNodeId]?.focus();
   };
 
   const { nodes, edges, width, height, layoutMode } = useMemo(() => {
@@ -234,7 +222,7 @@ export function GraphViewer({
   }, [objects, visibleObjectIds]);
 
   if (!objects || Object.keys(objects).length === 0) {
-    return <div className="text-sm" style={{ padding: '1rem', color: 'var(--muted)' }}>No objects.</div>;
+    return <div className="graph-viewer-empty graph-viewer-empty-state">No objects.</div>;
   }
 
   return (
@@ -269,19 +257,25 @@ export function GraphViewer({
         <span className="graph-legend-item"><i className="graph-legend-swatch is-selected" aria-hidden="true" />Selected</span>
         <span className="graph-legend-item"><i className="graph-legend-swatch is-related" aria-hidden="true" />Related</span>
       </div>
+      {onNodeSelect ? (
+        <p className="visually-hidden" id="graph-keyboard-hint">
+          Graph nodes are selectable buttons. Press Enter or Space to select a node. Use Arrow keys to move between nodes, or Home and End to jump to the first or last node.
+        </p>
+      ) : null}
       {visibleObjectIds.length === 0 ? (
         <div className="graph-viewer-empty" role="status">
           No graph objects match this filter.
         </div>
       ) : (
-      <div className="graph-viewer-outer" style={{ width: '100%', overflow: 'auto', background: 'transparent' }}>
+      <div className="graph-viewer-outer">
       <svg
         width="100%"
         // height={height}
         viewBox={`0 0 ${width} ${height}`}
         role={onNodeSelect ? 'group' : 'img'}
         aria-label="RelGeo dependency graph"
-        style={{ display: 'block' }}
+        aria-describedby={onNodeSelect ? 'graph-keyboard-hint' : undefined}
+        className="graph-viewer-canvas"
       >
         <title>RelGeo dependency graph</title>
         <defs>
