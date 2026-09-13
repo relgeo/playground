@@ -70,7 +70,9 @@ export function getPreviewRecoveryHint({
   isShowingFallback,
 }: Pick<PlaygroundStatusInput, 'hasError' | 'isResolving' | 'isShowingFallback'>): string | null {
   if (!hasError || !isShowingFallback) {
-    return null;
+    return hasError
+      ? 'No successful preview is available yet. Fix the source or reset to the selected example to recover a known-good starting point.'
+      : null;
   }
 
   if (isResolving) {

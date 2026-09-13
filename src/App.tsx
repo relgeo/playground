@@ -750,6 +750,7 @@ function App() {
                 onJumpToPath={handleJumpToErrorPath}
                 isShowingFallback={isShowingFallback}
                 onRestoreLastSuccessful={handleRestoreLastSuccessful}
+                onReset={handleReset}
                 violations={displayResolvedData?.violations}
                 dragState={dragState}
                 setDragState={setDragState}

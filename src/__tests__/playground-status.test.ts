@@ -50,7 +50,7 @@ describe('playground status helpers', () => {
     });
   });
 
-  it('returns a recovery hint only for stale-on-error preview', () => {
+  it('returns a recovery hint for stale and first-error states', () => {
     expect(
       getPreviewRecoveryHint({
         hasError: true,
@@ -66,5 +66,13 @@ describe('playground status helpers', () => {
         isShowingFallback: true,
       })
     ).toBeNull();
+
+    expect(
+      getPreviewRecoveryHint({
+        hasError: true,
+        isResolving: false,
+        isShowingFallback: false,
+      })
+    ).toContain('reset to the selected example');
   });
 });

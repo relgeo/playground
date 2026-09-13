@@ -371,6 +371,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U08 — related neighborhood kini mencakup dependency dan dependent langsung maupun tidak langsung hingga dua tingkat, dengan batas agar dokumen besar tetap terbaca.
 - [x] U08 — group yang memuat object terpilih atau terkait otomatis terbuka dan summary group kini menjelaskan jumlah selected/related secara ringkas.
 - [x] U10 — graph Inspector memiliki filter object/type, focus selection berbasis neighborhood, empty state filter, dan legend visual yang responsif.
+- [x] U07/U09 — error tanpa fallback kini menjelaskan bahwa belum ada preview sukses dan menyediakan reset ke selected example; fallback tetap menawarkan restore draft sukses terakhir.
 - [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
 - [x] U09 — error preview/error tab meneruskan error code, punya tombol ke source bila ada object id atau path, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
@@ -383,13 +384,13 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 ### Batch berikutnya yang sebagian sudah diterapkan
 
 - [ ] U08 — inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, dan related-object highlight lintas surface; grouping lanjutan masih belum.
-- [ ] U09 — first-error umum dan recovery saat belum ada draft sukses sebelumnya masih belum; error path dan recovery ke draft sukses terakhir sudah tersedia setelah fallback terbentuk.
+- [ ] U09 — first-error umum dan audit seluruh clickable affordance masih belum; recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia.
 - [ ] U11 — sebagian besar control utama sudah diaudit; audit seluruh affordance dan verifikasi real screen reader masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
 - [ ] U03 — responsive CSS, surface switch, dan drawer/sidebar mobile sudah ditambahkan serta gate teknis lulus; viewport matrix dan touch nyata belum selesai.
-- [ ] U09 — alert/error actions, error code/path, dan fallback restore sudah tersedia; first-error umum, recovery tanpa fallback, dan seluruh clickable affordance belum selesai.
+- [ ] U09 — alert/error actions, error code/path, fallback restore, dan reset tanpa fallback sudah tersedia; first-error umum dan seluruh clickable affordance belum selesai.
 - [ ] U12 — `touch-action` sudah diperlonggar, tetapi gesture contract belum diuji pada touch nyata.
 
 ### Belum dikerjakan

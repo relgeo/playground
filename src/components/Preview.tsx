@@ -30,6 +30,7 @@ interface PreviewProps {
   onJumpToPath?: (path: string) => void;
   isShowingFallback?: boolean;
   onRestoreLastSuccessful?: () => void;
+  onReset?: () => void;
   violations?: ConstraintViolation[];
   dragState: DragState;
   setDragState: (state: DragState) => void;
@@ -71,6 +72,7 @@ export function Preview({
   onJumpToPath,
   isShowingFallback = false,
   onRestoreLastSuccessful,
+  onReset,
   dragState,
   setDragState,
   resolvedData,
@@ -1152,6 +1154,15 @@ export function Preview({
                 onClick={onRestoreLastSuccessful}
               >
                 Restore last successful draft
+              </button>
+            )}
+            {!isShowingFallback && onReset && (
+              <button
+                type="button"
+                className="error-action"
+                onClick={onReset}
+              >
+                Reset to selected example
               </button>
             )}
           </div>
