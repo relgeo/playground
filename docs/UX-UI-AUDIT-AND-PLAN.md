@@ -298,6 +298,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Navigasi graph keyboard memakai ArrowLeft/Right/Up/Down serta Home/End untuk berpindah fokus antarnode tanpa menambah puluhan stop Tab; smoke test browser memverifikasi satu `tabIndex=0` dan perpindahan fokus.
 - [x] Graph memberi petunjuk keyboard yang tersembunyi secara visual tetapi tersedia untuk assistive technology melalui `aria-describedby`; style statis graph viewer dipindahkan dari inline ke class CSS.
 - [x] Navbar menghapus style inline yang statis pada kontrol preview, status, zoom, dan brand; tombol entry Sheet/View kembali memakai radius kontrol kecil, bukan radius pill.
+- [x] Preview memindahkan layout statis shell, toolbar, stage, viewport, dan wrapper SVG ke class CSS; style inline yang tersisa di Preview hanya untuk state geometry/zoom atau overlay interaktif.
 - [x] Graph memiliki filter nama/tipe, mode Focus selection berbasis neighborhood, count live, legend tipe/status, dan node keyboard-selectable.
 
 ### Phase 3 — Visual system dan cleanup

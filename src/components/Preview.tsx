@@ -771,48 +771,27 @@ export function Preview({
       : '';
 
   return (
-    <section className="canvas-panel" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <section className="canvas-panel preview-shell">
       {/* Dynamic Overlay Control Bar */}
       <div
-        className="overlay-toolbar"
-        style={{
-          display: 'flex',
-          gap: '0.5rem',
-          padding: '0.4rem 0.8rem',
-          background: 'var(--panel-strong)',
-          borderBottom: '1px solid var(--line)',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
+        className="overlay-toolbar preview-toolbar"
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
-          <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase' }}>
+        <div className="preview-toolbar-heading">
+          <span className="preview-toolbar-label">
             {previewLabel}
           </span>
-          <span style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>
+          <span className="preview-toolbar-hint">
             {previewHint}
           </span>
         </div>
-        <div role="group" aria-label="Preview overlays and line mode" style={{ display: 'flex', gap: '0.35rem' }}>
+        <div className="preview-overlay-groups" role="group" aria-label="Preview overlays and line mode">
           <div className="preview-toolset" role="group" aria-label="View controls">
             <button
               type="button"
               onClick={onFitAll}
               title="Fit and recenter preview"
               aria-label="Fit and recenter preview"
-              style={{
-                padding: '0.2rem 0.45rem',
-                fontSize: '0.72rem',
-                borderRadius: '4px',
-                border: '1px solid var(--line)',
-                background: 'white',
-                color: 'var(--muted)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.25rem',
-                fontWeight: 700,
-              }}
+              className="preview-fit-button"
             >
               {ICONS.Recenter}
               <span>Fit view</span>
@@ -1059,25 +1038,18 @@ export function Preview({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        style={{ flex: 1, overflow: 'auto', position: 'relative' }}
       >
-        <div className="preview-viewport" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100%', padding: '2rem' }}>
+        <div className="preview-viewport">
           <div
             className="svg-wrapper-container"
             style={{
-              position: 'relative',
-              display: 'inline-block',
               zoom: isPrintMode ? zoom / 100 : 1,
-              pointerEvents: 'auto',
             }}
           >
             {svgContent ? (
               <div
-                className="svg-wrapper"
+                className="svg-wrapper is-fluid"
                 style={{
-                  position: 'relative',
-                  display: 'inline-block',
-                  padding: 0,
                   width: fluidWidth,
                   height: fluidHeight,
                 }}
@@ -1085,7 +1057,6 @@ export function Preview({
                 <div
                   className="svg-inner-wrapper"
                   dangerouslySetInnerHTML={{ __html: svgContent }}
-                  style={{ width: '100%', height: '100%', display: 'block' }}
                 />
                 {modelPreviewSurfaceCss && (
                   <style>
