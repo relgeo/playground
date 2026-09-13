@@ -604,6 +604,7 @@ function App() {
           setIsPrintMode(val);
           requestFitAll();
         }}
+        isDirty={code !== EXAMPLES[selectedExample].code}
       />
 
       <div className={`main-area ${sidebarPosition === 'right' ? 'sidebar-right' : ''}`}>

@@ -42,6 +42,7 @@ interface NavbarProps {
   isPrintMode: boolean;
   setIsPrintMode: (val: boolean) => void;
   actionFeedback?: { tone: 'success' | 'error'; message: string } | null;
+  isDirty: boolean;
 }
 
 export function Navbar({
@@ -70,6 +71,7 @@ export function Navbar({
   isPrintMode,
   setIsPrintMode,
   actionFeedback,
+  isDirty,
 }: NavbarProps) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -244,6 +246,15 @@ export function Navbar({
         <details className="navbar-secondary-actions">
           <summary>More</summary>
           <div className="navbar-secondary-menu">
+            <div className="navbar-menu-section">
+              <span className="navbar-menu-label">Draft state</span>
+              <div className="navbar-persistence-note" role="status" aria-live="polite">
+                <strong>{isDirty ? 'Modified draft' : 'Selected example'}</strong>
+                <span>
+                  Drafts are saved only in this browser. Share links include the source in the URL hash.
+                </span>
+              </div>
+            </div>
             {viewMode !== 'preview-only' && (
               <div className="navbar-menu-section">
                 <span className="navbar-menu-label">Source actions</span>

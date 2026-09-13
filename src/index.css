@@ -1289,6 +1289,22 @@ input[type='range'] {
   text-align: center;
 }
 
+.navbar-persistence-note {
+  display: grid;
+  gap: 0.2rem;
+  max-width: 19rem;
+  padding: 0.35rem 0.45rem;
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+  font-size: 0.66rem;
+  line-height: 1.35;
+}
+
+.navbar-persistence-note strong {
+  color: var(--ink);
+  font-size: 0.68rem;
+}
+
 .inspector-error-summary {
   display: flex;
   align-items: center;

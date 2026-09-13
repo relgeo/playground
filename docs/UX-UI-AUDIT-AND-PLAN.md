@@ -375,6 +375,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U07/U09 — error tanpa fallback kini menjelaskan bahwa belum ada preview sukses dan menyediakan reset ke selected example; fallback tetap menawarkan restore draft sukses terakhir.
 - [x] U09 — tab Errors menampilkan jumlah diagnostics dan tombol Go to first error menuju object atau path pertama yang actionable.
 - [x] U11 — icon controls Navbar memiliki button type/label, zoom diumumkan saat berubah, dan profile/example controls menyatakan pressed/expanded state.
+- [x] U18 — menu More menjelaskan modified draft, penyimpanan lokal browser, dan bahwa share link membawa source melalui URL hash.
 - [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
 - [x] U09 — error preview/error tab meneruskan error code, punya tombol ke source bila ada object id atau path, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
@@ -402,7 +403,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] U02 — konsolidasi toolbar global dan verifikasi kepadatan desktop 1024px; aksi sekunder sudah dipindahkan ke menu More.
 - [ ] U08 — advanced generated-object grouping dan opsi kedalaman relasi yang lebih eksplisit.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
-- [ ] U18–U21 — CSS cleanup, persistence disclosure, dan README license.
+- [ ] U18–U21 — CSS cleanup dan README license.
 - [ ] Uji handset fisik.
 - [ ] Uji screen reader nyata dengan VoiceOver/TalkBack.
 - [ ] Verifikasi penuh camera-fit dan responsive contract.
