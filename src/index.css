@@ -1118,7 +1118,21 @@ input[type='range'] {
   text-transform: uppercase;
 }
 
-.inspector-object-group-summary span:last-child {
+.inspector-object-group-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--accent);
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.inspector-object-group-meta span {
+  color: var(--accent);
+}
+
+.inspector-object-group-meta strong {
   color: var(--brand);
 }
 

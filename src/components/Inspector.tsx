@@ -655,8 +655,15 @@ export function Inspector({
             const groupContainsSelection = Boolean(
               selectedObjectId && entries.some(([entryId]) => entryId === selectedObjectId)
             );
-            const groupIsForcedOpen = Boolean(normalizedQuery) || showSelectedOnly || groupContainsSelection;
+            const groupRelatedCount = entries.filter(([entryId]) => relatedObjectIds.includes(entryId)).length;
+            const groupContainsRelated = groupRelatedCount > 0;
+            const groupIsForcedOpen = Boolean(normalizedQuery) || showSelectedOnly || groupContainsSelection || groupContainsRelated;
             const groupIsCollapsed = collapsedGroups[group] ?? group.endsWith('(generated)');
+            const groupSummary = [
+              `${entries.length} object${entries.length === 1 ? '' : 's'}`,
+              groupContainsSelection ? 'selected' : '',
+              groupContainsRelated ? `${groupRelatedCount} related` : '',
+            ].filter(Boolean).join(', ');
 
             return (
           <details
@@ -671,9 +678,13 @@ export function Inspector({
             }}
             className="inspector-object-group"
           >
-            <summary className="inspector-object-group-summary">
+            <summary className="inspector-object-group-summary" aria-label={`${group}: ${groupSummary}`}>
               <span>{group}</span>
-              <span>{entries.length}</span>
+              <span className="inspector-object-group-meta">
+                <span>{groupContainsSelection ? 'selected' : ''}</span>
+                <span>{groupContainsRelated ? `${groupRelatedCount} related` : ''}</span>
+                <strong>{entries.length}</strong>
+              </span>
             </summary>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '0.35rem' }}>
         {entries.map(([id, obj]: [string, ResolvedObject]) => {
