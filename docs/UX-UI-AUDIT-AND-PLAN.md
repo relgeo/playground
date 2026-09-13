@@ -1,0 +1,367 @@
+# RelGeo Playground — UX/UI Audit & Improvement Plan
+
+**Status:** audit baseline  
+**Tanggal:** 2026-09-13  
+**Baseline:** `381b29a` (`main`)  
+**Ruang lingkup:** browser IDE playground: editor, resolver, preview, inspector, graph, sidebar, responsive behavior, accessibility, share, dan export.
+
+## 1. Ringkasan eksekutif
+
+Playground memiliki fondasi teknis yang sehat dan kemampuan yang cukup lengkap: source editor, worker untuk resolve, preview SVG, model/physical surface, parameter, layer, inspector, graph, serta share/export. Alur produknya sudah terbentuk:
+
+> pilih contoh → baca/edit source → resolve → lihat preview → inspeksi hasil → share/export
+
+Masalah utamanya bukan kekurangan fitur, melainkan kepadatan dan prioritas. Banyak kemampuan ditempatkan sekaligus dalam satu workbench, sementara tugas utama pengguna belum cukup dominan. Dampaknya:
+
+- pengguna baru tidak selalu segera melihat hasil gambar yang berguna;
+- navbar, preview toolbar, dan sidebar membagi kontrol ke terlalu banyak tempat;
+- inspector dan graph lebih terasa seperti dump data daripada alat diagnosis;
+- beberapa kontrol masih mouse-only atau belum mempunyai state semantik yang lengkap;
+- responsive CSS masih membawa jejak layout lama;
+- visual system belum sepenuhnya mengikuti arah RelGeo: bentuk sederhana, tidak rounded secara default, dan hierarki tegas.
+
+| Prioritas | Fokus | Dampak |
+| --- | --- | --- |
+| P1 | First-run preview dan kepadatan layout | Pengguna segera tahu playground bekerja |
+| P1 | Responsive/mobile dan keyboard access | Lebih banyak kondisi penggunaan menjadi layak |
+| P1 | Status, error recovery, dan feedback aksi | Pengguna tahu apa yang terjadi dan cara pulih |
+| P1 | Sidebar, inspector, dan graph navigation | Diagnosis tidak terasa seperti mencari data mentah |
+| P2 | Visual system dan CSS cleanup | Tampilan tenang, konsisten, mudah dirawat |
+| P2 | Persistence, dirty state, dan share semantics | Ekspektasi pengguna lebih aman |
+
+## 2. Batas produk dan prinsip
+
+`docs/README.md` memosisikan playground sebagai **lightweight browser IDE**, bukan pengganti penuh desktop workbench atau Flutter IDE. Audit ini mempertahankan batas tersebut.
+
+### Prinsip yang dipertahankan
+
+- Source tetap menjadi pusat: pengguna dapat membaca, mengedit, dan membagikan DSL.
+- Preview harus memberi hasil visual yang cepat dan dapat dipercaya.
+- Inspector, graph, layers, dan parameters adalah konteks, bukan layar utama yang bersaing dengan editor/preview.
+- Model dan physical surface harus mudah dibedakan.
+- Kontrol lanjutan boleh padat pada desktop, tetapi tidak boleh menjadi mouse-only.
+- Rounded hanya dipakai jika punya fungsi jelas: selector, status, segmented control, atau target aksi tertentu.
+- Jangan menambah sistem preferensi besar sebelum alur utama stabil.
+
+### Non-goals
+
+- Tidak menjadikan playground replika Flutter.
+- Tidak mengganti preview RelGeo dengan gambar dekoratif/AI.
+- Tidak membangun kolaborasi multi-user.
+- Tidak menyembunyikan kemampuan teknis; kemampuan itu hanya ditata menurut konteks.
+
+## 3. Metode dan bukti
+
+Audit mencakup `src/App.tsx`, `Navbar.tsx`, `Sidebar.tsx`, `Inspector.tsx`, `GraphViewer.tsx`, `Preview.tsx`, `index.css`, README, `docs/README.md`, konfigurasi Vite, dan scripts.
+
+Validasi baseline:
+
+- TypeScript check: **lulus**.
+- Vite production build: **lulus**.
+- Vitest: **48/48 test lulus**.
+- ESLint: **lulus**.
+- Preview produksi lokal dibuka pada `http://127.0.0.1:4325/playground/`.
+- Sweep browser viewport 390×844 dengan reduced-motion: 37 kontrol DOM terlihat, seluruhnya memiliki accessible name, seluruhnya tercapai dengan Tab, dan `scrollWidth` tetap 390.
+- AX tree standalone playground: kontrol yang terdeteksi memiliki nama, termasuk editor, combobox, slider, button, dan checkbox.
+
+Validasi itu membuktikan baseline tidak sedang rusak secara teknis. Itu belum membuktikan alur nyaman, jelas, dan optimal pada perangkat fisik.
+
+### Keterbatasan
+
+- Belum ada uji handset fisik.
+- Belum ada traversal penuh dengan VoiceOver, TalkBack, atau screen reader nyata.
+- Screenshot lokal adalah spot check, bukan usability study.
+- Beberapa temuan visual harus dikonfirmasi lagi setelah camera dan responsive layout berubah.
+
+## 4. Peta alur pengguna
+
+| Tahap | Kondisi saat ini | Penilaian |
+| --- | --- | --- |
+| First open | Banyak kontrol langsung terlihat, tetapi hasil gambar pada spot check berada terlalu rendah dalam canvas | Friksi tinggi |
+| Pilih contoh | Selector ada, tetapi nama contoh terpotong pada toolbar | Friksi sedang |
+| Edit source | Editor berfungsi dan accessible; feedback resolve belum cukup komunikatif | Friksi sedang |
+| Resolve | Status READY/error ada, tetapi feedback aksi belum seragam | Friksi sedang |
+| Preview | Kaya fitur, namun kontrol tersebar dan framing awal kurang meyakinkan | Friksi tinggi |
+| Inspect | Data tersedia, tetapi object list flat dan panjang | Friksi tinggi |
+| Recover error | Jump-to-code ada, tetapi sebagian affordance mouse-only | Friksi tinggi |
+| Parameters/layers | Kemampuan ada; grouping dan state panel belum cukup jelas | Friksi sedang |
+| Graph | Ada dan berguna dengan mouse; navigasi accessible belum memadai | Friksi tinggi |
+| Share/export | Aksi tersedia, tetapi kegagalan dan hasil belum selalu diinformasikan | Friksi sedang |
+| Reset/ganti contoh | Source dapat terganti; belum ada dirty-state/konfirmasi | Risiko tinggi |
+
+## 5. Temuan audit
+
+Severity: **P0** memblokir tugas utama; **P1** mengganggu penggunaan normal, aksesibilitas, atau recovery; **P2** adalah kualitas, discoverability, konsistensi, atau maintainability.
+
+### P1 — first-run, layout, dan accessibility
+
+#### U01 — Framing preview awal tidak meyakinkan
+
+**Observasi:** preview produksi lokal menampilkan ruang kosong besar di bagian atas, dengan gambar mulai jauh di bawah viewport. Spot check tombol recenter belum menghasilkan framing yang cukup meyakinkan.
+
+**Dampak:** pengguna baru dapat mengira resolver/renderer gagal, padahal gambar berada di luar fokus visual.
+
+**Perbaikan:** tetapkan camera-fit contract. Setelah resolve sukses, bounding box harus terlihat utuh atau pusat gambar berada di viewport dengan margin konsisten. Bedakan `fit`, `recenter`, dan `reset zoom`.
+
+**Acceptance:** contoh default menampilkan hasil utama tanpa scroll/pan; fit benar untuk gambar kecil, besar, kosong, dan multi-sheet.
+
+#### U02 — Workbench terlalu padat pada desktop umum
+
+**Observasi:** navbar menampung example selector, status, surface toggle, sheet selector, zoom, export, copy/share/reset, layout, dan sidebar controls. Selector contoh terlihat terpotong; banyak aksi hanya icon button.
+
+**Dampak:** hierarki tindakan tidak jelas dan area editor/preview berkurang, terutama sekitar 1024px.
+
+**Perbaikan:** pisahkan global workbench bar dari contextual preview toolbar. Kurangi kontrol yang selalu terlihat; pindahkan aksi jarang dipakai ke menu accessible. Beri ruang minimum untuk example name dan status.
+
+**Acceptance:** pada 1280px dan 1024px label penting tidak terpotong dan hierarki aksi dapat dipahami tanpa tooltip satu per satu.
+
+#### U03 — Responsive rules masih menarget layout lama
+
+**Observasi:** `index.css` masih memiliki media queries untuk `.control-panel`, `.workspace`, `.hero-bar`, `.preview-tools`, dan `.view-mode-strip`, sedangkan layout aktif memakai `.main-area`, `.workspace-split`, `.navbar`, dan sidebar.
+
+**Dampak:** breakpoint dapat terlihat ada tetapi tidak benar-benar mengubah layout aktif; layar sempit berisiko menjadi desktop yang terjepit.
+
+**Perbaikan:** inventaris class aktif, isolasi selector legacy, lalu desain breakpoint aktif untuk 1024/940/720/480px. Pada mobile gunakan surface switch atau drawer untuk sidebar.
+
+**Acceptance:** 390×844 dan 414×896 tidak horizontal overflow; editor, preview, sidebar, sheet, dan error state tetap reachable.
+
+#### U04 — Header sidebar bukan disclosure semantic
+
+**Observasi:** header `SidebarPanel` berupa `div` dengan `onClick`, bukan button/focusable control. Tidak ada `aria-expanded` dan `aria-controls`.
+
+**Perbaikan:** gunakan button/disclosure semantic, id body panel, `aria-expanded`, focus style, dan keyboard activation.
+
+**Acceptance:** semua panel dapat dibuka/ditutup dengan Tab + Enter/Space dan state terbaca di AX tree.
+
+#### U05 — Resizer split/sidebar mouse-only
+
+**Observasi:** `.split-resizer` dan `.sidebar-resizer` memakai `onMouseDown` serta listener mouse global, tanpa separator semantics, keyboard adjustment, atau label.
+
+**Perbaikan:** gunakan `role="separator"`, orientation, `aria-valuenow/min/max`, `tabIndex=0`, Arrow/Home/End, serta preset editor/preview/editor-only/preview-only.
+
+**Acceptance:** ukuran dapat diubah dengan keyboard dan tidak membuat layout unusable pada nilai ekstrem.
+
+#### U06 — Reduced motion belum dihormati CSS playground
+
+**Observasi:** ada pulse, transition, hover transform, dan fade, tetapi belum ada aturan `@media (prefers-reduced-motion: reduce)` khusus playground. Sweep sudah mendeteksi preference reduce, namun animasi belum otomatis dinonaktifkan.
+
+**Perbaikan:** matikan motion non-esensial saat reduce aktif; gunakan perubahan warna/border/teks sebagai feedback.
+
+**Acceptance:** recording/computed style pada reduced-motion tidak menjalankan animasi non-esensial.
+
+#### U07 — Feedback aksi dan clipboard belum kuat
+
+**Observasi:** export dapat return diam-diam saat SVG belum ada; copy tidak menangkap exception clipboard; share menangkap error hanya di log. Reset/ganti contoh belum memiliki dirty-state.
+
+**Perbaikan:** buat feedback terpusat (`idle`, `working`, `success`, `error`), live region ringan, disabled state jujur, fallback copy manual, dirty indicator, dan konfirmasi saat draft berubah.
+
+**Acceptance:** clipboard denied, SVG belum siap, export gagal, share berhasil, dan reset draft menghasilkan feedback berbeda yang dapat dipahami.
+
+#### U08 — Inspector terlalu panjang dan flat
+
+**Observasi:** object list menampilkan banyak object sekaligus, termasuk item generated berulang seperti `bathroom_tiles[i,j]`. Contoh Architectural Floor Plan memiliki sekitar 50 object entries.
+
+**Dampak:** sulit menemukan object relevan dan menghubungkannya dengan gambar/source.
+
+**Perbaikan:** search/filter, grouping role/parent, selected/related only, collapse all/expand selected, count per group, serta highlight dua arah preview/source/graph.
+
+**Acceptance:** object 50+ dapat ditemukan berdasarkan nama dalam satu langkah dan dapat diikuti ke code serta preview.
+
+#### U09 — Error recovery belum menjadi alur ringkas
+
+**Observasi:** error banner dan sebagian dependency/object affordance masih menggunakan `span`/`code` yang clickable. Belum ada “Go to first error” dan recovery summary.
+
+**Perbaikan:** `role="alert"` untuk error baru, ringkasan jumlah error, tombol first-error, action semantic untuk object/dependency link, dan pesan recovery dengan lokasi source.
+
+**Acceptance:** error dapat ditemukan dari keyboard, diumumkan screen reader, dan membawa user ke lokasi source yang tepat.
+
+#### U10 — Graph node belum keyboard/screen-reader selectable
+
+**Observasi:** SVG graph memiliki `role="img"` dan label keseluruhan, tetapi node `<g>` hanya `onClick` dengan cursor pointer.
+
+**Perbaikan:** buat node focusable dengan role button, label, Enter/Space, selected state, dan sinkronisasi ke inspector/source; atau sediakan companion object list setara.
+
+**Acceptance:** node penting dapat dicapai keyboard, punya nama, dan memilih node memperbarui inspector.
+
+#### U11 — State control belum seluruhnya semantic
+
+**Observasi:** overlay toggles, Model/Physical, layout, sidebar placement, dan inspector tabs memiliki visual state, tetapi tidak semuanya memakai `aria-pressed`, `aria-selected`, `role=tab`, `aria-controls`, atau equivalent.
+
+**Perbaikan:** petakan control ke primitive tepat: toggle button, radio/segmented control, tab, disclosure, atau checkbox. Jangan mengandalkan `title` sebagai satu-satunya penjelasan.
+
+**Acceptance:** AX tree menunjukkan selected/pressed/expanded/value state yang benar setelah setiap interaksi.
+
+#### U12 — Gesture preview perlu kontrak mobile
+
+**Observasi:** preview memakai `touchAction: none`, pointer capture, wheel modifier, dan pointer-based pan.
+
+**Dampak:** perilaku native touch/scroll dapat tertahan dan gesture tidak otomatis dapat dipahami.
+
+**Perbaikan:** tetapkan gesture contract: pan hanya di canvas, pinch bila didukung, toolbar sebagai alternatif non-gesture, dan halaman tetap dapat scroll di luar canvas.
+
+**Acceptance:** touch user dapat pan/zoom tanpa halaman terjebak; fungsi penting tersedia tanpa gesture.
+
+### P2 — visual language, discoverability, dan maintainability
+
+#### U13 — Rounded/pill terlalu dominan
+
+Radius default, icon button, selector, status pill, graph container, dan beberapa panel/chip membuat workbench terasa seperti kumpulan kartu. Definisikan radius token berdasarkan fungsi: editor/canvas/panel struktural kecil atau square; pill hanya untuk status/segmented control.
+
+#### U14 — Toolbar ganda dan Model/Physical ambigu
+
+Navbar dan Preview sama-sama mengatur surface/overlay/camera. Kelompokkan surface selector dekat preview, beri subtitle yang menjelaskan semantic model vs physical drawing, dan hilangkan duplikasi.
+
+#### U15 — Icon-only action kurang discoverable
+
+Pertahankan icon-only untuk aksi umum yang jelas konteksnya. Pada ruang longgar/mobile gunakan icon + label, tooltip tertunda, focus-visible label, dan disabled explanation.
+
+#### U16 — Typography IBM Plex tidak dijamin
+
+CSS menyebut IBM Plex Sans/Mono, tetapi source tidak memuat font file/import yang memastikan font tersedia. Putuskan self-host subset, import resmi, atau system stack sebagai kontrak; uji fallback.
+
+#### U17 — Empty state memiliki `min-width: 400px`
+
+`min-width` berisiko melampaui viewport 390px. Gunakan width fluid, `min-width: 0`, wrapping, dan ukur ulang pada 320/360/390px.
+
+#### U18 — CSS legacy dan inline styling tersebar
+
+`index.css` besar dan masih memiliki selector layout lama; Navbar/Preview juga memiliki inline style cukup banyak. Inventaris class dari JSX/TSX, hapus selector yang terbukti dead, pindahkan token/layout primitive ke layer jelas, dan pecah stylesheet hanya jika meningkatkan navigability.
+
+#### U19 — README menyebut ISC, paket memakai MIT
+
+Metadata paket dan `LICENSE` memakai MIT, tetapi README masih menyebut ISC. Selaraskan agar package surface dapat dipercaya.
+
+#### U20 — Persistence draft tidak terlihat
+
+Code disimpan ke localStorage dan URL hash setelah jeda, tetapi UI tidak membedakan default example, local draft, dan custom hash source. Tampilkan `Saved locally`/`Unsaved changes`, jelaskan bahwa share link memuat source, dan tetapkan strategi untuk hash panjang.
+
+#### U21 — Graph fixed-layout cepat menjadi tidak terbaca
+
+Graph memiliki overflow tetapi belum memiliki legend, search, zoom/minimap, atau focus mode. Mulai dari filter/focus selected dan legend sederhana; jangan memaksa semua node terlihat sekaligus.
+
+## 6. Arah UX target
+
+Gunakan tiga zona mental yang jelas:
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│ identity · example · resolve status · share/export          │
+├──────────────────────────────┬──────────────────────────────┤
+│ SOURCE                       │ PREVIEW                      │
+│ edit, errors, line context   │ fit, surface, overlays       │
+├──────────────────────────────┴──────────────────────────────┤
+│ optional context: inspector / parameters / layers / graph   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+Sidebar boleh berada di kanan/kiri pada desktop, tetapi secara mental tetap **optional context**. Pada mobile ia menjadi surface switch atau drawer, bukan kolom ketiga yang dipaksa mengecil.
+
+### Hierarki aksi
+
+1. **Primary:** edit source dan lihat hasil.
+2. **Status:** tahu editing, resolving, ready, atau error.
+3. **Context:** inspect object, parameter, layer, graph.
+4. **Utility:** share, copy, export, reset.
+
+Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondisi normal.
+
+## 7. Rencana implementasi bertahap
+
+### Phase 0 — Contract dan measurement
+
+- [ ] Tetapkan viewport QA: 1440×900, 1280×800, 1024×768, 768×1024, 414×896, 390×844, 320×800.
+- [ ] Simpan screenshot baseline untuk first open, valid result, error, inspector, graph, dan mobile.
+- [ ] Tetapkan acceptance test alur choose → edit → resolve → inspect → share.
+- [ ] Inventaris class aktif dan tandai selector CSS legacy.
+- [ ] Tetapkan camera-fit contract untuk setiap surface/sheet.
+
+### Phase 1 — Unblock daily loop
+
+- [ ] Perbaiki camera fit/recenter; gambar default langsung terlihat.
+- [ ] Pisahkan global controls dan preview contextual controls.
+- [ ] Pastikan example selector tidak memotong nama penting.
+- [ ] Tambahkan status editing/resolving/ready/error yang jelas.
+- [ ] Tambahkan feedback copy/share/export dan clipboard fallback.
+- [ ] Tambahkan dirty/draft indicator dan konfirmasi reset/ganti contoh bila perlu.
+- [ ] Implementasikan mobile surface switch/drawer.
+- [ ] Jadikan empty state fluid.
+
+### Phase 2 — Inspect dan debug
+
+- [ ] Ubah sidebar headers menjadi disclosure controls semantic.
+- [ ] Ubah resizer menjadi keyboard-accessible separator dan sediakan layout presets.
+- [ ] Tambahkan inspector search, grouping, count, selected/related filter, dan collapse behavior.
+- [ ] Sinkronkan selection preview ↔ inspector ↔ graph ↔ code definition.
+- [ ] Jadikan error summary/actions keyboard-accessible dan `role=alert`.
+- [ ] Implementasikan tab semantics Objects/Values/Errors/Graph/BOM.
+- [ ] Jadikan graph node focusable atau sediakan companion object list setara.
+- [ ] Tambahkan graph focus/filter/legend.
+
+### Phase 3 — Visual system dan cleanup
+
+- [ ] Definisikan tokens warna, border, spacing, radius, type, elevation, dan focus ring.
+- [ ] Kurangi rounded default; gunakan radius berdasarkan fungsi.
+- [ ] Satukan style control yang tersebar di inline styles/CSS.
+- [ ] Putuskan strategi font IBM Plex yang eksplisit.
+- [ ] Hapus selector legacy setelah regression check.
+- [ ] Pecah stylesheet hanya pada batas concern yang membantu perawatan.
+- [ ] Selaraskan README/license metadata dengan MIT.
+
+### Phase 4 — Verification dan release gate
+
+- [ ] Jalankan typecheck, lint, unit test, dan production build.
+- [ ] Uji keyboard traversal penuh untuk navbar, editor, preview, sidebar, inspector, graph, error, dan dialog.
+- [ ] Uji AX names, roles, expanded/selected/pressed/value states, dan alert announcements.
+- [ ] Uji reduced-motion dan pastikan motion non-esensial berhenti.
+- [ ] Uji clipboard denied, no SVG, slow resolve, stale worker, syntax error, dan long URL hash.
+- [ ] Uji browser responsive pada viewport matrix.
+- [ ] Uji handset fisik dan VoiceOver/TalkBack.
+- [ ] Smoke test URL deploy serta pin versi playground pada website.
+
+## 8. Acceptance criteria terukur
+
+| Area | Kriteria selesai |
+| --- | --- |
+| First run | Contoh default, status, source, dan gambar utama terlihat tanpa pengguna menebak tombol fit |
+| Camera | Fit/recenter konsisten untuk sheet dan bounding box relevan |
+| Responsive | Tidak ada horizontal overflow pada 390px; source/preview/context punya navigasi jelas |
+| Keyboard | Semua tindakan utama dan panel dapat dipakai tanpa mouse |
+| Semantics | Toggle/tab/disclosure/separator/alert memiliki role dan state sesuai |
+| Error | User dapat menemukan error pertama, lompat ke source, dan memahami recovery |
+| Inspector | Object 50+ dapat dicari, difilter, dikelompokkan, dan disinkronkan |
+| Graph | Node penting keyboard-selectable atau companion list setara |
+| Feedback | Copy/share/export/reset tidak pernah mengklaim sukses palsu |
+| Motion | Reduced-motion menghentikan animasi non-esensial |
+| Visual | Radius, typography, spacing, dan focus treatment mengikuti token |
+| Quality | Typecheck, lint, test, build, responsive, dan accessibility smoke test lulus |
+
+## 9. Urutan kerja yang disarankan
+
+1. **U01 + U02:** preview pertama harus memberi keyakinan; toolbar tidak boleh menguasai layar.
+2. **U03 + U17 + U12:** selesaikan mobile contract sebelum polish.
+3. **U06 + U07 + U09 + U11:** tutup celah feedback dan semantic accessibility.
+4. **U04 + U05:** jadikan struktur sidebar dan resizer usable tanpa mouse.
+5. **U08 + U10 + U21:** ubah inspector/graph menjadi alat diagnosis.
+6. **U13–U20:** lakukan visual dan codebase cleanup setelah interaksi stabil.
+7. **Phase 4:** ulangi QA matrix dan lakukan uji fisik.
+
+## 10. Status pekerjaan
+
+### Sudah tersedia pada baseline
+
+- [x] Worker-based resolve dan stale request protection.
+- [x] Editor memiliki accessible name dan dapat dilalui keyboard.
+- [x] Kontrol utama terlihat memiliki accessible name pada audit browser baseline.
+- [x] Production build, typecheck, lint, dan unit test lulus.
+- [x] Preview, inspector, parameters, layers, graph, share, dan export tersedia.
+
+### Belum dikerjakan
+
+- [ ] Perubahan implementasi UX/UI Phase 1–4.
+- [ ] Uji handset fisik.
+- [ ] Uji screen reader nyata dengan VoiceOver/TalkBack.
+- [ ] Camera-fit dan responsive contract yang sudah diimplementasikan.
+- [ ] Inspector/graph redesign.
+- [ ] Visual token cleanup dan penghapusan CSS legacy.
+
+Dokumen ini menjadi baseline diskusi dan checklist perubahan playground. Setiap implementasi sebaiknya menandai checklist yang relevan bersamaan dengan commit yang mengerjakannya.
