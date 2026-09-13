@@ -84,7 +84,7 @@ export function Inspector({
 
   const handleJump = (objectId: string) => {
     onSelectObject?.(objectId);
-    if (onJumpToLine) {
+    if (onJumpToLine && !onSelectObject) {
       const line = findLineForObject(objectId);
       onJumpToLine(line);
     }

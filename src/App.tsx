@@ -52,6 +52,19 @@ function clampPreviewZoom(value: number): number {
   return Math.min(MAX_PREVIEW_ZOOM, Math.max(MIN_PREVIEW_ZOOM, Math.round(value * 100) / 100));
 }
 
+function findSourceLineForObject(code: string, objectId: string): number {
+  const candidates = Array.from(new Set([
+    objectId,
+    objectId.split('[')[0],
+    objectId.split('.')[0],
+  ].filter(Boolean)));
+
+  return code.split('\n').findIndex((line) => {
+    const trimmedLine = line.trim();
+    return candidates.some((candidate) => trimmedLine.startsWith(`${candidate}:`));
+  });
+}
+
 async function copyText(text: string): Promise<void> {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
@@ -175,8 +188,15 @@ function App() {
   };
 
   const handleJumpToObject = (objectId: string) => {
-    const lineIndex = code.split('\n').findIndex((line) => line.trim().startsWith(`${objectId}:`));
+    const lineIndex = findSourceLineForObject(code, objectId);
     handleJumpToLine(lineIndex >= 0 ? lineIndex : 0);
+  };
+
+  const handleSelectObject = (objectId: string | null) => {
+    setSelectedObjectId(objectId);
+    if (objectId) {
+      handleJumpToObject(objectId);
+    }
   };
 
   // Sync code to URL hash and localStorage draft
@@ -568,7 +588,7 @@ function App() {
                 valueCount={resolvedValueCount}
                 unit={displayDoc?.scene?.unit || 'mm'}
                 selectedObjectId={visibleSelectedObjectId}
-                onSelectObject={setSelectedObjectId}
+                onSelectObject={handleSelectObject}
                 onJumpToLine={handleJumpToLine}
               />
               </Suspense>
@@ -670,7 +690,7 @@ function App() {
                 fitAllTrigger={fitAllTrigger}
                 selectedSheetId={effectiveSheetId}
                 selectedObjectId={visibleSelectedObjectId}
-                onSelectObject={setSelectedObjectId}
+                onSelectObject={handleSelectObject}
               />
               </Suspense>
             </div>

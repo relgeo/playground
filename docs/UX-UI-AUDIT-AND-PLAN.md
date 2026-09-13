@@ -290,7 +290,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [x] Sidebar headers menjadi disclosure controls semantic.
 - [x] Split/sidebar resizer menjadi keyboard-accessible separator; preset layout masih tersisa.
-- [ ] Inspector search, count, selected-only filter, dan generated-object grouping sudah ada; selected/related synchronization dan cross-surface collapse behavior masih tersisa.
+- [ ] Inspector search, count, selected-only filter, dan generated-object grouping sudah ada; selection preview/inspector/graph ke source definition sudah tersambung, sedangkan related-object synchronization dan cross-surface collapse behavior masih tersisa.
 - [ ] Sinkronkan selection preview ↔ inspector ↔ graph ↔ code definition.
 - [ ] Jadikan seluruh error summary/actions keyboard-accessible dan `role=alert`.
 - [x] Inspector tabs memiliki tablist/tab/tabpanel semantics.
@@ -366,12 +366,13 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U11 — Navbar, preview toggles, dan inspector tabs memiliki state semantics pada bagian yang sudah disentuh.
 - [x] U17 — empty state fluid dan tidak lagi memaksa minimum 400px.
 - [x] U08 — object hasil generated repeat kini dikelompokkan dan group dapat dibuka/tutup; sinkronisasi selection lintas surface masih tersisa.
+- [x] U08 — selection dari preview, inspector, dan graph kini memusatkan source definition di editor; related-object synchronization masih tersisa.
 - [x] U09 — error preview memiliki alert semantics dan tombol langsung ke source untuk error yang memiliki object id.
 - [x] U14 — toolbar groups diberi semantic label; konsolidasi visual dan pengurangan duplikasi masih tersisa.
 
 ### Batch berikutnya yang sebagian sudah diterapkan
 
-- [ ] U08 — inspector sekarang memiliki search, jumlah hasil, selected-only filter, dan grouping; sinkronisasi preview/source/graph serta grouping lanjutan masih belum.
+- [ ] U08 — inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, dan source jump lintas surface; related-object synchronization serta grouping lanjutan masih belum.
 - [ ] U09 — first-error umum dan recovery untuk error tanpa object id belum.
 - [ ] U11 — audit seluruh control, termasuk affordance yang belum disentuh, masih perlu.
 
@@ -385,7 +386,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [ ] U01 — camera fit/recenter untuk seluruh sheet dan frame ekstrem.
 - [ ] U02 — konsolidasi toolbar dan kepadatan desktop.
-- [ ] U08 — sinkronisasi selection preview/source/graph dan grouping lanjutan.
+- [ ] U08 — related-object synchronization, cross-surface collapse, dan grouping lanjutan.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
 - [ ] U18–U21 — CSS cleanup, persistence disclosure, README license, dan graph focus/legend.
 - [ ] Uji handset fisik.
