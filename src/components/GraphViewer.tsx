@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { getDependencyGraph } from '@relgeo/core';
 import type { RelGeoObject } from '@relgeo/core';
 
@@ -43,8 +43,24 @@ export function GraphViewer({
   relatedObjectIds = [],
   onNodeSelect,
 }: GraphViewerProps) {
+  const [objectQuery, setObjectQuery] = useState('');
+  const [focusSelection, setFocusSelection] = useState(false);
+  const allObjectIds = Object.keys(objects ?? {});
+  const normalizedQuery = objectQuery.trim().toLowerCase();
+  const visibleObjectIds = useMemo(() => {
+    const queryMatches = allObjectIds.filter((id) => {
+      if (!normalizedQuery) return true;
+      return id.toLowerCase().includes(normalizedQuery)
+        || (objects[id]?.type ?? 'unknown').toLowerCase().includes(normalizedQuery);
+    });
+    if (!focusSelection || !selectedObjectId) return queryMatches;
+
+    const focusedIds = new Set([selectedObjectId, ...relatedObjectIds]);
+    return queryMatches.filter((id) => focusedIds.has(id));
+  }, [allObjectIds, focusSelection, normalizedQuery, objects, relatedObjectIds, selectedObjectId]);
+
   const { nodes, edges, width, height, layoutMode } = useMemo(() => {
-    const ids = Object.keys(objects ?? {});
+    const ids = visibleObjectIds;
     const levels: Record<string, number> = {};
 
     // 1. Calculate dependency Graph map using @relgeo/core's getDependencyGraph
@@ -186,14 +202,50 @@ export function GraphViewer({
     } else {
       return { ...lr, layoutMode: 'LR' as const };
     }
-  }, [objects]);
+  }, [objects, visibleObjectIds]);
 
   if (!objects || Object.keys(objects).length === 0) {
     return <div className="text-sm" style={{ padding: '1rem', color: 'var(--muted)' }}>No objects.</div>;
   }
 
   return (
-    <div className="graph-viewer-outer" style={{ width: '100%', overflow: 'auto', background: 'transparent' }}>
+    <div className="graph-viewer-shell">
+      <div className="graph-viewer-controls" role="group" aria-label="Graph filters">
+        <label htmlFor="graph-object-filter">Find object</label>
+        <input
+          id="graph-object-filter"
+          type="search"
+          value={objectQuery}
+          onChange={(event) => setObjectQuery(event.target.value)}
+          placeholder="Name or type…"
+          aria-label="Find graph object by name or type"
+        />
+        <button
+          type="button"
+          onClick={() => setFocusSelection((value) => !value)}
+          disabled={!selectedObjectId}
+          aria-pressed={focusSelection && Boolean(selectedObjectId)}
+          title={selectedObjectId ? 'Show only the selected object and its related neighborhood' : 'Select an object first'}
+        >
+          Focus selection
+        </button>
+        <span className="graph-viewer-count" role="status" aria-live="polite">
+          Showing {visibleObjectIds.length} of {allObjectIds.length} objects
+        </span>
+      </div>
+      <div className="graph-viewer-legend" aria-label="Graph legend">
+        <span className="graph-legend-item"><i className="graph-legend-swatch is-point" aria-hidden="true" />Point</span>
+        <span className="graph-legend-item"><i className="graph-legend-swatch is-curve" aria-hidden="true" />Curve</span>
+        <span className="graph-legend-item"><i className="graph-legend-swatch is-other" aria-hidden="true" />Container / other</span>
+        <span className="graph-legend-item"><i className="graph-legend-swatch is-selected" aria-hidden="true" />Selected</span>
+        <span className="graph-legend-item"><i className="graph-legend-swatch is-related" aria-hidden="true" />Related</span>
+      </div>
+      {visibleObjectIds.length === 0 ? (
+        <div className="graph-viewer-empty" role="status">
+          No graph objects match this filter.
+        </div>
+      ) : (
+      <div className="graph-viewer-outer" style={{ width: '100%', overflow: 'auto', background: 'transparent' }}>
       <svg
         width="100%"
         // height={height}
@@ -312,6 +364,8 @@ export function GraphViewer({
           );
         })}
       </svg>
+      </div>
+      )}
     </div>
   );
 }

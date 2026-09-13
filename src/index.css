@@ -1178,6 +1178,132 @@ input[type='range'] {
   box-shadow: none;
 }
 
+.graph-viewer-shell {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.graph-viewer-controls {
+  display: grid;
+  grid-template-columns: auto minmax(8rem, 1fr) auto auto;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.graph-viewer-controls label {
+  white-space: nowrap;
+}
+
+.graph-viewer-controls input {
+  min-width: 0;
+  width: 100%;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 500;
+}
+
+.graph-viewer-controls button {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.graph-viewer-controls button[aria-pressed='true'] {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.graph-viewer-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.graph-viewer-count {
+  justify-self: end;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.graph-viewer-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.65rem;
+  color: var(--muted);
+  font-size: 0.64rem;
+}
+
+.graph-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  white-space: nowrap;
+}
+
+.graph-legend-swatch {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.45rem;
+  border: 1px solid var(--line);
+  background: var(--panel-strong);
+}
+
+.graph-legend-swatch.is-point {
+  border-color: var(--accent);
+  background: rgba(217, 119, 6, 0.14);
+}
+
+.graph-legend-swatch.is-curve {
+  border-color: var(--brand);
+  background: rgba(15, 118, 110, 0.14);
+}
+
+.graph-legend-swatch.is-selected {
+  border: 2px solid var(--ink);
+  background: var(--panel-strong);
+}
+
+.graph-legend-swatch.is-related {
+  border: 1px dashed var(--accent);
+  background: rgba(217, 119, 6, 0.12);
+}
+
+.graph-viewer-empty {
+  padding: 1.25rem 0.5rem;
+  color: var(--muted);
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .graph-viewer-controls {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .graph-viewer-controls label,
+  .graph-viewer-controls input {
+    grid-column: 1 / -1;
+  }
+
+  .graph-viewer-count {
+    justify-self: start;
+  }
+}
+
 .inspector-code {
   flex: 1;
   margin: 0;
