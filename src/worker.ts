@@ -10,7 +10,7 @@ const playgroundTextMetricsProvider = {
     const lines = String(content ?? '').split('\n');
 
     if (offscreenCtx) {
-      // Use Outfit/Inter or standard sans-serif font matching the Playground stylesheet
+      // Use the Playground's sans-serif metrics; the worker cannot depend on webfont loading.
       offscreenCtx.font = `${fontSize}px sans-serif`;
       let maxWidth = 0;
       let maxAscent = fontSize * 0.8;
