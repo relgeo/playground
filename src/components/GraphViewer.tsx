@@ -261,7 +261,17 @@ export function GraphViewer({
               key={node.id}
               transform={`translate(${node.x}, ${node.y})`}
               onClick={() => onNodeSelect?.(node.id)}
-              style={{ cursor: onNodeSelect ? 'pointer' : 'default' }}
+              onKeyDown={(event) => {
+                if (onNodeSelect && (event.key === 'Enter' || event.key === ' ')) {
+                  event.preventDefault();
+                  onNodeSelect(node.id);
+                }
+              }}
+              role={onNodeSelect ? 'button' : undefined}
+              tabIndex={onNodeSelect ? 0 : undefined}
+              aria-label={onNodeSelect ? `Select object ${node.id}` : undefined}
+              aria-pressed={onNodeSelect ? isSelected : undefined}
+              style={{ cursor: onNodeSelect ? 'pointer' : 'default', outline: 'none' }}
             >
               {/* Interactive Node Card */}
               <rect

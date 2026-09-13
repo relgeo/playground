@@ -783,6 +783,8 @@ export function Preview({
                 onClick={() => setOverlay(p => ({ ...p, showSegments: !p.showSegments }))}
                 className={overlay.showSegments ? 'active' : ''}
                 title="Toggle Indices"
+                aria-label="Toggle indices"
+                aria-pressed={overlay.showSegments}
                 style={{
                   padding: '0.2rem 0.4rem',
                   fontSize: '0.8rem',
@@ -801,6 +803,8 @@ export function Preview({
                 onClick={() => setOverlay(p => ({ ...p, showAnchors: !p.showAnchors }))}
                 className={overlay.showAnchors ? 'active' : ''}
                 title="Toggle Anchors"
+                aria-label="Toggle anchors"
+                aria-pressed={overlay.showAnchors}
                 style={{
                   padding: '0.2rem 0.4rem',
                   fontSize: '0.8rem',
@@ -819,6 +823,8 @@ export function Preview({
                 onClick={() => setOverlay(p => ({ ...p, showBoundingBoxes: !p.showBoundingBoxes }))}
                 className={overlay.showBoundingBoxes ? 'active' : ''}
                 title="Toggle Bounds"
+                aria-label="Toggle bounds"
+                aria-pressed={overlay.showBoundingBoxes}
                 style={{
                   padding: '0.2rem 0.4rem',
                   fontSize: '0.8rem',
@@ -837,6 +843,8 @@ export function Preview({
                 onClick={() => setOverlay(p => ({ ...p, showLabels: !p.showLabels }))}
                 className={overlay.showLabels ? 'active' : ''}
                 title="Toggle Labels"
+                aria-label="Toggle labels"
+                aria-pressed={overlay.showLabels}
                 style={{
                   padding: '0.2rem 0.4rem',
                   fontSize: '0.8rem',
@@ -855,6 +863,7 @@ export function Preview({
                 onClick={() => setPreviewLineMode('static')}
                 className={previewLineMode === 'static' ? 'active' : ''}
                 title="Static Screen Line Preview"
+                aria-pressed={previewLineMode === 'static'}
                 style={{
                   padding: '0.2rem 0.45rem',
                   fontSize: '0.72rem',
@@ -872,6 +881,7 @@ export function Preview({
                 onClick={() => setPreviewLineMode('physical-relative')}
                 className={previewLineMode === 'physical-relative' ? 'active' : ''}
                 title="Physical Relative Line Preview"
+                aria-pressed={previewLineMode === 'physical-relative'}
                 style={{
                   padding: '0.2rem 0.45rem',
                   fontSize: '0.72rem',
@@ -893,6 +903,8 @@ export function Preview({
                 onClick={() => setShowAnchors(!showAnchors)}
                 className={showAnchors ? 'active' : ''}
                 title="Toggle Anchors"
+                aria-label="Toggle anchors"
+                aria-pressed={showAnchors}
                 style={{
                   padding: '0.2rem 0.4rem',
                   fontSize: '0.8rem',
@@ -911,6 +923,8 @@ export function Preview({
                 onClick={() => setShowBoundingBox(!showBoundingBox)}
                 className={showBoundingBox ? 'active' : ''}
                 title="Toggle Bounds"
+                aria-label="Toggle bounds"
+                aria-pressed={showBoundingBox}
                 style={{
                   padding: '0.2rem 0.4rem',
                   fontSize: '0.8rem',
@@ -929,6 +943,8 @@ export function Preview({
                 onClick={() => setShowLabels(!showLabels)}
                 className={showLabels ? 'active' : ''}
                 title="Toggle Labels"
+                aria-label="Toggle labels"
+                aria-pressed={showLabels}
                 style={{
                   padding: '0.2rem 0.4rem',
                   fontSize: '0.8rem',
@@ -947,6 +963,8 @@ export function Preview({
                 onClick={() => setShowDimensions(!showDimensions)}
                 className={showDimensions ? 'active' : ''}
                 title="Toggle Dimensions"
+                aria-label="Toggle dimensions"
+                aria-pressed={showDimensions}
                 style={{
                   padding: '0.2rem 0.4rem',
                   fontSize: '0.8rem',
@@ -965,6 +983,8 @@ export function Preview({
                 onClick={() => setShowAnnotations(!showAnnotations)}
                 className={showAnnotations ? 'active' : ''}
                 title="Toggle Annotations"
+                aria-label="Toggle annotations"
+                aria-pressed={showAnnotations}
                 style={{
                   padding: '0.2rem 0.4rem',
                   fontSize: '0.8rem',
@@ -1043,7 +1063,7 @@ export function Preview({
       </div>
 
       {error && (
-        <div className="error-banner">
+        <div className="error-banner" role="alert" aria-live="assertive">
           <div className="error-message-box">
             <div className="error-title">
               <strong>{fullError?.code || 'Error'}</strong>

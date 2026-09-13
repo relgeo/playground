@@ -280,21 +280,21 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] Perbaiki camera fit/recenter; gambar default langsung terlihat.
 - [ ] Pisahkan global controls dan preview contextual controls.
 - [ ] Pastikan example selector tidak memotong nama penting.
-- [ ] Tambahkan status editing/resolving/ready/error yang jelas.
-- [ ] Tambahkan feedback copy/share/export dan clipboard fallback.
-- [ ] Tambahkan dirty/draft indicator dan konfirmasi reset/ganti contoh bila perlu.
-- [ ] Implementasikan mobile surface switch/drawer.
-- [ ] Jadikan empty state fluid.
+- [x] Status utama diberi `role=status` dan live announcement.
+- [x] Feedback copy/share/export dan clipboard fallback dasar sudah diterapkan.
+- [x] Reset/ganti contoh sekarang meminta konfirmasi saat draft berubah.
+- [ ] Implementasikan mobile surface switch/drawer dan verifikasi viewport matrix.
+- [x] Empty state tidak lagi memaksa lebar 400px.
 
 ### Phase 2 — Inspect dan debug
 
-- [ ] Ubah sidebar headers menjadi disclosure controls semantic.
-- [ ] Ubah resizer menjadi keyboard-accessible separator dan sediakan layout presets.
+- [x] Sidebar headers menjadi disclosure controls semantic.
+- [x] Split/sidebar resizer menjadi keyboard-accessible separator; preset layout masih tersisa.
 - [ ] Tambahkan inspector search, grouping, count, selected/related filter, dan collapse behavior.
 - [ ] Sinkronkan selection preview ↔ inspector ↔ graph ↔ code definition.
-- [ ] Jadikan error summary/actions keyboard-accessible dan `role=alert`.
-- [ ] Implementasikan tab semantics Objects/Values/Errors/Graph/BOM.
-- [ ] Jadikan graph node focusable atau sediakan companion object list setara.
+- [ ] Jadikan seluruh error summary/actions keyboard-accessible dan `role=alert`.
+- [x] Inspector tabs memiliki tablist/tab/tabpanel semantics.
+- [x] Graph node dapat difokuskan, diberi nama, dan dipilih dengan Enter/Space; graph focus/filter masih tersisa.
 - [ ] Tambahkan graph focus/filter/legend.
 
 ### Phase 3 — Visual system dan cleanup
@@ -312,7 +312,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] Jalankan typecheck, lint, unit test, dan production build.
 - [ ] Uji keyboard traversal penuh untuk navbar, editor, preview, sidebar, inspector, graph, error, dan dialog.
 - [ ] Uji AX names, roles, expanded/selected/pressed/value states, dan alert announcements.
-- [ ] Uji reduced-motion dan pastikan motion non-esensial berhenti.
+- [x] Tambahkan reduced-motion rule; verifikasi recording/computed style masih perlu dilakukan.
 - [ ] Uji clipboard denied, no SVG, slow resolve, stale worker, syntax error, dan long URL hash.
 - [ ] Uji browser responsive pada viewport matrix.
 - [ ] Uji handset fisik dan VoiceOver/TalkBack.
@@ -355,13 +355,33 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Production build, typecheck, lint, dan unit test lulus.
 - [x] Preview, inspector, parameters, layers, graph, share, dan export tersedia.
 
+### Selesai pada batch implementasi saat ini
+
+- [x] U04 — sidebar panel headers menjadi disclosure semantic.
+- [x] U05 — split/sidebar resizer memiliki separator semantics dan keyboard adjustment.
+- [x] U06 — reduced-motion override tersedia.
+- [x] U07 — copy/share/export memiliki feedback dan clipboard fallback; pengujian permission edge case masih tersisa.
+- [x] U10 — graph nodes memiliki role, accessible name, dan keyboard activation.
+- [x] U11 — Navbar, preview toggles, dan inspector tabs memiliki state semantics pada bagian yang sudah disentuh.
+- [x] U17 — empty state fluid dan tidak lagi memaksa minimum 400px.
+
+### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
+
+- [ ] U03 — responsive CSS aktif sudah ditambahkan, tetapi viewport matrix dan surface switch/drawer belum selesai.
+- [ ] U09 — alert/error actions sudah sebagian semantic, tetapi first-error recovery dan seluruh clickable affordance belum selesai.
+- [ ] U12 — `touch-action` sudah diperlonggar, tetapi gesture contract belum diuji pada touch nyata.
+
 ### Belum dikerjakan
 
-- [ ] Perubahan implementasi UX/UI Phase 1–4.
+- [ ] U01 — camera fit/recenter dan first-run framing.
+- [ ] U02 — konsolidasi toolbar dan kepadatan desktop.
+- [ ] U08 — inspector search/group/filter.
+- [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
+- [ ] U18–U21 — CSS cleanup, persistence disclosure, README license, dan graph focus/legend.
 - [ ] Uji handset fisik.
 - [ ] Uji screen reader nyata dengan VoiceOver/TalkBack.
-- [ ] Camera-fit dan responsive contract yang sudah diimplementasikan.
-- [ ] Inspector/graph redesign.
+- [ ] Verifikasi penuh camera-fit dan responsive contract.
+- [ ] Inspector redesign.
 - [ ] Visual token cleanup dan penghapusan CSS legacy.
 
 Dokumen ini menjadi baseline diskusi dan checklist perubahan playground. Setiap implementasi sebaiknya menandai checklist yang relevan bersamaan dengan commit yang mengerjakannya.

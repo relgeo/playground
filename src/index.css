@@ -279,15 +279,31 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   padding: 0.65rem 0.85rem;
   background: rgba(0, 0, 0, 0.02);
+  border: 0;
+  border-radius: 0;
+  color: inherit;
   cursor: pointer;
   user-select: none;
   transition: background 0.15s;
+  transform: none;
+  box-shadow: none;
+  text-align: left;
 }
 
 .sidebar-panel-header:hover {
   background: rgba(0, 0, 0, 0.04);
+  transform: none;
+  box-shadow: none;
+}
+
+.sidebar-panel-header:focus-visible,
+.split-resizer:focus-visible,
+.sidebar-resizer:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
 }
 
 .sidebar-panel-header h3 {
@@ -353,6 +369,7 @@ button:disabled {
 }
 
 .navbar {
+  position: relative;
   height: var(--navbar-height);
   background: var(--panel-strong);
   border-bottom: 1px solid var(--line);
@@ -361,6 +378,25 @@ button:disabled {
   justify-content: space-between;
   padding: 0 1rem;
   z-index: 30;
+}
+
+.action-feedback {
+  position: absolute;
+  left: 50%;
+  bottom: -1.65rem;
+  z-index: 40;
+  min-height: 1.2rem;
+  padding: 0.2rem 0.45rem;
+  color: var(--muted);
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  font-size: 0.7rem;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.action-feedback:empty {
+  display: none;
 }
 
 .navbar-left,
@@ -756,7 +792,7 @@ input[type='range'] {
   position: relative;
   background: var(--bg);
   cursor: grab;
-  touch-action: none;
+  touch-action: pan-x pan-y;
   display: block;
   /* Gunakan block agar scrollbar bekerja secara natural */
 }
@@ -814,7 +850,9 @@ input[type='range'] {
   border-radius: 4px;
   padding: 3rem;
   text-align: center;
-  min-width: 400px;
+  width: min(100%, 28rem);
+  min-width: 0;
+  max-width: calc(100vw - 2rem);
   color: var(--muted);
 }
 
@@ -1066,6 +1104,154 @@ input[type='range'] {
 
   .workspace {
     grid-template-rows: minmax(340px, 1fr) 260px;
+  }
+}
+
+/* The active workbench layout needs its own responsive contract. */
+@media (max-width: 940px) {
+  .playground-shell {
+    grid-template-rows: auto 1fr;
+  }
+
+  .navbar {
+    min-height: var(--navbar-height);
+    height: auto;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.55rem;
+    padding: 0.35rem 0.55rem;
+  }
+
+  .navbar-left,
+  .navbar-center,
+  .navbar-right {
+    min-width: 0;
+    gap: 0.35rem;
+  }
+
+  .navbar-left {
+    flex: 1 1 18rem;
+  }
+
+  .navbar-center {
+    order: 3;
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.1rem;
+  }
+
+  .navbar-right {
+    margin-left: auto;
+  }
+
+  .main-area {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    overflow: auto;
+  }
+
+  .playground-shell {
+    height: auto;
+    max-height: none;
+    min-height: 100%;
+  }
+
+  .main-area,
+  .main-area.sidebar-right {
+    flex-direction: column;
+    min-height: calc(100vh - 7rem);
+    overflow: visible;
+  }
+
+  .sidebar,
+  .main-area.sidebar-right .sidebar {
+    order: 2;
+    width: 100% !important;
+    height: auto;
+    max-height: none;
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .sidebar.is-hidden {
+    display: none;
+  }
+
+  .sidebar-resizer {
+    display: none;
+  }
+
+  .workspace-split {
+    order: 1;
+    flex: 1 1 auto;
+    min-height: 70vh;
+    overflow: visible;
+  }
+
+  .workspace-split.is-vertical {
+    min-height: 70vh;
+  }
+
+  .workspace-split:not(.is-vertical) {
+    flex-direction: column;
+  }
+
+  .workspace-split:not(.is-vertical) .editor-side,
+  .workspace-split:not(.is-vertical) .preview-side {
+    flex: 1 1 50% !important;
+    min-height: 22rem;
+  }
+
+  .workspace-split.is-vertical .editor-side,
+  .workspace-split.is-vertical .preview-side {
+    min-height: 22rem;
+  }
+
+  .workspace-split:not(.is-vertical) > .split-resizer {
+    width: 100%;
+    height: 4px;
+    cursor: row-resize;
+  }
+
+  .navbar-left .example-select {
+    width: min(11rem, 45vw) !important;
+  }
+
+  .navbar-left .sheet-select {
+    width: min(9rem, 38vw) !important;
+  }
+
+  .navbar-right .control-group button,
+  .navbar-center .control-group button {
+    min-width: 2.2rem;
+    min-height: 2.2rem;
+  }
+
+  .action-feedback {
+    left: 0.55rem;
+    right: 0.55rem;
+    bottom: -1.8rem;
+    transform: none;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  button:hover {
+    transform: none;
   }
 }
 

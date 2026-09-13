@@ -866,6 +866,8 @@ export function Inspector({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', overflowY: 'auto', flex: 1 }}>
         {rError && (
           <div
+            role="alert"
+            aria-live="assertive"
             style={{
               padding: '0.85rem',
               background: 'var(--error-soft)',
@@ -879,8 +881,10 @@ export function Inspector({
                 Error Code: {rError.path ? 'VALIDATION_FAILED' : 'COMPILE_ERROR'}
               </span>
               {rError.objectId && (
-                <span
+                <button
+                  type="button"
                   onClick={() => handleJump(rError.objectId!)}
+                  aria-label={`Jump to object ${rError.objectId} definition`}
                   style={{
                     fontSize: '0.68rem',
                     fontFamily: 'var(--font-mono)',
@@ -894,7 +898,7 @@ export function Inspector({
                   title="Jump to object definition"
                 >
                   obj: {rError.objectId} ↗
-                </span>
+                </button>
               )}
             </div>
             <p style={{ margin: '0 0 0.5rem', color: 'var(--error)', fontSize: '0.76rem', fontWeight: 600, lineHeight: 1.4 }}>
@@ -907,8 +911,10 @@ export function Inspector({
                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.3rem' }}>
                   {rError.dependencyChain.map((node: string, idx: number) => (
                     <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                      <code
+                      <button
+                        type="button"
                         onClick={() => handleJump(node)}
+                        aria-label={`Jump to ${node} definition`}
                         style={{
                           fontSize: '0.7rem',
                           background: 'white',
@@ -920,7 +926,7 @@ export function Inspector({
                         }}
                       >
                         {node}
-                      </code>
+                      </button>
                       {idx < rError.dependencyChain.length - 1 && <span style={{ color: 'var(--muted)' }}>→</span>}
                     </span>
                   ))}
@@ -946,12 +952,14 @@ export function Inspector({
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
                   <strong style={{ fontSize: '0.74rem', color: 'var(--accent)' }}>{violation.code}</strong>
                   {violation.objectId && (
-                    <span
+                    <button
+                      type="button"
                       onClick={() => handleJump(violation.objectId)}
+                      aria-label={`Jump to ${violation.objectId} definition`}
                       style={{ fontSize: '0.68rem', color: 'var(--accent)', cursor: 'pointer', fontWeight: 'bold' }}
                     >
                       {violation.objectId} ↗
-                    </span>
+                    </button>
                   )}
                 </div>
                 <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--ink)' }}>{violation.message}</p>
@@ -987,9 +995,18 @@ export function Inspector({
           </div>
         </div>
       </div>
-      <div className="tab-strip" style={{ padding: '0.25rem 0 0.75rem', borderBottom: '1px solid var(--line)', marginBottom: '0.75rem' }}>
+      <div
+        className="tab-strip"
+        role="tablist"
+        aria-label="Inspector views"
+        style={{ padding: '0.25rem 0 0.75rem', borderBottom: '1px solid var(--line)', marginBottom: '0.75rem' }}
+      >
         <button
           type="button"
+          id="inspector-tab-objects"
+          role="tab"
+          aria-selected={tab === 'resolved'}
+          aria-controls="inspector-tabpanel"
           className={tab === 'resolved' ? 'active' : ''}
           onClick={() => setTab('resolved')}
         >
@@ -997,6 +1014,10 @@ export function Inspector({
         </button>
         <button
           type="button"
+          id="inspector-tab-values"
+          role="tab"
+          aria-selected={tab === 'values'}
+          aria-controls="inspector-tabpanel"
           className={tab === 'values' ? 'active' : ''}
           onClick={() => setTab('values')}
         >
@@ -1004,6 +1025,10 @@ export function Inspector({
         </button>
         <button
           type="button"
+          id="inspector-tab-errors"
+          role="tab"
+          aria-selected={tab === 'errors'}
+          aria-controls="inspector-tabpanel"
           className={tab === 'errors' ? 'active' : ''}
           onClick={() => setTab('errors')}
         >
@@ -1011,6 +1036,10 @@ export function Inspector({
         </button>
         <button
           type="button"
+          id="inspector-tab-graph"
+          role="tab"
+          aria-selected={tab === 'graph'}
+          aria-controls="inspector-tabpanel"
           className={tab === 'graph' ? 'active' : ''}
           onClick={() => setTab('graph')}
         >
@@ -1018,6 +1047,10 @@ export function Inspector({
         </button>
         <button
           type="button"
+          id="inspector-tab-bom"
+          role="tab"
+          aria-selected={tab === 'bom'}
+          aria-controls="inspector-tabpanel"
           className={tab === 'bom' ? 'active' : ''}
           onClick={() => setTab('bom')}
         >
@@ -1025,7 +1058,13 @@ export function Inspector({
         </button>
       </div>
 
-      <div className="inspector-body" style={{ minHeight: '300px', maxHeight: '500px', display: 'flex', flexDirection: 'column' }}>
+      <div
+        id="inspector-tabpanel"
+        role="tabpanel"
+        aria-labelledby={`inspector-tab-${tab === 'resolved' ? 'objects' : tab}`}
+        className="inspector-body"
+        style={{ minHeight: '300px', maxHeight: '500px', display: 'flex', flexDirection: 'column' }}
+      >
         {tab === 'graph' ? (
           <Suspense fallback={<div style={{ padding: '1rem', color: 'var(--muted)', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>Loading dependency graph...</div>}>
             <GraphViewer

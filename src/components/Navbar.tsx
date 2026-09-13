@@ -26,9 +26,9 @@ interface NavbarProps {
   statusLabel: string;
   statusDetail?: string | null;
   // Editor actions
-  onCopy: () => void;
+  onCopy: () => void | Promise<boolean>;
   onReset: () => void;
-  onShareLink: () => void;
+  onShareLink: () => void | Promise<boolean>;
   // Preview actions
   zoom: number;
   onZoomIn: () => void;
@@ -41,6 +41,7 @@ interface NavbarProps {
   onSheetChange: (sheetId: string | null) => void;
   isPrintMode: boolean;
   setIsPrintMode: (val: boolean) => void;
+  actionFeedback?: { tone: 'success' | 'error'; message: string } | null;
 }
 
 export function Navbar({
@@ -68,6 +69,7 @@ export function Navbar({
   onSheetChange,
   isPrintMode,
   setIsPrintMode,
+  actionFeedback,
 }: NavbarProps) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -87,14 +89,16 @@ export function Navbar({
     ? `Physical Preview: ${selectedSheetId}`
     : 'Model Preview';
 
-  const handleCopyCode = () => {
-    onCopy();
+  const handleCopyCode = async () => {
+    const copied = await onCopy();
+    if (copied === false) return;
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const handleShareLink = () => {
-    onShareLink();
+  const handleShareLink = async () => {
+    const copied = await onShareLink();
+    if (copied === false) return;
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
@@ -150,7 +154,12 @@ export function Navbar({
       </div>
 
       <div className="navbar-center">
-        <div className={`status-indicator status-${status}`}>
+        <div
+          className={`status-indicator status-${status}`}
+          role="status"
+          aria-live="polite"
+          aria-label={`${statusLabel}${statusDetail ? `: ${statusDetail}` : ''}`}
+        >
           <div className="status-dot" />
           <span>{statusLabel}</span>
           {statusDetail && (
@@ -198,9 +207,11 @@ export function Navbar({
                   {sheetPreviewEntryLabel}
                 </button>
               )}
-              <button 
+              <button
                 onClick={() => setIsPrintMode(!isPrintMode)} 
                 title={isPrintMode ? "Switch to Model Preview" : "Switch to Physical Preview"}
+                aria-pressed={isPrintMode}
+                aria-label={isPrintMode ? 'Switch to model preview' : 'Switch to physical preview'}
                 className={isPrintMode ? 'active' : ''}
                 style={{
                   background: isPrintMode ? 'var(--brand-soft)' : 'transparent',
@@ -216,11 +227,11 @@ export function Navbar({
                 </span>
               </button>
               <div className="navbar-divider" style={{ margin: '0 4px', opacity: 0.5 }} />
-              <button onClick={onZoomOut} title="Zoom Out">{ICONS.ZoomOut}</button>
+              <button onClick={onZoomOut} title="Zoom Out" aria-label="Zoom out">{ICONS.ZoomOut}</button>
               <span style={{ fontSize: '0.7rem', width: '52px', textAlign: 'center' }}>{formatZoomLabel(zoom)}</span>
-              <button onClick={onZoomIn} title="Zoom In">{ICONS.ZoomIn}</button>
-              <button onClick={onRecenter} title="Recenter">{ICONS.Recenter}</button>
-              <button onClick={onExport} title="Export SVG">{ICONS.Export}</button>
+              <button onClick={onZoomIn} title="Zoom In" aria-label="Zoom in">{ICONS.ZoomIn}</button>
+              <button onClick={onRecenter} title="Recenter" aria-label="Fit and recenter preview">{ICONS.Recenter}</button>
+              <button onClick={onExport} title="Export SVG" aria-label="Export SVG">{ICONS.Export}</button>
             </div>
           </>
         )}
@@ -230,15 +241,15 @@ export function Navbar({
           <>
             <div className="navbar-divider" />
             <div className="control-group">
-              <button onClick={handleCopyCode} title="Copy Code">
+              <button onClick={handleCopyCode} title="Copy Code" aria-label="Copy source code">
                 {ICONS.Copy}
                 {copiedCode && <span style={{ fontSize: '0.65rem', color: 'var(--ready)', marginLeft: '2px', fontWeight: 'bold' }}>Copied!</span>}
               </button>
-              <button onClick={handleShareLink} title="Copy Share Link">
+              <button onClick={handleShareLink} title="Copy Share Link" aria-label="Copy share link">
                 {ICONS.Share}
                 {copiedLink && <span style={{ fontSize: '0.65rem', color: 'var(--ready)', marginLeft: '2px', fontWeight: 'bold' }}>Link Copied!</span>}
               </button>
-              <button onClick={onReset} title="Reset Code">{ICONS.Reset}</button>
+              <button onClick={onReset} title="Reset Code" aria-label="Reset source code">{ICONS.Reset}</button>
             </div>
           </>
         )}
@@ -251,6 +262,8 @@ export function Navbar({
             className={viewMode === 'split-h' ? 'active' : ''}
             onClick={() => setViewMode('split-h')}
             title="Horizontal Split"
+            aria-label="Horizontal split"
+            aria-pressed={viewMode === 'split-h'}
           >
             {ICONS.LayoutH}
           </button>
@@ -258,6 +271,8 @@ export function Navbar({
             className={viewMode === 'split-v' ? 'active' : ''}
             onClick={() => setViewMode('split-v')}
             title="Vertical Split"
+            aria-label="Vertical split"
+            aria-pressed={viewMode === 'split-v'}
           >
             {ICONS.LayoutV}
           </button>
@@ -265,6 +280,8 @@ export function Navbar({
             className={viewMode === 'editor-only' ? 'active' : ''}
             onClick={() => setViewMode('editor-only')}
             title="Editor Only"
+            aria-label="Editor only"
+            aria-pressed={viewMode === 'editor-only'}
           >
             {ICONS.ModeEditor}
           </button>
@@ -272,6 +289,8 @@ export function Navbar({
             className={viewMode === 'preview-only' ? 'active' : ''}
             onClick={() => setViewMode('preview-only')}
             title="Preview Only"
+            aria-label="Preview only"
+            aria-pressed={viewMode === 'preview-only'}
           >
             {ICONS.ModePreview}
           </button>
@@ -288,6 +307,8 @@ export function Navbar({
               if (!sidebarVisible) setSidebarVisible(true);
             }}
             title="Sidebar Left"
+            aria-label="Show sidebar on left"
+            aria-pressed={sidebarVisible && sidebarPosition === 'left'}
           >
             {ICONS.SidebarLeft}
           </button>
@@ -298,6 +319,8 @@ export function Navbar({
               if (!sidebarVisible) setSidebarVisible(true);
             }}
             title="Sidebar Right"
+            aria-label="Show sidebar on right"
+            aria-pressed={sidebarVisible && sidebarPosition === 'right'}
           >
             {ICONS.SidebarRight}
           </button>
@@ -305,10 +328,15 @@ export function Navbar({
             className={!sidebarVisible ? 'active' : ''}
             onClick={() => setSidebarVisible(false)}
             title="Hide Sidebar"
+            aria-label="Hide sidebar"
+            aria-pressed={!sidebarVisible}
           >
             {ICONS.SidebarHide}
           </button>
         </div>
+      </div>
+      <div className="action-feedback" role="status" aria-live="polite" aria-atomic="true">
+        {actionFeedback?.message}
       </div>
     </nav>
   );

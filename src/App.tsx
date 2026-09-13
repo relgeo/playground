@@ -52,6 +52,26 @@ function clampPreviewZoom(value: number): number {
   return Math.min(MAX_PREVIEW_ZOOM, Math.max(MIN_PREVIEW_ZOOM, Math.round(value * 100) / 100));
 }
 
+async function copyText(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand('copy');
+  textarea.remove();
+  if (!copied) {
+    throw new Error('Clipboard access is unavailable.');
+  }
+}
+
 function App() {
   const [initialPlaygroundState] = useState(() => {
     let hashCode: string | null = null;
@@ -128,6 +148,7 @@ function App() {
   const [isResizingSidebar, setIsResizingSidebar] = useState(false);
   const [isResizingSplit, setIsResizingSplit] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
+  const [actionFeedback, setActionFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
 
   const requestFitAll = () => setFitAllTrigger((trigger) => trigger + 1);
 
@@ -349,6 +370,9 @@ function App() {
   }, [deferredCode, paramOverrides, selectedProfile, effectiveSheetId, isPrintMode, showDimensions, showAnnotations, showAnchors, showBoundingBox, showLabels, hiddenRoles]);
 
   const handleExampleChange = (key: string) => {
+    if (code !== EXAMPLES[selectedExample].code && !window.confirm('Replace the current draft with this example?')) {
+      return;
+    }
     startTransition(() => {
       setSelectedExample(key);
       setCode(EXAMPLES[key].code);
@@ -360,6 +384,7 @@ function App() {
       setErrorPath(null);
       setFullError(null);
       setInspectorTab('resolved');
+      setActionFeedback(null);
       requestFitAll();
     });
   };
@@ -369,35 +394,55 @@ function App() {
   };
 
   const handleExport = () => {
-    if (!displaySvgContent) return;
-    const blob = new Blob([displaySvgContent], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = getExportFileName(
-      selectedExample,
-      effectiveSheetId,
-      isPrintMode
-    );
-    a.click();
-    URL.revokeObjectURL(url);
+    if (!displaySvgContent) {
+      setActionFeedback({ tone: 'error', message: 'Export is unavailable until a preview is ready.' });
+      return;
+    }
+    try {
+      const blob = new Blob([displaySvgContent], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = getExportFileName(selectedExample, effectiveSheetId, isPrintMode);
+      a.click();
+      URL.revokeObjectURL(url);
+      setActionFeedback({ tone: 'success', message: 'SVG exported.' });
+    } catch (e) {
+      console.error('Failed to export SVG', e);
+      setActionFeedback({ tone: 'error', message: 'SVG export failed. Try again.' });
+    }
   };
 
-  const handleCopyCode = async () => {
-    await navigator.clipboard.writeText(code);
+  const handleCopyCode = async (): Promise<boolean> => {
+    try {
+      await copyText(code);
+      setActionFeedback({ tone: 'success', message: 'Source copied to clipboard.' });
+      return true;
+    } catch (e) {
+      console.error('Failed to copy source', e);
+      setActionFeedback({ tone: 'error', message: 'Copy failed. Check clipboard permission.' });
+      return false;
+    }
   };
 
-  const handleShareLink = async () => {
+  const handleShareLink = async (): Promise<boolean> => {
     try {
       const hash = encodeCodeToHash(code);
       const url = `${window.location.origin}${window.location.pathname}#${hash}`;
-      await navigator.clipboard.writeText(url);
+      await copyText(url);
+      setActionFeedback({ tone: 'success', message: 'Share link copied.' });
+      return true;
     } catch (e) {
       console.error('Failed to copy share link', e);
+      setActionFeedback({ tone: 'error', message: 'Share link copy failed. Check clipboard permission.' });
+      return false;
     }
   };
 
   const handleReset = () => {
+    if (code !== EXAMPLES[selectedExample].code && !window.confirm('Reset the current draft to the example source?')) {
+      return;
+    }
     startTransition(() => {
       setCode(EXAMPLES[selectedExample].code);
       setParamOverrides({});
@@ -408,6 +453,7 @@ function App() {
       setZoom(100);
       setPan({ x: 0, y: 0 });
       setInspectorTab('resolved');
+      setActionFeedback({ tone: 'success', message: 'Draft reset to the selected example.' });
       // Reset localStorage draft too
       try {
         localStorage.removeItem(DRAFT_STORAGE_KEY);
@@ -424,7 +470,7 @@ function App() {
 
   return (
     <div className="playground-shell">
-      <Navbar
+        <Navbar
         selectedExample={selectedExample}
         onExampleChange={handleExampleChange}
         viewMode={viewMode}
@@ -436,6 +482,7 @@ function App() {
         status={status}
         statusLabel={statusMeta.label}
         statusDetail={statusMeta.detail}
+        actionFeedback={actionFeedback}
         onCopy={handleCopyCode}
         onShareLink={handleShareLink}
         onReset={handleReset}
@@ -471,6 +518,7 @@ function App() {
           width={sidebarWidth}
           isResizing={isResizingSidebar}
           onResizeStart={() => setIsResizingSidebar(true)}
+          onResizeKeyboard={(delta) => setSidebarWidth((width) => Math.max(240, Math.min(600, width + delta)))}
         >
           {{
             profiles: (
@@ -544,7 +592,32 @@ function App() {
           {(viewMode === 'split-h' || viewMode === 'split-v') && (
             <div 
               className="split-resizer" 
-              onMouseDown={() => setIsResizingSplit(true)} 
+              role="separator"
+              tabIndex={0}
+              aria-orientation={viewMode === 'split-v' ? 'horizontal' : 'vertical'}
+              aria-valuemin={10}
+              aria-valuemax={90}
+              aria-valuenow={Math.round(splitRatio)}
+              aria-valuetext={`${Math.round(splitRatio)}% editor space`}
+              aria-label={viewMode === 'split-v' ? 'Resize editor and preview vertically' : 'Resize editor and preview horizontally'}
+              onMouseDown={() => setIsResizingSplit(true)}
+              onDoubleClick={() => setSplitRatio(50)}
+              onKeyDown={(event) => {
+                const step = event.shiftKey ? 10 : 5;
+                if (event.key === 'Home') {
+                  event.preventDefault();
+                  setSplitRatio(10);
+                } else if (event.key === 'End') {
+                  event.preventDefault();
+                  setSplitRatio(90);
+                } else if ((viewMode === 'split-h' && event.key === 'ArrowLeft') || (viewMode === 'split-v' && event.key === 'ArrowUp')) {
+                  event.preventDefault();
+                  setSplitRatio((ratio) => Math.max(10, ratio - step));
+                } else if ((viewMode === 'split-h' && event.key === 'ArrowRight') || (viewMode === 'split-v' && event.key === 'ArrowDown')) {
+                  event.preventDefault();
+                  setSplitRatio((ratio) => Math.min(90, ratio + step));
+                }
+              }}
             />
           )}
 

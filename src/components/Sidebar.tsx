@@ -13,6 +13,7 @@ interface SidebarProps {
   width: number;
   isResizing?: boolean;
   onResizeStart?: () => void;
+  onResizeKeyboard?: (delta: number) => void;
   children: {
     profiles: ReactNode;
     parameters: ReactNode;
@@ -33,6 +34,7 @@ export function Sidebar({
   width,
   isResizing,
   onResizeStart,
+  onResizeKeyboard,
   children,
 }: SidebarProps) {
   const sidebarWidth = visible ? width : 0;
@@ -50,6 +52,7 @@ export function Sidebar({
       <div className="sidebar-content">
         {hasProfiles && (
           <SidebarPanel 
+            panelId="profiles"
             title="Parameter Profiles" 
             isExpanded={panelState.profiles} 
             onToggle={() => togglePanel('profiles')}
@@ -60,6 +63,7 @@ export function Sidebar({
 
         {hasParameters && (
           <SidebarPanel 
+            panelId="parameters"
             title="Parameters" 
             isExpanded={panelState.parameters} 
             onToggle={() => togglePanel('parameters')}
@@ -71,6 +75,7 @@ export function Sidebar({
 
         {hasMetaPresets && (
           <SidebarPanel
+            panelId="meta-presets"
             title="Metadata Presets (Read-only)"
             isExpanded={panelState.metaPresets}
             onToggle={() => togglePanel('metaPresets')}
@@ -80,6 +85,7 @@ export function Sidebar({
         )}
 
         <SidebarPanel 
+          panelId="inspector"
           title="Inspector" 
           isExpanded={panelState.inspector} 
           onToggle={() => togglePanel('inspector')}
@@ -89,6 +95,7 @@ export function Sidebar({
         </SidebarPanel>
 
         <SidebarPanel 
+          panelId="layers"
           title="Layers" 
           isExpanded={panelState.layers} 
           onToggle={() => togglePanel('layers')}
@@ -100,7 +107,29 @@ export function Sidebar({
       {visible && onResizeStart && (
         <div
           className="sidebar-resizer"
+          role="separator"
+          tabIndex={0}
+          aria-orientation="vertical"
+          aria-valuemin={240}
+          aria-valuemax={600}
+          aria-valuenow={width}
+          aria-label={`Resize sidebar ${position === 'left' ? 'width' : 'width'}`}
           onMouseDown={onResizeStart}
+          onKeyDown={(event) => {
+            if (!onResizeKeyboard) return;
+            const step = event.shiftKey ? 48 : 24;
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+              event.preventDefault();
+              const grows = position === 'left' ? event.key === 'ArrowRight' : event.key === 'ArrowLeft';
+              onResizeKeyboard(grows ? step : -step);
+            } else if (event.key === 'Home') {
+              event.preventDefault();
+              onResizeKeyboard(240 - width);
+            } else if (event.key === 'End') {
+              event.preventDefault();
+              onResizeKeyboard(600 - width);
+            }
+          }}
           style={{
             position: 'absolute',
             top: 0,
@@ -121,6 +150,7 @@ export function Sidebar({
 }
 
 interface SidebarPanelProps {
+  panelId: string;
   title: string;
   isExpanded: boolean;
   onToggle: () => void;
@@ -128,16 +158,31 @@ interface SidebarPanelProps {
   large?: boolean;
 }
 
-function SidebarPanel({ title, isExpanded, onToggle, children, large }: SidebarPanelProps) {
+function SidebarPanel({ panelId, title, isExpanded, onToggle, children, large }: SidebarPanelProps) {
+  const headerId = `sidebar-panel-header-${panelId}`;
+  const bodyId = `sidebar-panel-body-${panelId}`;
   return (
     <div className="sidebar-panel">
-      <div className="sidebar-panel-header" onClick={onToggle}>
+      <button
+        id={headerId}
+        type="button"
+        className="sidebar-panel-header"
+        onClick={onToggle}
+        aria-expanded={isExpanded}
+        aria-controls={bodyId}
+      >
         <h3>{title}</h3>
         <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>
           {isExpanded ? ICONS.ChevronUp : ICONS.ChevronDown}
         </span>
-      </div>
-      <div className={`sidebar-panel-body ${!isExpanded ? 'is-collapsed' : ''} ${large ? 'is-large' : ''}`}>
+      </button>
+      <div
+        id={bodyId}
+        className={`sidebar-panel-body ${!isExpanded ? 'is-collapsed' : ''} ${large ? 'is-large' : ''}`}
+        role="region"
+        aria-labelledby={headerId}
+        hidden={!isExpanded}
+      >
         {children}
       </div>
     </div>
