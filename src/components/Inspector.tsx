@@ -1087,45 +1087,44 @@ export function Inspector({
 
     if (!rError && !hasViolations) {
       return (
-        <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--ready)', fontSize: '0.8rem', fontWeight: 'bold' }}>
+        <div className="inspector-empty-success">
           ✨ No errors or constraint violations detected!
         </div>
       );
     }
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', overflowY: 'auto', flex: 1 }}>
+      <div className="inspector-errors-list">
         <div
           className="inspector-error-summary"
           role="alert"
           aria-live="assertive"
           aria-label={`${errorCount} diagnostic${errorCount === 1 ? '' : 's'} found${hasFirstErrorTarget ? '. A first-error action is available.' : '.'}`}
-        >
-          <span>{errorCount} diagnostic{errorCount === 1 ? '' : 's'} found</span>
-          {hasFirstErrorTarget && (
-            <button
+          >
+            <span>{errorCount} diagnostic{errorCount === 1 ? '' : 's'} found</span>
+            {hasFirstErrorTarget && (
+              <button
               type="button"
               onClick={handleJumpToFirstError}
               aria-label="Jump to first error"
-            >
-              Go to first error
-            </button>
-          )}
-        </div>
+              >
+                Go to first error
+              </button>
+            )}
+            {!hasFirstErrorTarget && (
+              <span className="inspector-error-summary-hint">Fix source or reset draft</span>
+            )}
+          </div>
         {rError && (
           <div
+            className="inspector-error-card"
             role="alert"
             aria-live="assertive"
-            style={{
-              padding: '0.85rem',
-              background: 'var(--error-soft)',
-              border: '1px solid rgba(194, 65, 12, 0.2)',
-              borderRadius: '6px',
-              position: 'relative',
-            }}
+            aria-labelledby="inspector-error-code"
+            aria-describedby="inspector-error-message"
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-              <span style={{ color: 'var(--error)', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <div className="inspector-error-header">
+              <span className="inspector-error-code" id="inspector-error-code">
                 Error Code: {rError.path ? 'VALIDATION_FAILED' : 'COMPILE_ERROR'}
               </span>
               {rError.objectId && (
@@ -1133,23 +1132,14 @@ export function Inspector({
                   type="button"
                   onClick={() => handleJump(rError.objectId!)}
                   aria-label={`Jump to object ${rError.objectId} definition`}
-                  style={{
-                    fontSize: '0.68rem',
-                    fontFamily: 'var(--font-mono)',
-                    background: '#fff7ed',
-                    color: '#9a3412',
-                    padding: '0.12rem 0.32rem',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                  }}
+                  className="inspector-error-object-link"
                   title="Jump to object definition"
                 >
                   obj: {rError.objectId} ↗
                 </button>
               )}
             </div>
-            <p style={{ margin: '0 0 0.5rem', color: 'var(--error)', fontSize: '0.76rem', fontWeight: 600, lineHeight: 1.4 }}>
+            <p className="inspector-error-message" id="inspector-error-message">
               {rError.message}
             </p>
 
@@ -1158,44 +1148,27 @@ export function Inspector({
                 type="button"
                 onClick={() => onJumpToPath(rError.path!)}
                 aria-label="Jump to error location"
-                style={{
-                  fontSize: '0.68rem',
-                  background: '#fff7ed',
-                  color: '#9a3412',
-                  padding: '0.25rem 0.4rem',
-                  borderRadius: '4px',
-                  border: '1px solid rgba(154, 52, 18, 0.2)',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                }}
+                className="inspector-error-path-action"
               >
                 Go to error location
               </button>
             )}
 
             {rError.dependencyChain && rError.dependencyChain.length > 0 && (
-              <div style={{ marginTop: '0.6rem', padding: '0.4rem 0.5rem', background: 'rgba(0, 0, 0, 0.03)', borderRadius: '6px' }}>
-                <span style={{ fontSize: '0.6rem', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>Circular Dependency Chain</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.3rem' }}>
+              <div className="inspector-dependency-chain">
+                <span className="inspector-dependency-chain-label">Circular Dependency Chain</span>
+                <div className="inspector-dependency-chain-items">
                   {rError.dependencyChain.map((node: string, idx: number) => (
-                    <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <span key={idx} className="inspector-dependency-node">
                       <button
                         type="button"
                         onClick={() => handleJump(node)}
                         aria-label={`Jump to ${node} definition`}
-                        style={{
-                          fontSize: '0.7rem',
-                          background: 'white',
-                          padding: '0.1rem 0.3rem',
-                          borderRadius: '4px',
-                          border: '1px solid var(--line)',
-                          cursor: 'pointer',
-                          fontWeight: 'bold',
-                        }}
+                        className="inspector-dependency-node-button"
                       >
                         {node}
                       </button>
-                      {idx < rError.dependencyChain.length - 1 && <span style={{ color: 'var(--muted)' }}>→</span>}
+                      {idx < rError.dependencyChain.length - 1 && <span className="inspector-dependency-arrow">→</span>}
                     </span>
                   ))}
                 </div>
@@ -1205,35 +1178,30 @@ export function Inspector({
         )}
 
         {hasViolations && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase' }}>Constraint Violations</span>
+          <section className="inspector-violations" aria-labelledby="inspector-violations-label">
+            <span className="inspector-violations-label" id="inspector-violations-label">Constraint Violations</span>
             {rData.violations.map((violation: ConstraintViolation, idx: number) => (
               <div
                 key={idx}
-                style={{
-                  padding: '0.65rem 0.8rem',
-                  background: 'var(--accent-soft)',
-                  border: '1px solid rgba(217, 119, 6, 0.2)',
-                  borderRadius: '6px',
-                }}
+                className="inspector-violation-card"
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-                  <strong style={{ fontSize: '0.74rem', color: 'var(--accent)' }}>{violation.code}</strong>
+                <div className="inspector-violation-header">
+                  <strong className="inspector-violation-code">{violation.code}</strong>
                   {violation.objectId && (
                     <button
                       type="button"
                       onClick={() => handleJump(violation.objectId)}
                       aria-label={`Jump to ${violation.objectId} definition`}
-                      style={{ fontSize: '0.68rem', color: 'var(--accent)', cursor: 'pointer', fontWeight: 'bold' }}
+                      className="inspector-violation-object-link"
                     >
                       {violation.objectId} ↗
                     </button>
                   )}
                 </div>
-                <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--ink)' }}>{violation.message}</p>
+                <p className="inspector-violation-message">{violation.message}</p>
               </div>
             ))}
-          </div>
+          </section>
         )}
       </div>
     );

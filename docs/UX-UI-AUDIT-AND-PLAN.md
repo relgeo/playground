@@ -299,6 +299,8 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Graph memberi petunjuk keyboard yang tersembunyi secara visual tetapi tersedia untuk assistive technology melalui `aria-describedby`; style statis graph viewer dipindahkan dari inline ke class CSS.
 - [x] Navbar menghapus style inline yang statis pada kontrol preview, status, zoom, dan brand; tombol entry Sheet/View kembali memakai radius kontrol kecil, bukan radius pill.
 - [x] Preview memindahkan layout statis shell, toolbar, stage, viewport, dan wrapper SVG ke class CSS; style inline yang tersisa di Preview hanya untuk state geometry/zoom atau overlay interaktif.
+- [x] Inspector diagnostics tanpa source target kini tetap memberi recovery cue eksplisit (`Fix source or reset draft`), sementara action jump hanya dirender ketika target object/path memang tersedia.
+- [x] Browser error smoke memverifikasi invalid YAML menghasilkan `role=alert` summary/detail tanpa horizontal overflow, lalu `Reset to selected example` mengembalikan editor ke READY dan menghapus error banner.
 - [x] Graph memiliki filter nama/tipe, mode Focus selection berbasis neighborhood, count live, legend tipe/status, dan node keyboard-selectable.
 
 ### Phase 3 — Visual system dan cleanup

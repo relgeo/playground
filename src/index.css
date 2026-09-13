@@ -1426,6 +1426,160 @@ input[type='range'] {
   font-weight: 700;
 }
 
+.inspector-error-summary-hint {
+  color: var(--error);
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.inspector-empty-success {
+  padding: 2rem 1rem;
+  color: var(--ready);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.inspector-errors-list {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.8rem;
+  overflow-y: auto;
+}
+
+.inspector-error-card {
+  position: relative;
+  padding: 0.85rem;
+  border: 1px solid rgba(194, 65, 12, 0.2);
+  border-radius: var(--radius-card);
+  background: var(--error-soft);
+}
+
+.inspector-error-header,
+.inspector-violation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.inspector-error-code {
+  color: var(--error);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.inspector-error-object-link,
+.inspector-error-path-action,
+.inspector-dependency-node-button {
+  border: 1px solid rgba(154, 52, 18, 0.2);
+  border-radius: var(--radius-control);
+  background: #fff7ed;
+  color: #9a3412;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.inspector-error-object-link {
+  padding: 0.12rem 0.32rem;
+}
+
+.inspector-error-path-action {
+  padding: 0.25rem 0.4rem;
+  font-family: inherit;
+}
+
+.inspector-error-message {
+  margin: 0 0 0.5rem;
+  color: var(--error);
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.inspector-dependency-chain {
+  margin-top: 0.6rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--radius-card);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.inspector-dependency-chain-label,
+.inspector-violations-label {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--muted);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.inspector-dependency-chain-items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.inspector-dependency-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.inspector-dependency-node-button {
+  padding: 0.1rem 0.3rem;
+  border-color: var(--line);
+  background: white;
+  color: var(--ink);
+}
+
+.inspector-dependency-arrow {
+  color: var(--muted);
+}
+
+.inspector-violations {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inspector-violation-card {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  border-radius: var(--radius-card);
+  background: var(--accent-soft);
+}
+
+.inspector-violation-code {
+  color: var(--accent);
+  font-size: 0.74rem;
+}
+
+.inspector-violation-object-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.inspector-violation-message {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.72rem;
+}
+
 @media (max-width: 840px) {
   .graph-viewer-controls {
     grid-template-columns: minmax(0, 1fr) auto;
