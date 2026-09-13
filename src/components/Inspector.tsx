@@ -21,6 +21,8 @@ interface InspectorProps {
   unit?: string;
   selectedObjectId?: string | null;
   relatedObjectIds?: string[];
+  relatedDepth?: number;
+  onRelatedDepthChange?: (depth: number) => void;
   onSelectObject?: (objectId: string | null) => void;
   onJumpToLine?: (lineNum: number) => void;
   onJumpToPath?: (path: string) => void;
@@ -39,6 +41,8 @@ export function Inspector({
   unit = 'mm',
   selectedObjectId = null,
   relatedObjectIds = [],
+  relatedDepth = 2,
+  onRelatedDepthChange,
   onSelectObject,
   onJumpToLine,
   onJumpToPath,
@@ -658,6 +662,21 @@ export function Inspector({
             />
             Selected only
           </label>
+          {onRelatedDepthChange && (
+            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', fontSize: '0.7rem', color: 'var(--muted)' }}>
+            <span>Related depth</span>
+            <select
+              value={relatedDepth}
+              onChange={(event) => onRelatedDepthChange(Number(event.target.value))}
+              aria-label="Related object depth"
+              style={{ minWidth: '5rem', padding: '0.2rem 0.3rem', fontSize: '0.7rem' }}
+            >
+              <option value={1}>1 level</option>
+              <option value={2}>2 levels</option>
+              <option value={3}>3 levels</option>
+            </select>
+            </label>
+          )}
           {selectedObjectId && (
             <button
               type="button"
@@ -720,7 +739,7 @@ export function Inspector({
             dependencyGraph,
             id,
             Object.keys(rData.objects),
-            2,
+            relatedDepth,
           );
           const isRelated = relatedObjectIds.includes(id);
           return (

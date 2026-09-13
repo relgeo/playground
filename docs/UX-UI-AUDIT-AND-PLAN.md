@@ -290,7 +290,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [x] Sidebar headers menjadi disclosure controls semantic.
 - [x] Split/sidebar resizer menjadi keyboard-accessible separator; preset layout masih tersisa.
-- [ ] Inspector search, count, selected-only filter, generated-object grouping, cross-surface collapse behavior, related-object navigation, dan automatic related-object highlight sudah ada; grouping lanjutan masih tersisa.
+- [x] Inspector search, count, selected-only filter, generated-object grouping, cross-surface collapse behavior, related-object navigation, automatic related-object highlight, dan pilihan kedalaman relasi 1–3 level sudah tersedia.
 - [x] Sinkronkan selection preview ↔ inspector ↔ graph ↔ code definition untuk object yang dipilih langsung; object terkait kini ikut ditandai tanpa mengubah single-selection focus.
 - [ ] Jadikan seluruh error summary/actions keyboard-accessible dan `role=alert`.
 - [x] Inspector tabs memiliki tablist/tab/tabpanel semantics.
@@ -366,7 +366,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U10 — graph nodes memiliki role, accessible name, dan keyboard activation.
 - [x] U11 — Navbar, preview toggles, dan inspector tabs memiliki state semantics pada bagian yang sudah disentuh.
 - [x] U17 — empty state fluid dan tidak lagi memaksa minimum 400px.
-- [x] U08 — object hasil generated repeat kini dikelompokkan dan group dapat dibuka/tutup; related-object highlight lintas surface tersedia, sementara grouping lanjutan masih tersisa.
+- [x] U08 — object hasil generated repeat kini dikelompokkan dan group dapat dibuka/tutup; related-object highlight lintas surface serta pilihan kedalaman relasi tersedia.
 - [x] U08 — selection dari preview, inspector, dan graph kini memusatkan source definition di editor; dependency/dependent terkait ikut ditandai di inspector, preview, dan graph.
 - [x] U08 — related neighborhood kini mencakup dependency dan dependent langsung maupun tidak langsung hingga dua tingkat, dengan batas agar dokumen besar tetap terbaca.
 - [x] U08 — group yang memuat object terpilih atau terkait otomatis terbuka dan summary group kini menjelaskan jumlah selected/related secara ringkas.
@@ -390,13 +390,14 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U03/U11 — Escape kini memakai breakpoint `840px` yang sama dan menutup drawer tablet sebelum membersihkan selection; perilaku terverifikasi pada viewport `812px`.
 - [x] U05/U12 — resizer sidebar dan split memakai Pointer Events, termasuk `pointercancel`, sehingga jalur drag siap untuk mouse, touch, dan stylus; uji gesture perangkat nyata masih tersisa.
 - [x] U11 — mobile surface switcher memiliki `role="group"`, label yang jelas, dan tombol dengan `aria-pressed` untuk Both/Source/Preview; semantics terverifikasi pada browser tablet.
+- [x] U08 — Inspector menyediakan pilihan Related depth 1/2/3 levels; kedalaman yang dipilih dipakai konsisten untuk neighborhood highlight, auto-open group, related list, dan graph context.
 - [x] U02 — aksi sekunder source dan sidebar placement dipindahkan ke menu More; kepadatan toolbar global pada 1024px masih perlu verifikasi.
 - [x] U14 — toolbar preview kini dipisah menjadi kelompok overlay dan line rendering serta wrap aman di mobile; pemisahan global-vs-contextual dan pengurangan duplikasi masih tersisa.
 - [x] Performance — dependency graph dikirim dari worker sehingga `@relgeo/core` tidak lagi eager di main bundle; ukuran main chunk turun dari sekitar 584 kB menjadi sekitar 307 kB, sementara worker/core tetap terpisah.
 
 ### Batch berikutnya yang sebagian sudah diterapkan
 
-- [ ] U08 — inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, dan related-object highlight lintas surface; grouping lanjutan masih belum.
+- [x] U08 — Inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, related-object highlight lintas surface, dan Related depth 1/2/3 levels.
 - [ ] U09 — audit seluruh clickable affordance dan diagnostics tanpa target source masih belum; first-error actionable, recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia.
 - [ ] U11 — control utama dan state yang tersentuh sudah diaudit; inventaris seluruh affordance dan verifikasi real screen reader masih perlu.
 
@@ -410,7 +411,6 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [ ] U01 — verifikasi camera fit/recenter untuk seluruh sheet, frame ekstrem nyata, resize viewport, dan handset.
 - [ ] U02 — verifikasi visual kepadatan desktop 1024px setelah mode compact; aksi sekunder sudah dipindahkan ke menu More.
-- [ ] U08 — advanced generated-object grouping dan opsi kedalaman relasi yang lebih eksplisit.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
 - [ ] U18–U21 — CSS cleanup dan README license.
 - [ ] Uji handset fisik.

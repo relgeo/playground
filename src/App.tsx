@@ -177,6 +177,7 @@ function App() {
   const [hiddenRoles, setHiddenRoles] = useState<Set<string>>(new Set(DEFAULT_HIDDEN_ROLES));
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>('resolved');
+  const [relationDepth, setRelationDepth] = useState(2);
   const [viewMode, setViewMode] = useState<ViewMode>('split-h');
   const [sidebarPosition, setSidebarPosition] = useState<SidebarPosition>('right');
   const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -402,9 +403,9 @@ function App() {
       displayDependencyGraph ?? [],
       visibleSelectedObjectId,
       Object.keys(displayResolvedData.objects),
-      2,
+      relationDepth,
     );
-  }, [displayDependencyGraph, displayDoc, displayResolvedData, visibleSelectedObjectId]);
+  }, [displayDependencyGraph, displayDoc, displayResolvedData, relationDepth, visibleSelectedObjectId]);
 
   // Initialize Worker
   useEffect(() => {
@@ -696,6 +697,8 @@ function App() {
                 unit={displayDoc?.scene?.unit || 'mm'}
                 selectedObjectId={visibleSelectedObjectId}
                 relatedObjectIds={selectedRelatedObjectIds}
+                relatedDepth={relationDepth}
+                onRelatedDepthChange={setRelationDepth}
                 onSelectObject={handleSelectObject}
                 onJumpToLine={handleJumpToLine}
                 onJumpToPath={handleJumpToErrorPath}
