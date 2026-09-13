@@ -294,7 +294,8 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Sinkronkan selection preview ↔ inspector ↔ graph ↔ code definition untuk object yang dipilih langsung; object terkait kini ikut ditandai tanpa mengubah single-selection focus.
 - [x] Jadikan error summary/actions keyboard-accessible dan `role=alert`; ringkasan diagnostic mengumumkan jumlah error secara assertive dan tombol first-error serta detail action sudah berupa button native.
 - [x] Inspector tabs memiliki tablist/tab/tabpanel semantics.
-- [x] Graph node dapat difokuskan, diberi nama, dan dipilih dengan Enter/Space; graph filter, focus selection, dan legend juga tersedia.
+- [x] Graph node dapat difokuskan, diberi nama, dan dipilih dengan Enter/Space; graph filter, focus selection, dan legend juga tersedia. Tab order graph memakai roving focus agar hanya satu node yang masuk traversal.
+- [x] Navigasi graph keyboard memakai ArrowLeft/Right/Up/Down serta Home/End untuk berpindah fokus antarnode tanpa menambah puluhan stop Tab; smoke test browser memverifikasi satu `tabIndex=0` dan perpindahan fokus.
 - [x] Graph memiliki filter nama/tipe, mode Focus selection berbasis neighborhood, count live, legend tipe/status, dan node keyboard-selectable.
 
 ### Phase 3 — Visual system dan cleanup
@@ -412,7 +413,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [x] U08 — Inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, related-object highlight lintas surface, dan Related depth 1/2/3 levels.
 - [ ] U09 — audit seluruh clickable affordance dan diagnostics tanpa target source masih belum; first-error actionable, recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia.
-- [ ] U11 — control utama dan state yang tersentuh sudah diaudit; inventaris seluruh affordance dan verifikasi real screen reader masih perlu.
+- [ ] U11 — control utama dan state yang tersentuh sudah diaudit, termasuk roving focus pada graph; inventaris seluruh affordance dan verifikasi real screen reader masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 

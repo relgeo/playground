@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import { getDependencyGraph } from '@relgeo/core';
 import type { RelGeoObject } from '@relgeo/core';
 
@@ -45,6 +46,7 @@ export function GraphViewer({
 }: GraphViewerProps) {
   const [objectQuery, setObjectQuery] = useState('');
   const [focusSelection, setFocusSelection] = useState(false);
+  const graphNodeRefs = useRef<Record<string, SVGGElement | null>>({});
   const allObjectIds = Object.keys(objects ?? {});
   const normalizedQuery = objectQuery.trim().toLowerCase();
   const visibleObjectIds = useMemo(() => {
@@ -58,6 +60,33 @@ export function GraphViewer({
     const focusedIds = new Set([selectedObjectId, ...relatedObjectIds]);
     return queryMatches.filter((id) => focusedIds.has(id));
   }, [allObjectIds, focusSelection, normalizedQuery, objects, relatedObjectIds, selectedObjectId]);
+
+  const rovingFocusNodeId = selectedObjectId && visibleObjectIds.includes(selectedObjectId)
+    ? selectedObjectId
+    : visibleObjectIds[0] ?? null;
+
+  const handleNodeKeyDown = (event: KeyboardEvent<SVGGElement>, nodeId: string) => {
+    if (!onNodeSelect) return;
+
+    const currentIndex = visibleObjectIds.indexOf(nodeId);
+    if (currentIndex < 0 || visibleObjectIds.length === 0) return;
+
+    let nextIndex: number | null = null;
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % visibleObjectIds.length;
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + visibleObjectIds.length) % visibleObjectIds.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = visibleObjectIds.length - 1;
+    }
+
+    if (nextIndex === null) return;
+
+    event.preventDefault();
+    graphNodeRefs.current[visibleObjectIds[nextIndex]]?.focus();
+  };
 
   const { nodes, edges, width, height, layoutMode } = useMemo(() => {
     const ids = visibleObjectIds;
@@ -321,16 +350,21 @@ export function GraphViewer({
           return (
             <g
               key={node.id}
+              ref={(element) => {
+                graphNodeRefs.current[node.id] = element;
+              }}
               transform={`translate(${node.x}, ${node.y})`}
               onClick={() => onNodeSelect?.(node.id)}
               onKeyDown={(event) => {
                 if (onNodeSelect && (event.key === 'Enter' || event.key === ' ')) {
                   event.preventDefault();
                   onNodeSelect(node.id);
+                  return;
                 }
+                handleNodeKeyDown(event, node.id);
               }}
               role={onNodeSelect ? 'button' : undefined}
-              tabIndex={onNodeSelect ? 0 : undefined}
+              tabIndex={onNodeSelect && node.id === rovingFocusNodeId ? 0 : -1}
               focusable={onNodeSelect ? 'true' : undefined}
               aria-label={onNodeSelect ? `Select object ${node.id}${isRelated ? ', related to current selection' : ''}` : undefined}
               aria-pressed={onNodeSelect ? isSelected : undefined}
