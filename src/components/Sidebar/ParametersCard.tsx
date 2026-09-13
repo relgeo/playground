@@ -169,6 +169,7 @@ export function ParametersCard({
             </div>
             <input
               type="range"
+              aria-label={leaf.customLabel ?? leaf.label}
               min={leaf.min}
               max={leaf.max}
               step={leaf.step}

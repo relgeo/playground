@@ -107,9 +107,21 @@ export function Editor({ code, onChange, editorRef }: EditorProps) {
         <CodeMirror
           ref={editorRef}
           value={code}
+          aria-label="RelGeo DSL source editor"
           height="100%"
+          indentWithTab={false}
           theme="none" // We use our own CSS for styling
-          extensions={[yaml(), relgeoLinter, relgeoAutocompletion, EditorView.lineWrapping, relgeoHover]}
+          extensions={[
+            yaml(),
+            relgeoLinter,
+            relgeoAutocompletion,
+            EditorView.lineWrapping,
+            relgeoHover,
+            EditorView.contentAttributes.of({
+              'aria-label': 'RelGeo DSL source editor',
+              'aria-multiline': 'true',
+            }),
+          ]}
           onChange={(value) => onChange(value)}
           basicSetup={{
             lineNumbers: true,

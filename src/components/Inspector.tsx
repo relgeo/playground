@@ -585,6 +585,12 @@ export function Inspector({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <button
                     type="button"
+                    aria-label={`${isExpanded ? 'Collapse' : 'Expand'} object ${id}`}
+                    aria-expanded={isExpanded}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      toggleExpand(id);
+                    }}
                     style={{ border: 'none', background: 'transparent', padding: 0, width: '16px', height: '16px', color: 'var(--muted)' }}
                   >
                     {isExpanded ? ICONS.ChevronUp : ICONS.ChevronDown}

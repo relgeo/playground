@@ -12,6 +12,7 @@ export function LayersCard({ hiddenRoles, setHiddenRoles }: LayersCardProps) {
         <label key={role} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', fontSize: '13px' }}>
           <input
             type="checkbox"
+            aria-label={`Show ${role}`}
             checked={!hiddenRoles.has(role)}
             onChange={(event) => {
               const nextHiddenRoles = new Set(hiddenRoles);

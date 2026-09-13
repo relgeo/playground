@@ -38,6 +38,7 @@ export function ExampleCard({
       {!collapsed && <p className="example-summary">{example.summary}</p>}
       <select
         className="example-select"
+        aria-label="Choose example"
         value={selectedExample}
         onChange={(e) => onChange(e.target.value)}
       >

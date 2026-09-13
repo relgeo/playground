@@ -108,6 +108,7 @@ export function Navbar({
         <div className="navbar-divider" />
         <select
           className="example-select"
+          aria-label="Choose example"
           style={{ width: '150px', marginTop: 0 }}
           value={selectedExample}
           onChange={(e) => onExampleChange(e.target.value)}
@@ -124,6 +125,7 @@ export function Navbar({
             <div className="navbar-divider" />
             <select
               className="sheet-select"
+              aria-label="Choose preview surface"
               style={{
                 width: '140px',
                 marginTop: 0,
