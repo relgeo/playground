@@ -305,7 +305,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] Putuskan strategi font IBM Plex yang eksplisit.
 - [ ] Hapus selector legacy setelah regression check.
 - [ ] Pecah stylesheet hanya pada batas concern yang membantu perawatan.
-- [ ] Selaraskan README/license metadata dengan MIT.
+- [x] README, `package.json`, dan `LICENSE` sudah menyatakan MIT secara konsisten; penyelarasan metadata dasar selesai.
 
 ### Phase 4 — Verification dan release gate
 
@@ -396,6 +396,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U08/U11 — memilih object tetap membuka Objects pada selection baru, tetapi tidak lagi memaksa tab kembali ke Objects saat pengguna berpindah ke Graph/Values/Errors; alur object terpilih → Graph terverifikasi di browser.
 - [x] U07/U09 — share URL kini dibatasi secara konservatif; draft yang terlalu besar tetap disimpan lokal dan menampilkan feedback, sementara helper limit memiliki regression test.
 - [x] U03/U09 — breakpoint handset `480px` kini mencegah navbar/select/error path/graph count meluber; editor dan preview mendapat minimum height yang lebih realistis untuk layar kecil. Matrix perangkat tetap perlu dijalankan.
+- [x] U18 — metadata lisensi Playground diverifikasi konsisten: `package.json` memakai `MIT`, README memiliki bagian License, dan file LICENSE adalah MIT dengan copyright Agus Made.
 - [x] U11 — mode drawer tablet memindahkan fokus ke panel pertama saat dibuka dan menyimpan kontrol pemicu untuk focus-return saat ditutup; behavior diterapkan untuk Escape, backdrop, dan Hide.
 - [x] U11 — drawer tablet kini memiliki focus trap Tab/Shift+Tab di antara control yang terlihat; siklus fokus browser terverifikasi dari kontrol terakhir ke header PARAMETERS dan kembali ke kontrol terakhir.
 - [x] U06 — reduced-motion stylesheet menonaktifkan keyframe, transition, delay, dan smooth scrolling; emulasi preference browser nyata masih tersisa.
