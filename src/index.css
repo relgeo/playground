@@ -540,6 +540,24 @@ button:disabled {
   border-left: 0;
 }
 
+.inspector-clear-selection {
+  justify-self: start;
+  padding: 0.2rem 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--brand);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  text-align: left;
+}
+
+.inspector-clear-selection:hover {
+  background: var(--brand-soft);
+  transform: none;
+  box-shadow: none;
+}
+
 .status-indicator {
   font-size: 0.75rem;
   font-weight: 600;

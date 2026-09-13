@@ -614,6 +614,19 @@ export function Inspector({
             />
             Selected only
           </label>
+          {selectedObjectId && (
+            <button
+              type="button"
+              className="inspector-clear-selection"
+              onClick={() => {
+                onSelectObject?.(null);
+                setShowSelectedOnly(false);
+              }}
+              aria-label={`Clear selected object ${selectedObjectId}`}
+            >
+              Clear selection: {selectedObjectId}
+            </button>
+          )}
           <span role="status" aria-live="polite" style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>
             Showing {objectEntries.length} of {Object.keys(rData.objects).length} objects
           </span>

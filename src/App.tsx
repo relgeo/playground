@@ -219,6 +219,26 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('input, textarea, [contenteditable="true"]')) return;
+
+      if (window.matchMedia('(max-width: 720px)').matches && sidebarVisible) {
+        setSidebarVisible(false);
+        return;
+      }
+
+      if (selectedObjectId) {
+        setSelectedObjectId(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [selectedObjectId, sidebarVisible]);
+
   // Sync code to URL hash and localStorage draft
   useEffect(() => {
     const timer = setTimeout(() => {
