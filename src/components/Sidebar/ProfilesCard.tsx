@@ -37,6 +37,7 @@ export function ProfilesCard({
           type="button"
           className={`profile-item ${selectedProfile === null ? 'active' : ''}`}
           onClick={() => handleSelect(null, {})}
+          aria-pressed={selectedProfile === null}
         >
           Default
         </button>
@@ -48,6 +49,7 @@ export function ProfilesCard({
               type="button"
               className={`profile-item ${selectedProfile === name ? 'active' : ''}`}
               onClick={() => handleSelect(name, p.overrides || {})}
+              aria-pressed={selectedProfile === name}
             >
               {name}
             </button>

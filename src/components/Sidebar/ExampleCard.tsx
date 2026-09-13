@@ -30,6 +30,8 @@ export function ExampleCard({
             className="icon-button"
             onClick={() => setCollapsed(!collapsed)}
             title={collapsed ? 'Expand' : 'Collapse'}
+            aria-label={`${collapsed ? 'Expand' : 'Collapse'} example details`}
+            aria-expanded={!collapsed}
           >
             {collapsed ? ICONS.ChevronDown : ICONS.ChevronUp}
           </button>

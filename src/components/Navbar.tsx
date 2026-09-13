@@ -191,6 +191,7 @@ export function Navbar({
               </span>
               {sheetPreviewEntryTarget && sheetPreviewEntryLabel && (
                 <button
+                  type="button"
                   onClick={() => onSheetChange(sheetPreviewEntryTarget)}
                   title="Open the first available sheet/view physical preview without changing the default model-preview entry point"
                   style={{
@@ -208,6 +209,7 @@ export function Navbar({
                 </button>
               )}
               <button
+                type="button"
                 onClick={() => setIsPrintMode(!isPrintMode)} 
                 title={isPrintMode ? "Switch to Model Preview" : "Switch to Physical Preview"}
                 aria-pressed={isPrintMode}
@@ -227,11 +229,11 @@ export function Navbar({
                 </span>
               </button>
               <div className="navbar-divider" style={{ margin: '0 4px', opacity: 0.5 }} />
-              <button onClick={onZoomOut} title="Zoom Out" aria-label="Zoom out">{ICONS.ZoomOut}</button>
-              <span style={{ fontSize: '0.7rem', width: '52px', textAlign: 'center' }}>{formatZoomLabel(zoom)}</span>
-              <button onClick={onZoomIn} title="Zoom In" aria-label="Zoom in">{ICONS.ZoomIn}</button>
-              <button onClick={onRecenter} title="Recenter" aria-label="Fit and recenter preview">{ICONS.Recenter}</button>
-              <button onClick={onExport} title="Export SVG" aria-label="Export SVG">{ICONS.Export}</button>
+              <button type="button" onClick={onZoomOut} title="Zoom Out" aria-label="Zoom out">{ICONS.ZoomOut}</button>
+              <span aria-live="polite" aria-label={`Zoom ${formatZoomLabel(zoom)}`} style={{ fontSize: '0.7rem', width: '52px', textAlign: 'center' }}>{formatZoomLabel(zoom)}</span>
+              <button type="button" onClick={onZoomIn} title="Zoom In" aria-label="Zoom in">{ICONS.ZoomIn}</button>
+              <button type="button" onClick={onRecenter} title="Recenter" aria-label="Fit and recenter preview">{ICONS.Recenter}</button>
+              <button type="button" onClick={onExport} title="Export SVG" aria-label="Export SVG">{ICONS.Export}</button>
             </div>
           </>
         )}
@@ -306,6 +308,7 @@ export function Navbar({
         {/* Layout Toggles */}
         <div className="control-group navbar-layout-group" role="group" aria-label="Workspace layout">
           <button
+            type="button"
             className={viewMode === 'split-h' ? 'active' : ''}
             onClick={() => setViewMode('split-h')}
             title="Horizontal Split"
@@ -315,6 +318,7 @@ export function Navbar({
             {ICONS.LayoutH}
           </button>
           <button
+            type="button"
             className={viewMode === 'split-v' ? 'active' : ''}
             onClick={() => setViewMode('split-v')}
             title="Vertical Split"
@@ -324,6 +328,7 @@ export function Navbar({
             {ICONS.LayoutV}
           </button>
           <button
+            type="button"
             className={viewMode === 'editor-only' ? 'active' : ''}
             onClick={() => setViewMode('editor-only')}
             title="Editor Only"
@@ -333,6 +338,7 @@ export function Navbar({
             {ICONS.ModeEditor}
           </button>
           <button
+            type="button"
             className={viewMode === 'preview-only' ? 'active' : ''}
             onClick={() => setViewMode('preview-only')}
             title="Preview Only"

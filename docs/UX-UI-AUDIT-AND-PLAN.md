@@ -373,6 +373,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U10 — graph Inspector memiliki filter object/type, focus selection berbasis neighborhood, empty state filter, dan legend visual yang responsif.
 - [x] U07/U09 — error tanpa fallback kini menjelaskan bahwa belum ada preview sukses dan menyediakan reset ke selected example; fallback tetap menawarkan restore draft sukses terakhir.
 - [x] U09 — tab Errors menampilkan jumlah diagnostics dan tombol Go to first error menuju object atau path pertama yang actionable.
+- [x] U11 — icon controls Navbar memiliki button type/label, zoom diumumkan saat berubah, dan profile/example controls menyatakan pressed/expanded state.
 - [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
 - [x] U09 — error preview/error tab meneruskan error code, punya tombol ke source bila ada object id atau path, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
@@ -386,7 +387,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [ ] U08 — inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, dan related-object highlight lintas surface; grouping lanjutan masih belum.
 - [ ] U09 — audit seluruh clickable affordance dan diagnostics tanpa target source masih belum; first-error actionable, recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia.
-- [ ] U11 — sebagian besar control utama sudah diaudit; audit seluruh affordance dan verifikasi real screen reader masih perlu.
+- [ ] U11 — control utama dan state yang tersentuh sudah diaudit; inventaris seluruh affordance dan verifikasi real screen reader masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
