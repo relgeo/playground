@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { ICONS } from './Icons';
 import type { SidebarPanels } from '../types';
 
@@ -41,6 +41,17 @@ export function Sidebar({
 }: SidebarProps) {
   const sidebarWidth = visible ? width : 0;
   const sidebarClass = `sidebar ${!visible ? 'is-hidden' : ''}`;
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!visible || !onClose || typeof window === 'undefined') return;
+    if (!window.matchMedia('(max-width: 840px)').matches) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      sidebarRef.current?.querySelector<HTMLElement>('.sidebar-panel-header')?.focus();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [visible, onClose]);
 
   return (
     <>
@@ -52,8 +63,10 @@ export function Sidebar({
           onClick={onClose}
         />
       )}
-      <aside 
+      <aside
+        ref={sidebarRef}
         className={sidebarClass}
+        aria-label="Workspace tools"
         style={{ 
           width: `${sidebarWidth}px`,
           transition: isResizing ? 'none' : 'width 0.2s ease',

@@ -1,4 +1,4 @@
-import { lazy, startTransition, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, startTransition, Suspense, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 // import { parseRelGeo, resolveGeometry, renderToSVG } from '@relgeo/core';
 import { DEFAULT_EXAMPLE_KEY, EXAMPLES } from './examples';
 
@@ -199,6 +199,28 @@ function App() {
   const [isResizingSplit, setIsResizingSplit] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
   const [actionFeedback, setActionFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
+  const sidebarReturnFocusRef = useRef<HTMLElement | null>(null);
+
+  const openSidebar = useCallback(() => {
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      sidebarReturnFocusRef.current = document.activeElement;
+    }
+    setSidebarVisible(true);
+  }, []);
+
+  const closeSidebar = useCallback(() => {
+    setSidebarVisible(false);
+  }, []);
+
+  useEffect(() => {
+    if (sidebarVisible || !sidebarReturnFocusRef.current || typeof window === 'undefined') return;
+    if (!window.matchMedia('(max-width: 840px)').matches) return;
+
+    const element = sidebarReturnFocusRef.current;
+    const frame = window.requestAnimationFrame(() => element.focus());
+    sidebarReturnFocusRef.current = null;
+    return () => window.cancelAnimationFrame(frame);
+  }, [sidebarVisible]);
 
   const requestFitAll = () => setFitAllTrigger((trigger) => trigger + 1);
 
@@ -249,7 +271,7 @@ function App() {
       if (target?.closest('input, textarea, [contenteditable="true"]')) return;
 
       if (window.matchMedia('(max-width: 840px)').matches && sidebarVisible) {
-        setSidebarVisible(false);
+        closeSidebar();
         return;
       }
 
@@ -260,7 +282,7 @@ function App() {
 
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, [selectedObjectId, sidebarVisible]);
+  }, [closeSidebar, selectedObjectId, sidebarVisible]);
 
   // Sync code to URL hash and localStorage draft
   useEffect(() => {
@@ -607,7 +629,8 @@ function App() {
         viewMode={viewMode}
         setViewMode={setViewMode}
         sidebarVisible={sidebarVisible}
-        setSidebarVisible={setSidebarVisible}
+        onOpenSidebar={openSidebar}
+        onCloseSidebar={closeSidebar}
         sidebarPosition={sidebarPosition}
         setSidebarPosition={setSidebarPosition}
         status={status}
@@ -651,7 +674,7 @@ function App() {
           isResizing={isResizingSidebar}
           onResizeStart={() => setIsResizingSidebar(true)}
           onResizeKeyboard={(delta) => setSidebarWidth((width) => Math.max(240, Math.min(600, width + delta)))}
-          onClose={() => setSidebarVisible(false)}
+          onClose={closeSidebar}
         >
           {{
             profiles: (

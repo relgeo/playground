@@ -391,6 +391,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U05/U12 — resizer sidebar dan split memakai Pointer Events, termasuk `pointercancel`, sehingga jalur drag siap untuk mouse, touch, dan stylus; uji gesture perangkat nyata masih tersisa.
 - [x] U11 — mobile surface switcher memiliki `role="group"`, label yang jelas, dan tombol dengan `aria-pressed` untuk Both/Source/Preview; semantics terverifikasi pada browser tablet.
 - [x] U08 — Inspector menyediakan pilihan Related depth 1/2/3 levels; kedalaman yang dipilih dipakai konsisten untuk neighborhood highlight, auto-open group, related list, dan graph context.
+- [x] U11 — mode drawer tablet memindahkan fokus ke panel pertama saat dibuka dan menyimpan kontrol pemicu untuk focus-return saat ditutup; behavior diterapkan untuk Escape, backdrop, dan Hide.
 - [x] U02 — aksi sekunder source dan sidebar placement dipindahkan ke menu More; kepadatan toolbar global pada 1024px masih perlu verifikasi.
 - [x] U14 — toolbar preview kini dipisah menjadi kelompok overlay dan line rendering serta wrap aman di mobile; pemisahan global-vs-contextual dan pengurangan duplikasi masih tersisa.
 - [x] Performance — dependency graph dikirim dari worker sehingga `@relgeo/core` tidak lagi eager di main bundle; ukuran main chunk turun dari sekitar 584 kB menjadi sekitar 307 kB, sementara worker/core tetap terpisah.

@@ -19,7 +19,8 @@ interface NavbarProps {
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
   sidebarVisible: boolean;
-  setSidebarVisible: (visible: boolean) => void;
+  onOpenSidebar: () => void;
+  onCloseSidebar: () => void;
   sidebarPosition: SidebarPosition;
   setSidebarPosition: (pos: SidebarPosition) => void;
   status: 'error' | 'ready' | 'idle' | 'resolving';
@@ -51,7 +52,8 @@ export function Navbar({
   viewMode,
   setViewMode,
   sidebarVisible,
-  setSidebarVisible,
+  onOpenSidebar,
+  onCloseSidebar,
   sidebarPosition,
   setSidebarPosition,
   status,
@@ -280,7 +282,7 @@ export function Navbar({
                   className={sidebarVisible && sidebarPosition === 'left' ? 'active' : ''}
                   onClick={() => {
                     setSidebarPosition('left');
-                    if (!sidebarVisible) setSidebarVisible(true);
+                    if (!sidebarVisible) onOpenSidebar();
                   }}
                   title="Sidebar Left"
                   aria-label="Show sidebar on left"
@@ -293,7 +295,7 @@ export function Navbar({
                   className={sidebarVisible && sidebarPosition === 'right' ? 'active' : ''}
                   onClick={() => {
                     setSidebarPosition('right');
-                    if (!sidebarVisible) setSidebarVisible(true);
+                    if (!sidebarVisible) onOpenSidebar();
                   }}
                   title="Sidebar Right"
                   aria-label="Show sidebar on right"
@@ -304,7 +306,7 @@ export function Navbar({
                 <button
                   type="button"
                   className={!sidebarVisible ? 'active' : ''}
-                  onClick={() => setSidebarVisible(false)}
+                  onClick={onCloseSidebar}
                   title="Hide Sidebar"
                   aria-label="Hide sidebar"
                   aria-pressed={!sidebarVisible}
