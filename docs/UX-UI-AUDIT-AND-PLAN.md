@@ -397,6 +397,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U07/U09 — share URL kini dibatasi secara konservatif; draft yang terlalu besar tetap disimpan lokal dan menampilkan feedback, sementara helper limit memiliki regression test.
 - [x] U03/U09 — breakpoint handset `480px` kini mencegah navbar/select/error path/graph count meluber; editor dan preview mendapat minimum height yang lebih realistis untuk layar kecil. Matrix perangkat tetap perlu dijalankan.
 - [x] U18 — metadata lisensi Playground diverifikasi konsisten: `package.json` memakai `MIT`, README memiliki bagian License, dan file LICENSE adalah MIT dengan copyright Agus Made.
+- [x] U18/U21 — selector CSS orphan dari layout lama sudah diaudit dan dibersihkan; selector status dinamis dan class CodeMirror dipertahankan, sehingga stylesheet turun sekitar 10% (1.846 → 1.659 baris).
 - [x] U11 — mode drawer tablet memindahkan fokus ke panel pertama saat dibuka dan menyimpan kontrol pemicu untuk focus-return saat ditutup; behavior diterapkan untuk Escape, backdrop, dan Hide.
 - [x] U11 — drawer tablet kini memiliki focus trap Tab/Shift+Tab di antara control yang terlihat; siklus fokus browser terverifikasi dari kontrol terakhir ke header PARAMETERS dan kembali ke kontrol terakhir.
 - [x] U06 — reduced-motion stylesheet menonaktifkan keyframe, transition, delay, dan smooth scrolling; emulasi preference browser nyata masih tersisa.
