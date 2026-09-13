@@ -40,6 +40,7 @@ export function Inspector({
   onJumpToPath,
 }: InspectorProps) {
   const [expandedObjects, setExpandedObjects] = useState<Record<string, boolean>>({});
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [objectQuery, setObjectQuery] = useState('');
   const [showSelectedOnly, setShowSelectedOnly] = useState(false);
 
@@ -55,6 +56,19 @@ export function Inspector({
       setTab('resolved');
     }
   }, [selectedObjectId, setTab, tab]);
+
+  useEffect(() => {
+    if (!selectedObjectId || tab !== 'resolved' || typeof document === 'undefined') return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const selectedCard = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-inspector-object-id]')
+      ).find((element) => element.dataset.inspectorObjectId === selectedObjectId);
+      selectedCard?.scrollIntoView({ block: 'nearest' });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [data, objectQuery, selectedObjectId, showSelectedOnly, tab]);
 
   // Helper to find the line number of an object in the YAML code
   const findLineForObject = (objectId: string): number => {
@@ -633,9 +647,24 @@ export function Inspector({
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', overflowY: 'auto', flex: 1, paddingRight: '2px' }}>
         {Array.from(groupedEntries.entries()).map(([group, entries]) => (
+          (() => {
+            const groupContainsSelection = Boolean(
+              selectedObjectId && entries.some(([entryId]) => entryId === selectedObjectId)
+            );
+            const groupIsForcedOpen = Boolean(normalizedQuery) || showSelectedOnly || groupContainsSelection;
+            const groupIsCollapsed = collapsedGroups[group] ?? group.endsWith('(generated)');
+
+            return (
           <details
             key={group}
-            open={!group.endsWith('(generated)') || Boolean(normalizedQuery) || showSelectedOnly}
+            open={groupIsForcedOpen || !groupIsCollapsed}
+            onToggle={(event) => {
+              if (groupIsForcedOpen) return;
+              setCollapsedGroups((prev) => ({
+                ...prev,
+                [group]: !event.currentTarget.open,
+              }));
+            }}
             className="inspector-object-group"
           >
             <summary className="inspector-object-group-summary">
@@ -648,13 +677,15 @@ export function Inspector({
           return (
             <div
               key={id}
+              data-inspector-object-id={id}
+              className={selectedObjectId === id ? 'inspector-object-card is-selected' : 'inspector-object-card'}
               style={{
-                background: isExpanded ? 'var(--panel-strong)' : 'rgba(255, 255, 255, 0.4)',
-                border: '1px solid var(--line)',
+                background: isExpanded || selectedObjectId === id ? 'var(--panel-strong)' : 'rgba(255, 255, 255, 0.4)',
+                border: selectedObjectId === id ? '1px solid var(--brand)' : '1px solid var(--line)',
                 borderRadius: '6px',
                 padding: '0.5rem 0.65rem',
                 transition: 'all 150ms ease',
-                boxShadow: isExpanded ? '0 4px 12px rgba(60, 44, 10, 0.04)' : 'none',
+                boxShadow: isExpanded || selectedObjectId === id ? '0 4px 12px rgba(60, 44, 10, 0.08)' : 'none',
               }}
             >
               {/* Header Card */}
@@ -770,6 +801,8 @@ export function Inspector({
         })}
             </div>
           </details>
+            );
+          })()
         ))}
         {objectEntries.length === 0 && (
           <div style={{ padding: '1rem 0.4rem', color: 'var(--muted)', fontSize: '0.76rem' }}>
