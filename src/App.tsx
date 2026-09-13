@@ -81,22 +81,42 @@ function findSourceLineForErrorPath(code: string, path: string): number {
 }
 
 async function copyText(text: string): Promise<void> {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
+  let modernClipboardError: unknown;
+  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch (error) {
+      // Some browsers expose the API but reject it for an insecure context or
+      // a denied permission. Continue to the legacy gesture-based fallback.
+      modernClipboardError = error;
+    }
+  }
+
+  if (typeof document === 'undefined' || !document.body || typeof document.execCommand !== 'function') {
+    throw modernClipboardError instanceof Error
+      ? modernClipboardError
+      : new Error('Clipboard access is unavailable.');
   }
 
   const textarea = document.createElement('textarea');
   textarea.value = text;
   textarea.setAttribute('readonly', '');
+  textarea.setAttribute('aria-hidden', 'true');
+  textarea.tabIndex = -1;
   textarea.style.position = 'fixed';
   textarea.style.opacity = '0';
-  document.body.appendChild(textarea);
-  textarea.select();
-  const copied = document.execCommand('copy');
-  textarea.remove();
-  if (!copied) {
-    throw new Error('Clipboard access is unavailable.');
+  try {
+    document.body.appendChild(textarea);
+    textarea.focus({ preventScroll: true });
+    textarea.select();
+    if (!document.execCommand('copy')) {
+      throw modernClipboardError instanceof Error
+        ? modernClipboardError
+        : new Error('Clipboard access is unavailable.');
+    }
+  } finally {
+    textarea.remove();
   }
 }
 
