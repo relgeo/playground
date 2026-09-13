@@ -125,7 +125,7 @@ export function Sidebar({
           aria-valuemax={600}
           aria-valuenow={width}
           aria-label={`Resize sidebar ${position === 'left' ? 'width' : 'width'}`}
-          onMouseDown={onResizeStart}
+          onPointerDown={onResizeStart}
           onKeyDown={(event) => {
             if (!onResizeKeyboard) return;
             const step = event.shiftKey ? 48 : 24;

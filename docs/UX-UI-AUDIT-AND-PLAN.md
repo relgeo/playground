@@ -388,6 +388,8 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U07 — jalur copy mencoba Clipboard API lalu fallback legacy bila API tersedia tetapi ditolak; textarea fallback selalu dibersihkan dan tidak ikut masuk keyboard traversal.
 - [x] U03 — mode mobile-workbench diperluas hingga `840px`; pada viewport tablet `812px` sidebar menjadi drawer, surface switcher tampil, dan editor/preview tersusun vertikal tanpa layout tiga-kolom yang terlalu sempit.
 - [x] U03/U11 — Escape kini memakai breakpoint `840px` yang sama dan menutup drawer tablet sebelum membersihkan selection; perilaku terverifikasi pada viewport `812px`.
+- [x] U05/U12 — resizer sidebar dan split memakai Pointer Events, termasuk `pointercancel`, sehingga jalur drag siap untuk mouse, touch, dan stylus; uji gesture perangkat nyata masih tersisa.
+- [x] U11 — mobile surface switcher memiliki `role="group"`, label yang jelas, dan tombol dengan `aria-pressed` untuk Both/Source/Preview; semantics terverifikasi pada browser tablet.
 - [x] U02 — aksi sekunder source dan sidebar placement dipindahkan ke menu More; kepadatan toolbar global pada 1024px masih perlu verifikasi.
 - [x] U14 — toolbar preview kini dipisah menjadi kelompok overlay dan line rendering serta wrap aman di mobile; pemisahan global-vs-contextual dan pengurangan duplikasi masih tersisa.
 - [x] Performance — dependency graph dikirim dari worker sehingga `@relgeo/core` tidak lagi eager di main bundle; ukuran main chunk turun dari sekitar 584 kB menjadi sekitar 307 kB, sementara worker/core tetap terpisah.

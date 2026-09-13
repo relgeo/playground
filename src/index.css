@@ -225,6 +225,7 @@ button:disabled {
   background: var(--line);
   z-index: 10;
   transition: background 0.2s;
+  touch-action: none;
 }
 
 .split-resizer:hover,
@@ -240,6 +241,10 @@ button:disabled {
 .workspace-split.is-vertical>.split-resizer {
   height: 4px;
   cursor: row-resize;
+}
+
+.sidebar-resizer {
+  touch-action: none;
 }
 
 

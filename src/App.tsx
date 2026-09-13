@@ -294,25 +294,27 @@ function App() {
   // Sidebar Resize
   useEffect(() => {
     if (!isResizingSidebar) return;
-    const handleMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (e: PointerEvent) => {
       const newWidth = sidebarPosition === 'left' 
         ? Math.max(240, Math.min(600, e.clientX))
         : Math.max(240, Math.min(600, window.innerWidth - e.clientX));
       setSidebarWidth(newWidth);
     };
-    const handleMouseUp = () => setIsResizingSidebar(false);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    const handlePointerUp = () => setIsResizingSidebar(false);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
     };
   }, [isResizingSidebar, sidebarPosition]);
 
   // Split Resize
   useEffect(() => {
     if (!isResizingSplit) return;
-    const handleMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (e: PointerEvent) => {
       const container = document.querySelector('.workspace-split');
       if (!container) return;
       const rect = container.getBoundingClientRect();
@@ -324,12 +326,14 @@ function App() {
       }
       setSplitRatio(Math.max(10, Math.min(90, ratio)));
     };
-    const handleMouseUp = () => setIsResizingSplit(false);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    const handlePointerUp = () => setIsResizingSplit(false);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
     };
   }, [isResizingSplit, viewMode]);
 
@@ -730,7 +734,7 @@ function App() {
               aria-valuenow={Math.round(splitRatio)}
               aria-valuetext={`${Math.round(splitRatio)}% editor space`}
               aria-label={viewMode === 'split-v' ? 'Resize editor and preview vertically' : 'Resize editor and preview horizontally'}
-              onMouseDown={() => setIsResizingSplit(true)}
+              onPointerDown={() => setIsResizingSplit(true)}
               onDoubleClick={() => setSplitRatio(50)}
               onKeyDown={(event) => {
                 const step = event.shiftKey ? 10 : 5;
