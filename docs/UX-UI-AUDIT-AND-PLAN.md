@@ -368,6 +368,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U08 — object hasil generated repeat kini dikelompokkan dan group dapat dibuka/tutup; related-object highlight lintas surface tersedia, sementara grouping lanjutan masih tersisa.
 - [x] U08 — selection dari preview, inspector, dan graph kini memusatkan source definition di editor; dependency/dependent terkait ikut ditandai di inspector, preview, dan graph.
 - [x] U08 — related neighborhood kini mencakup dependency dan dependent langsung maupun tidak langsung hingga dua tingkat, dengan batas agar dokumen besar tetap terbaca.
+- [x] U08 — group yang memuat object terpilih atau terkait otomatis terbuka dan summary group kini menjelaskan jumlah selected/related secara ringkas.
 - [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
 - [x] U09 — error preview/error tab meneruskan error code, punya tombol ke source bila ada object id atau path, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
