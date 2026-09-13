@@ -1012,7 +1012,9 @@ input[type='range'] {
 }
 
 .error-banner code {
-  white-space: nowrap;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
   align-self: flex-start;
   background: rgba(255, 255, 255, 0.8);
   border-radius: 999px;
@@ -1048,6 +1050,8 @@ input[type='range'] {
 }
 
 .error-path {
+  max-width: 100%;
+  overflow-wrap: anywhere;
   font-size: 0.7rem !important;
   opacity: 0.8;
   margin-left: auto;
@@ -1780,6 +1784,56 @@ input[type='range'] {
     bottom: -1.8rem;
     transform: none;
     text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-left {
+    flex-basis: 100%;
+    flex-wrap: wrap;
+  }
+
+  .navbar-left .example-select,
+  .navbar-left .sheet-select {
+    flex: 1 1 8rem;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .navbar-center {
+    max-width: 100%;
+  }
+
+  .navbar-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .workspace-split:not(.is-vertical) .editor-side,
+  .workspace-split:not(.is-vertical) .preview-side,
+  .workspace-split.is-vertical .editor-side,
+  .workspace-split.is-vertical .preview-side {
+    min-height: 18rem;
+  }
+
+  .error-title {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .error-path {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  .graph-viewer-controls {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .graph-viewer-count {
+    grid-column: 1 / -1;
+    justify-self: start;
   }
 }
 

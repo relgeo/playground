@@ -395,6 +395,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U08 — Inspector menyediakan pilihan Related depth 1/2/3 levels; kedalaman yang dipilih dipakai konsisten untuk neighborhood highlight, auto-open group, related list, dan graph context.
 - [x] U08/U11 — memilih object tetap membuka Objects pada selection baru, tetapi tidak lagi memaksa tab kembali ke Objects saat pengguna berpindah ke Graph/Values/Errors; alur object terpilih → Graph terverifikasi di browser.
 - [x] U07/U09 — share URL kini dibatasi secara konservatif; draft yang terlalu besar tetap disimpan lokal dan menampilkan feedback, sementara helper limit memiliki regression test.
+- [x] U03/U09 — breakpoint handset `480px` kini mencegah navbar/select/error path/graph count meluber; editor dan preview mendapat minimum height yang lebih realistis untuk layar kecil. Matrix perangkat tetap perlu dijalankan.
 - [x] U11 — mode drawer tablet memindahkan fokus ke panel pertama saat dibuka dan menyimpan kontrol pemicu untuk focus-return saat ditutup; behavior diterapkan untuk Escape, backdrop, dan Hide.
 - [x] U11 — drawer tablet kini memiliki focus trap Tab/Shift+Tab di antara control yang terlihat; siklus fokus browser terverifikasi dari kontrol terakhir ke header PARAMETERS dan kembali ke kontrol terakhir.
 - [x] U06 — reduced-motion stylesheet menonaktifkan keyframe, transition, delay, dan smooth scrolling; emulasi preference browser nyata masih tersisa.
