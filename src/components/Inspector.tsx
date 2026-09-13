@@ -19,6 +19,7 @@ interface InspectorProps {
   valueCount?: number;
   unit?: string;
   selectedObjectId?: string | null;
+  relatedObjectIds?: string[];
   onSelectObject?: (objectId: string | null) => void;
   onJumpToLine?: (lineNum: number) => void;
   onJumpToPath?: (path: string) => void;
@@ -36,6 +37,7 @@ export function Inspector({
   valueCount,
   unit = 'mm',
   selectedObjectId = null,
+  relatedObjectIds = [],
   onSelectObject,
   onJumpToLine,
   onJumpToPath,
@@ -688,19 +690,20 @@ export function Inspector({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '0.35rem' }}>
         {entries.map(([id, obj]: [string, ResolvedObject]) => {
           const isExpanded = !!expandedObjects[id];
-          const relatedObjectIds = getRelatedObjectIds(id);
+          const objectRelatedIds = getRelatedObjectIds(id);
+          const isRelated = relatedObjectIds.includes(id);
           return (
             <div
               key={id}
               data-inspector-object-id={id}
               className={selectedObjectId === id ? 'inspector-object-card is-selected' : 'inspector-object-card'}
               style={{
-                background: isExpanded || selectedObjectId === id ? 'var(--panel-strong)' : 'rgba(255, 255, 255, 0.4)',
-                border: selectedObjectId === id ? '1px solid var(--brand)' : '1px solid var(--line)',
+                background: isExpanded || selectedObjectId === id || isRelated ? 'var(--panel-strong)' : 'rgba(255, 255, 255, 0.4)',
+                border: selectedObjectId === id ? '1px solid var(--brand)' : isRelated ? '1px dashed var(--accent)' : '1px solid var(--line)',
                 borderRadius: '6px',
                 padding: '0.5rem 0.65rem',
                 transition: 'all 150ms ease',
-                boxShadow: isExpanded || selectedObjectId === id ? '0 4px 12px rgba(60, 44, 10, 0.08)' : 'none',
+                boxShadow: isExpanded || selectedObjectId === id || isRelated ? '0 4px 12px rgba(60, 44, 10, 0.08)' : 'none',
               }}
             >
               {/* Header Card */}
@@ -809,11 +812,11 @@ export function Inspector({
                       </div>
                     </div>
                   )}
-                  {relatedObjectIds.length > 0 && (
+                  {objectRelatedIds.length > 0 && (
                     <div className="inspector-related-objects">
                       <span className="inspector-related-label">Related objects</span>
                       <div className="inspector-related-list">
-                        {relatedObjectIds.map((relatedId) => (
+                        {objectRelatedIds.map((relatedId) => (
                           <button
                             key={relatedId}
                             type="button"
@@ -1253,6 +1256,7 @@ export function Inspector({
             <GraphViewer
               objects={doc?.objects || {}}
               selectedObjectId={selectedObjectId}
+              relatedObjectIds={relatedObjectIds}
               onNodeSelect={(nodeId) => {
                 setExpandedObjects((prev) => ({ ...prev, [nodeId]: true }));
                 setTab('resolved');

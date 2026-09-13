@@ -1,4 +1,5 @@
-import { lazy, startTransition, Suspense, useDeferredValue, useEffect, useRef, useState } from 'react';
+import { getDependencyGraph } from '@relgeo/core';
+import { lazy, startTransition, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 // import { parseRelGeo, resolveGeometry, renderToSVG } from '@relgeo/core';
 import { DEFAULT_EXAMPLE_KEY, EXAMPLES } from './examples';
 
@@ -366,6 +367,22 @@ function App() {
     : null;
   const visiblePrintMode = isPrintMode && (!selectedSheetId || visibleSelectedSheetId !== null);
   const effectiveSheetId = getEffectiveSheetId(visibleSelectedSheetId, visiblePrintMode);
+  const selectedRelatedObjectIds = useMemo(() => {
+    if (!visibleSelectedObjectId || !displayDoc?.objects || !displayResolvedData?.objects) return [];
+
+    const dependencyGraph = getDependencyGraph(displayDoc.objects, displayDoc);
+    const baseObjectId = visibleSelectedObjectId.split('[')[0];
+    const graphObjectId = dependencyGraph.some((item) => item.id === visibleSelectedObjectId)
+      ? visibleSelectedObjectId
+      : baseObjectId;
+    const dependencies = dependencyGraph.find((item) => item.id === graphObjectId)?.deps ?? [];
+    const dependents = dependencyGraph
+      .filter((item) => item.deps.includes(graphObjectId))
+      .map((item) => item.id);
+
+    return Array.from(new Set([...dependencies, ...dependents]))
+      .filter((relatedId) => relatedId !== visibleSelectedObjectId && displayResolvedData.objects[relatedId]);
+  }, [displayDoc, displayResolvedData, visibleSelectedObjectId]);
 
   // Initialize Worker
   useEffect(() => {
@@ -652,6 +669,7 @@ function App() {
                 valueCount={resolvedValueCount}
                 unit={displayDoc?.scene?.unit || 'mm'}
                 selectedObjectId={visibleSelectedObjectId}
+                relatedObjectIds={selectedRelatedObjectIds}
                 onSelectObject={handleSelectObject}
                 onJumpToLine={handleJumpToLine}
                 onJumpToPath={handleJumpToErrorPath}
@@ -758,6 +776,7 @@ function App() {
                 fitAllTrigger={fitAllTrigger}
                 selectedSheetId={effectiveSheetId}
                 selectedObjectId={visibleSelectedObjectId}
+                relatedObjectIds={selectedRelatedObjectIds}
                 onSelectObject={handleSelectObject}
               />
               </Suspense>

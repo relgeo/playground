@@ -52,6 +52,7 @@ interface PreviewProps {
   fitAllTrigger: number;
   selectedSheetId: string | null;
   selectedObjectId?: string | null;
+  relatedObjectIds?: string[];
   onSelectObject?: (objectId: string | null) => void;
 }
 
@@ -90,6 +91,7 @@ export function Preview({
   fitAllTrigger,
   selectedSheetId,
   selectedObjectId = null,
+  relatedObjectIds = [],
   onSelectObject,
 }: PreviewProps) {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -397,6 +399,7 @@ export function Preview({
       <g transform={groupTransform}>
         {Object.entries(objectsMap).map(([id, obj]: [string, ResolvedObject]) => {
             if (obj.meta?.visible === false) return null;
+            const isRelated = relatedObjectIds.includes(id);
 
             // Pass parentMap to getBoundingBox so it uses the world-space bounding box
             const bbox = getBoundingBox(id, obj, parentMap);
@@ -419,7 +422,7 @@ export function Preview({
                   />
                 )}
 
-                {selectedObjectId === id && bbox && (
+                {(selectedObjectId === id || isRelated) && bbox && (
                   <g className="overlay-interactive" style={{ pointerEvents: 'none' }}>
                     <rect
                       x={bbox.x}
@@ -427,18 +430,20 @@ export function Preview({
                       width={bbox.width}
                       height={bbox.height}
                       fill="rgba(251, 191, 36, 0.08)"
-                      stroke="var(--brand)"
-                      strokeWidth={1.4 * s}
-                      strokeDasharray={`${3 * s},${2 * s}`}
-                      opacity="0.95"
+                      stroke={selectedObjectId === id ? 'var(--brand)' : 'var(--accent)'}
+                      strokeWidth={(selectedObjectId === id ? 1.4 : 0.85) * s}
+                      strokeDasharray={selectedObjectId === id ? `${3 * s},${2 * s}` : `${1.5 * s},${2 * s}`}
+                      opacity={selectedObjectId === id ? '0.95' : '0.62'}
                     />
-                    <circle
-                      cx={bbox.x + bbox.width / 2}
-                      cy={bbox.y + bbox.height / 2}
-                      r={1.8 * s}
-                      fill="var(--brand)"
-                      opacity="0.95"
-                    />
+                    {selectedObjectId === id && (
+                      <circle
+                        cx={bbox.x + bbox.width / 2}
+                        cy={bbox.y + bbox.height / 2}
+                        r={1.8 * s}
+                        fill="var(--brand)"
+                        opacity="0.95"
+                      />
+                    )}
                   </g>
                 )}
 
@@ -539,10 +544,10 @@ export function Preview({
                       width={id.length * 2.4 + 4}
                       height={4}
                       rx="1"
-                      fill={selectedObjectId === id ? 'var(--brand)' : 'var(--ink)'}
-                      stroke={selectedObjectId === id ? 'rgba(255, 255, 255, 0.55)' : 'rgba(255, 255, 255, 0.2)'}
+                      fill={selectedObjectId === id ? 'var(--brand)' : isRelated ? 'var(--accent)' : 'var(--ink)'}
+                      stroke={selectedObjectId === id || isRelated ? 'rgba(255, 255, 255, 0.55)' : 'rgba(255, 255, 255, 0.2)'}
                       strokeWidth={0.3}
-                      opacity={selectedObjectId === id ? '0.95' : '0.75'}
+                      opacity={selectedObjectId === id || isRelated ? '0.9' : '0.75'}
                     />
                     <text
                       x={0}

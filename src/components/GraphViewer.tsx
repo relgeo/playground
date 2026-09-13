@@ -5,6 +5,7 @@ import type { RelGeoObject } from '@relgeo/core';
 interface GraphViewerProps {
   objects: Record<string, RelGeoObject>;
   selectedObjectId?: string | null;
+  relatedObjectIds?: string[];
   onNodeSelect?: (objectId: string) => void;
 }
 
@@ -39,6 +40,7 @@ const PADDING = 5;
 export function GraphViewer({
   objects,
   selectedObjectId,
+  relatedObjectIds = [],
   onNodeSelect,
 }: GraphViewerProps) {
   const { nodes, edges, width, height, layoutMode } = useMemo(() => {
@@ -238,6 +240,7 @@ export function GraphViewer({
           const isPoint = type === 'point';
           const isCurve = ['line', 'arc', 'path', 'polygon'].includes(type);
           const isSelected = node.id === selectedObjectId;
+          const isRelated = relatedObjectIds.includes(node.id);
 
           let fill = 'var(--panel-strong)';
           let stroke = 'var(--line)';
@@ -256,6 +259,12 @@ export function GraphViewer({
             stroke = 'var(--ink)';
           }
 
+          if (isRelated && !isSelected) {
+            fill = 'rgba(217, 119, 6, 0.12)';
+            stroke = 'var(--accent)';
+            textFill = 'var(--accent)';
+          }
+
           return (
             <g
               key={node.id}
@@ -269,7 +278,7 @@ export function GraphViewer({
               }}
               role={onNodeSelect ? 'button' : undefined}
               tabIndex={onNodeSelect ? 0 : undefined}
-              aria-label={onNodeSelect ? `Select object ${node.id}` : undefined}
+              aria-label={onNodeSelect ? `Select object ${node.id}${isRelated ? ', related to current selection' : ''}` : undefined}
               aria-pressed={onNodeSelect ? isSelected : undefined}
               style={{ cursor: onNodeSelect ? 'pointer' : 'default', outline: 'none' }}
             >
