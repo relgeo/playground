@@ -1097,8 +1097,9 @@ export function Inspector({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', overflowY: 'auto', flex: 1 }}>
         <div
           className="inspector-error-summary"
-          role="status"
-          aria-live="polite"
+          role="alert"
+          aria-live="assertive"
+          aria-label={`${errorCount} diagnostic${errorCount === 1 ? '' : 's'} found${hasFirstErrorTarget ? '. A first-error action is available.' : '.'}`}
         >
           <span>{errorCount} diagnostic{errorCount === 1 ? '' : 's'} found</span>
           {hasFirstErrorTarget && (

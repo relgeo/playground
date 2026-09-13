@@ -292,10 +292,10 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Split/sidebar resizer menjadi keyboard-accessible separator; preset layout masih tersisa.
 - [x] Inspector search, count, selected-only filter, generated-object grouping, cross-surface collapse behavior, related-object navigation, automatic related-object highlight, dan pilihan kedalaman relasi 1–3 level sudah tersedia.
 - [x] Sinkronkan selection preview ↔ inspector ↔ graph ↔ code definition untuk object yang dipilih langsung; object terkait kini ikut ditandai tanpa mengubah single-selection focus.
-- [ ] Jadikan seluruh error summary/actions keyboard-accessible dan `role=alert`.
+- [x] Jadikan error summary/actions keyboard-accessible dan `role=alert`; ringkasan diagnostic mengumumkan jumlah error secara assertive dan tombol first-error serta detail action sudah berupa button native.
 - [x] Inspector tabs memiliki tablist/tab/tabpanel semantics.
 - [x] Graph node dapat difokuskan, diberi nama, dan dipilih dengan Enter/Space; graph filter, focus selection, dan legend juga tersedia.
-- [ ] Tambahkan graph focus/filter/legend.
+- [x] Graph memiliki filter nama/tipe, mode Focus selection berbasis neighborhood, count live, legend tipe/status, dan node keyboard-selectable.
 
 ### Phase 3 — Visual system dan cleanup
 
