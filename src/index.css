@@ -452,6 +452,10 @@ button:disabled {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.mobile-surface-switcher {
+  display: none;
+}
+
 .status-indicator {
   font-size: 0.75rem;
   font-weight: 600;
@@ -1261,6 +1265,39 @@ input[type='range'] {
   .navbar-center .control-group button {
     min-width: 2.2rem;
     min-height: 2.2rem;
+  }
+
+  .navbar-layout-group {
+    display: none;
+  }
+
+  .mobile-surface-switcher {
+    display: flex;
+    order: 4;
+    flex: 1 0 100%;
+    gap: 0.2rem;
+    padding: 0.2rem;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+
+  .mobile-surface-switcher button {
+    flex: 1 1 0;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.5rem;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .mobile-surface-switcher button.active {
+    background: var(--panel-strong);
+    color: var(--brand);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .action-feedback {

@@ -283,7 +283,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Status utama diberi `role=status` dan live announcement.
 - [x] Feedback copy/share/export dan clipboard fallback dasar sudah diterapkan.
 - [x] Reset/ganti contoh sekarang meminta konfirmasi saat draft berubah.
-- [ ] Implementasikan mobile surface switch/drawer dan verifikasi viewport matrix.
+- [x] Mobile surface switch untuk Source/Both/Preview sudah diimplementasikan; drawer/sidebar dan verifikasi viewport matrix masih tersisa.
 - [x] Empty state tidak lagi memaksa lebar 400px.
 
 ### Phase 2 — Inspect dan debug
@@ -367,6 +367,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U17 — empty state fluid dan tidak lagi memaksa minimum 400px.
 - [x] U08 — object hasil generated repeat kini dikelompokkan dan group dapat dibuka/tutup; sinkronisasi selection lintas surface masih tersisa.
 - [x] U08 — selection dari preview, inspector, dan graph kini memusatkan source definition di editor; related-object synchronization masih tersisa.
+- [x] U03 — mobile surface switch Source/Both/Preview sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
 - [x] U09 — error preview memiliki alert semantics, tombol langsung ke source bila ada object id, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U14 — toolbar groups diberi semantic label; konsolidasi visual dan pengurangan duplikasi masih tersisa.
 
@@ -378,7 +379,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
-- [ ] U03 — responsive CSS aktif sudah ditambahkan, tetapi viewport matrix dan surface switch/drawer belum selesai.
+- [ ] U03 — responsive CSS dan surface switch sudah ditambahkan, tetapi drawer/sidebar mobile, viewport matrix, dan touch nyata belum selesai.
 - [ ] U09 — alert/error actions sudah sebagian semantic dan fallback restore sudah tersedia, tetapi first-error umum, recovery tanpa fallback, dan seluruh clickable affordance belum selesai.
 - [ ] U12 — `touch-action` sudah diperlonggar, tetapi gesture contract belum diuji pada touch nyata.
 

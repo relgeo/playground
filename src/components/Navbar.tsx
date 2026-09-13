@@ -257,7 +257,7 @@ export function Navbar({
 
       <div className="navbar-right">
         {/* Layout Toggles */}
-        <div className="control-group" role="group" aria-label="Workspace layout">
+        <div className="control-group navbar-layout-group" role="group" aria-label="Workspace layout">
           <button
             className={viewMode === 'split-h' ? 'active' : ''}
             onClick={() => setViewMode('split-h')}
@@ -334,6 +334,32 @@ export function Navbar({
             {ICONS.SidebarHide}
           </button>
         </div>
+      </div>
+      <div className="mobile-surface-switcher" role="group" aria-label="Mobile workspace surface">
+        <button
+          type="button"
+          className={viewMode === 'split-h' || viewMode === 'split-v' ? 'active' : ''}
+          onClick={() => setViewMode('split-h')}
+          aria-pressed={viewMode === 'split-h' || viewMode === 'split-v'}
+        >
+          Both
+        </button>
+        <button
+          type="button"
+          className={viewMode === 'editor-only' ? 'active' : ''}
+          onClick={() => setViewMode('editor-only')}
+          aria-pressed={viewMode === 'editor-only'}
+        >
+          Source
+        </button>
+        <button
+          type="button"
+          className={viewMode === 'preview-only' ? 'active' : ''}
+          onClick={() => setViewMode('preview-only')}
+          aria-pressed={viewMode === 'preview-only'}
+        >
+          Preview
+        </button>
       </div>
       <div className="action-feedback" role="status" aria-live="polite" aria-atomic="true">
         {actionFeedback?.message}
