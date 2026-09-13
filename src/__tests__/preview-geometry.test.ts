@@ -96,4 +96,38 @@ describe('preview geometry', () => {
     expect(computeFitZoomPercent({ width: Number.POSITIVE_INFINITY, height: 100 }, 760, 560)).toBeNull();
     expect(computeFitZoomPercent({ width: 100, height: 100 }, Number.NaN, 560)).toBeNull();
   });
+
+  it('uses the limiting axis for wide and tall frames', () => {
+    expect(computeFitZoomPercent({ width: 200, height: 100 }, 400, 300)).toBe(200);
+    expect(computeFitZoomPercent({ width: 100, height: 200 }, 400, 300)).toBe(150);
+  });
+
+  it('clamps extreme fit results to the supported zoom range', () => {
+    expect(computeFitZoomPercent({ width: 1, height: 1 }, 1000, 1000)).toBe(10000);
+    expect(computeFitZoomPercent({ width: 100000, height: 100000 }, 1, 1)).toBe(0.01);
+  });
+
+  it('rejects empty or negative frames and containers', () => {
+    expect(computeFitZoomPercent({ width: 0, height: 100 }, 760, 560)).toBeNull();
+    expect(computeFitZoomPercent({ width: 100, height: -1 }, 760, 560)).toBeNull();
+    expect(computeFitZoomPercent({ width: 100, height: 100 }, 0, 560)).toBeNull();
+  });
+
+  it('rejects invalid selected-sheet dimensions before they reach CSS zoom', () => {
+    const scene: ResolvedScene = {
+      ...createScene('mm'),
+      sheets: {
+        broken: {
+          id: 'broken',
+          width: Number.NaN,
+          height: 210,
+          views: [],
+        },
+      },
+    };
+
+    const frame = getPreviewFrameSize(scene, 'broken', 'physical');
+    expect(frame?.width).toBeNaN();
+    expect(computeFitZoomPercent(frame, 760, 560)).toBeNull();
+  });
 });
