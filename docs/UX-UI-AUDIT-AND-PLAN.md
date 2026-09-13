@@ -277,7 +277,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Phase 1 — Unblock daily loop
 
-- [x] Verifikasi camera fit/recenter pada default model desktop; gambar tampil utuh dan terpusat setelah resolve. Multi-sheet/mobile masih perlu matrix test.
+- [x] Camera fit/recenter tersedia pada default model desktop; Fit view kini juga tersedia langsung di toolbar Preview, dengan guard frame non-finite. Multi-sheet/mobile masih perlu matrix test.
 - [ ] Pisahkan global controls dan preview contextual controls.
 - [ ] Pastikan example selector tidak memotong nama penting.
 - [x] Status utama diberi `role=status` dan live announcement.
@@ -358,6 +358,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 ### Selesai pada batch implementasi saat ini
 
 - [x] U01 — default model desktop terverifikasi tampil terpusat setelah resolve; pengujian semua frame masih tersisa.
+- [x] U01 — Fit view tersedia di toolbar Preview sehingga recenter tetap dapat dilakukan pada surface mobile; frame non-finite ditolak agar zoom tidak menjadi invalid.
 - [x] U04 — sidebar panel headers menjadi disclosure semantic.
 - [x] U05 — split/sidebar resizer memiliki separator semantics dan keyboard adjustment.
 - [x] U06 — reduced-motion override tersedia.
@@ -393,7 +394,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Belum dikerjakan
 
-- [ ] U01 — camera fit/recenter untuk seluruh sheet dan frame ekstrem.
+- [ ] U01 — verifikasi camera fit/recenter untuk seluruh sheet, frame ekstrem nyata, resize viewport, dan handset.
 - [ ] U02 — konsolidasi toolbar global dan verifikasi kepadatan desktop 1024px; aksi sekunder sudah dipindahkan ke menu More.
 - [ ] U08 — advanced generated-object grouping dan opsi kedalaman relasi yang lebih eksplisit.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.

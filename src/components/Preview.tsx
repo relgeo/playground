@@ -50,6 +50,7 @@ interface PreviewProps {
   staticPreviewStrokePx: number;
   hiddenRoles?: Set<string>;
   fitAllTrigger: number;
+  onFitAll: () => void;
   selectedSheetId: string | null;
   selectedObjectId?: string | null;
   relatedObjectIds?: string[];
@@ -89,6 +90,7 @@ export function Preview({
   staticPreviewStrokePx,
   hiddenRoles,
   fitAllTrigger,
+  onFitAll,
   selectedSheetId,
   selectedObjectId = null,
   relatedObjectIds = [],
@@ -790,6 +792,30 @@ export function Preview({
           </span>
         </div>
         <div role="group" aria-label="Preview overlays and line mode" style={{ display: 'flex', gap: '0.35rem' }}>
+          <div className="preview-toolset" role="group" aria-label="View controls">
+            <button
+              type="button"
+              onClick={onFitAll}
+              title="Fit and recenter preview"
+              aria-label="Fit and recenter preview"
+              style={{
+                padding: '0.2rem 0.45rem',
+                fontSize: '0.72rem',
+                borderRadius: '4px',
+                border: '1px solid var(--line)',
+                background: 'white',
+                color: 'var(--muted)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+                fontWeight: 700,
+              }}
+            >
+              {ICONS.Recenter}
+              <span>Fit view</span>
+            </button>
+          </div>
           {toolbarMode === 'model' && (
             <>
               <div className="preview-toolset" role="group" aria-label="Model overlays">

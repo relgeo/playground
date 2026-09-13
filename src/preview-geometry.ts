@@ -98,6 +98,7 @@ export function computeFitZoomPercent(
   containerHeight: number
 ): number | null {
   if (!frame) return null;
+  if (![frame.width, frame.height, containerWidth, containerHeight].every(Number.isFinite)) return null;
   if (frame.width <= 0 || frame.height <= 0) return null;
   if (containerWidth <= 0 || containerHeight <= 0) return null;
 

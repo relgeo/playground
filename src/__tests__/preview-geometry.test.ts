@@ -90,4 +90,10 @@ describe('preview geometry', () => {
     expect(physicalSheetFrame?.width).toBeCloseTo(1122.519685, 6);
     expect(physicalSheetFrame?.height).toBeCloseTo(793.700787, 6);
   });
+
+  it('rejects non-finite frames instead of producing an invalid zoom', () => {
+    expect(computeFitZoomPercent({ width: Number.NaN, height: 100 }, 760, 560)).toBeNull();
+    expect(computeFitZoomPercent({ width: Number.POSITIVE_INFINITY, height: 100 }, 760, 560)).toBeNull();
+    expect(computeFitZoomPercent({ width: 100, height: 100 }, Number.NaN, 560)).toBeNull();
+  });
 });
