@@ -393,11 +393,75 @@ button:disabled {
   letter-spacing: -0.02em;
 }
 
+.navbar-brand-accent {
+  color: var(--accent);
+}
+
 .navbar-divider {
   width: 1px;
   height: 20px;
   background: var(--line);
   margin: 0 0.25rem;
+}
+
+.navbar-divider-compact {
+  margin: 0 0.25rem;
+  opacity: 0.5;
+}
+
+.status-detail {
+  margin-left: 0.45rem;
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.preview-mode-label {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.preview-mode-label.is-physical {
+  color: var(--brand);
+}
+
+.sheet-preview-entry {
+  padding: 0.18rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.preview-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  color: inherit;
+}
+
+.preview-mode-toggle.active {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.preview-mode-toggle-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.zoom-readout {
+  width: 52px;
+  color: var(--ink);
+  font-size: 0.7rem;
+  text-align: center;
 }
 
 .navbar-secondary-actions {
@@ -657,6 +721,22 @@ button:disabled {
   color: var(--ink);
   padding: 0.5rem 0.62rem;
   outline: none;
+}
+
+.navbar-left .example-select {
+  width: 150px;
+  margin-top: 0;
+}
+
+.navbar-left .sheet-select {
+  width: 140px;
+  margin-top: 0;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 0.75rem;
 }
 
 .example-select {

@@ -297,6 +297,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Graph node dapat difokuskan, diberi nama, dan dipilih dengan Enter/Space; graph filter, focus selection, dan legend juga tersedia. Tab order graph memakai roving focus agar hanya satu node yang masuk traversal.
 - [x] Navigasi graph keyboard memakai ArrowLeft/Right/Up/Down serta Home/End untuk berpindah fokus antarnode tanpa menambah puluhan stop Tab; smoke test browser memverifikasi satu `tabIndex=0` dan perpindahan fokus.
 - [x] Graph memberi petunjuk keyboard yang tersembunyi secara visual tetapi tersedia untuk assistive technology melalui `aria-describedby`; style statis graph viewer dipindahkan dari inline ke class CSS.
+- [x] Navbar menghapus style inline yang statis pada kontrol preview, status, zoom, dan brand; tombol entry Sheet/View kembali memakai radius kontrol kecil, bukan radius pill.
 - [x] Graph memiliki filter nama/tipe, mode Focus selection berbasis neighborhood, count live, legend tipe/status, dan node keyboard-selectable.
 
 ### Phase 3 — Visual system dan cleanup

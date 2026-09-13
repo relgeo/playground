@@ -112,14 +112,13 @@ export function Navbar({
     <nav className="navbar">
       <div className="navbar-left">
         <div className="navbar-brand">
-          <span style={{ color: 'var(--accent)' }}>Rel</span><span>Geo</span>
+          <span className="navbar-brand-accent">Rel</span><span>Geo</span>
         </div>
         <div className="navbar-divider" />
         <select
           className="example-select"
           aria-label="Choose example"
           title={`Current example: ${selectedExampleName}. Open to choose another example.`}
-          style={{ width: '150px', marginTop: 0 }}
           value={selectedExample}
           onChange={(e) => onExampleChange(e.target.value)}
         >
@@ -136,16 +135,6 @@ export function Navbar({
             <select
               className="sheet-select"
               aria-label="Choose preview surface"
-              style={{
-                width: '140px',
-                marginTop: 0,
-                padding: '0.2rem 0.4rem',
-                fontSize: '0.75rem',
-                borderRadius: '4px',
-                border: '1px solid var(--line)',
-                background: 'var(--panel)',
-                color: 'var(--ink)'
-              }}
               value={selectedSheetId || ""}
               onChange={(e) => onSheetChange(e.target.value || null)}
               title="Choose model preview or a sheet/view print-oriented surface"
@@ -169,7 +158,7 @@ export function Navbar({
           <div className="status-dot" />
           <span>{statusLabel}</span>
           {statusDetail && (
-            <span style={{ fontSize: '0.65rem', color: 'var(--muted)', marginLeft: '0.45rem' }}>
+            <span className="status-detail">
               {statusDetail}
             </span>
           )}
@@ -181,14 +170,7 @@ export function Navbar({
             <div className="navbar-divider" />
             <div className="control-group" role="group" aria-label="Preview controls">
               <span
-                style={{
-                  fontSize: '0.68rem',
-                  color: isPrintMode ? 'var(--brand)' : 'var(--muted)',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
-                  whiteSpace: 'nowrap',
-                }}
+                className={`preview-mode-label${isPrintMode ? ' is-physical' : ''}`}
                 title={hasSheets
                   ? 'Preview route switches between model preview and sheet/view physical preview'
                   : 'This document is currently in model preview'}
@@ -200,16 +182,7 @@ export function Navbar({
                   type="button"
                   onClick={() => onSheetChange(sheetPreviewEntryTarget)}
                   title="Open the first available sheet/view physical preview without changing the default model-preview entry point"
-                  style={{
-                    border: '1px solid var(--line)',
-                    background: 'var(--panel)',
-                    color: 'var(--ink)',
-                    borderRadius: '999px',
-                    padding: '0.18rem 0.55rem',
-                    fontSize: '0.68rem',
-                    fontWeight: 700,
-                    whiteSpace: 'nowrap',
-                  }}
+                  className="sheet-preview-entry"
                 >
                   {sheetPreviewEntryLabel}
                 </button>
@@ -220,23 +193,16 @@ export function Navbar({
                 title={isPrintMode ? "Switch to Model Preview" : "Switch to Physical Preview"}
                 aria-pressed={isPrintMode}
                 aria-label={isPrintMode ? 'Switch to model preview' : 'Switch to physical preview'}
-                className={isPrintMode ? 'active' : ''}
-                style={{
-                  background: isPrintMode ? 'var(--brand-soft)' : 'transparent',
-                  color: isPrintMode ? 'var(--brand)' : 'inherit',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
+                className={`preview-mode-toggle${isPrintMode ? ' active' : ''}`}
               >
                 {ICONS.Printer}
-                <span style={{ fontSize: '0.68rem', fontWeight: 700 }}>
+                <span className="preview-mode-toggle-label">
                   {isPrintMode ? 'Physical' : 'Model'}
                 </span>
               </button>
-              <div className="navbar-divider" style={{ margin: '0 4px', opacity: 0.5 }} />
+              <div className="navbar-divider navbar-divider-compact" />
               <button type="button" onClick={onZoomOut} title="Zoom Out" aria-label="Zoom out">{ICONS.ZoomOut}</button>
-              <span aria-live="polite" aria-label={`Zoom ${formatZoomLabel(zoom)}`} style={{ fontSize: '0.7rem', width: '52px', textAlign: 'center' }}>{formatZoomLabel(zoom)}</span>
+              <span className="zoom-readout" aria-live="polite" aria-label={`Zoom ${formatZoomLabel(zoom)}`}>{formatZoomLabel(zoom)}</span>
               <button type="button" onClick={onZoomIn} title="Zoom In" aria-label="Zoom in">{ICONS.ZoomIn}</button>
               <button type="button" onClick={onRecenter} title="Recenter" aria-label="Fit and recenter preview">{ICONS.Recenter}</button>
               <button type="button" onClick={onExport} title="Export SVG" aria-label="Export SVG">{ICONS.Export}</button>
