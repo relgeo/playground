@@ -1,4 +1,5 @@
 import type { RelGeoDocument, ResolvedScene } from '@relgeo/core';
+import type { InspectorDependencyGraphEntry } from './inspector-helpers';
 
 export type InspectorTab = 'resolved' | 'values' | 'errors' | 'graph' | 'bom';
 export type DragState = { startX: number; startY: number; originX: number; originY: number } | null;
@@ -43,6 +44,7 @@ export type WorkerResponse =
         doc: RelGeoDocument;
         resolvedData: ResolvedScene;
         svgContent: string;
+        dependencyGraph: InspectorDependencyGraphEntry[];
       };
     }
   | {

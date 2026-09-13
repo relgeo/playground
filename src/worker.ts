@@ -1,4 +1,4 @@
-import { parseRelGeo, resolveGeometry } from '@relgeo/core';
+import { getDependencyGraph, parseRelGeo, resolveGeometry } from '@relgeo/core';
 import { renderToSVG } from '@relgeo/renderer-svg';
 import type { WorkerRequest, WorkerResponse } from './types';
 
@@ -77,6 +77,8 @@ export function processWorkerRequest({
       textMetrics: playgroundTextMetricsProvider
     });
 
+    const dependencyGraph = getDependencyGraph(doc.objects, doc);
+
     // 3. Render to SVG
     const svgContent = renderToSVG(scene, {
       sheetId: selectedSheetId || undefined,
@@ -103,6 +105,7 @@ export function processWorkerRequest({
         doc,
         resolvedData: scene,
         svgContent,
+        dependencyGraph,
       },
     };
   } catch (err: unknown) {

@@ -1,4 +1,3 @@
-import { getDependencyGraph } from '@relgeo/core';
 import { lazy, startTransition, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 // import { parseRelGeo, resolveGeometry, renderToSVG } from '@relgeo/core';
 import { DEFAULT_EXAMPLE_KEY, EXAMPLES } from './examples';
@@ -25,7 +24,7 @@ import {
   getPlaygroundStatusMeta,
   getPreviewRecoveryHint,
 } from './playground-status';
-import { getRelatedObjectIds } from './inspector-helpers';
+import { getRelatedObjectIds, type InspectorDependencyGraphEntry } from './inspector-helpers';
 import {
   getNextWorkerRequestId,
   shouldApplyWorkerResponse,
@@ -162,6 +161,7 @@ function App() {
   const [svgContent, setSvgContent] = useState<string>('');
   const [resolvedData, setResolvedData] = useState<ResolvedScene | null>(null);
   const [doc, setDoc] = useState<RelGeoDocument | null>(null);
+  const [dependencyGraph, setDependencyGraph] = useState<InspectorDependencyGraphEntry[]>([]);
   const [lastSuccessfulRender, setLastSuccessfulRender] =
     useState<PlaygroundRenderSnapshot | null>(null);
   const [lastSuccessfulCode, setLastSuccessfulCode] = useState<string | null>(null);
@@ -338,17 +338,20 @@ function App() {
       doc,
       resolvedData,
       svgContent,
+      dependencyGraph,
     },
     fallback: lastSuccessfulRender,
   });
   const displayDoc = displayRender.doc;
   const displayResolvedData = displayRender.resolvedData;
   const displaySvgContent = displayRender.svgContent;
+  const displayDependencyGraph = displayRender.dependencyGraph;
   const isShowingFallback = isUsingFallbackRender({
     current: {
       doc,
       resolvedData,
       svgContent,
+      dependencyGraph,
     },
     fallback: lastSuccessfulRender,
   });
@@ -391,14 +394,13 @@ function App() {
   const selectedRelatedObjectIds = useMemo(() => {
     if (!visibleSelectedObjectId || !displayDoc?.objects || !displayResolvedData?.objects) return [];
 
-    const dependencyGraph = getDependencyGraph(displayDoc.objects, displayDoc);
     return getRelatedObjectIds(
-      dependencyGraph,
+      displayDependencyGraph ?? [],
       visibleSelectedObjectId,
       Object.keys(displayResolvedData.objects),
       2,
     );
-  }, [displayDoc, displayResolvedData, visibleSelectedObjectId]);
+  }, [displayDependencyGraph, displayDoc, displayResolvedData, visibleSelectedObjectId]);
 
   // Initialize Worker
   useEffect(() => {
@@ -417,10 +419,12 @@ function App() {
         setDoc(res.data.doc);
         setResolvedData(res.data.resolvedData);
         setSvgContent(res.data.svgContent);
+        setDependencyGraph(res.data.dependencyGraph);
         setLastSuccessfulRender({
           doc: res.data.doc,
           resolvedData: res.data.resolvedData,
           svgContent: res.data.svgContent,
+          dependencyGraph: res.data.dependencyGraph,
         });
         if (requestCode !== undefined) {
           setLastSuccessfulCode(requestCode);
@@ -441,6 +445,7 @@ function App() {
         setDoc(null);
         setResolvedData(null);
         setSvgContent('');
+        setDependencyGraph([]);
       }
       setIsResolving(false);
     };

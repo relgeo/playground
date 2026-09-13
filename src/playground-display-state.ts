@@ -1,9 +1,11 @@
 import type { RelGeoDocument, ResolvedScene } from '@relgeo/core';
+import type { InspectorDependencyGraphEntry } from './inspector-helpers';
 
 export interface PlaygroundRenderSnapshot {
   doc: RelGeoDocument | null;
   resolvedData: ResolvedScene | null;
   svgContent: string;
+  dependencyGraph?: InspectorDependencyGraphEntry[];
 }
 
 interface ResolveDisplayStateInput {
