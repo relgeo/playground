@@ -9,7 +9,7 @@ import {
   getExportFileName,
   getNextPrintModeForSheetSelection,
 } from './view-state';
-import { decodeCodeFromHash, encodeCodeToHash } from './share-code';
+import { buildShareUrl, decodeCodeFromHash, encodeCodeToHash } from './share-code';
 import {
   DRAFT_STORAGE_KEY,
   SELECTED_EXAMPLE_STORAGE_KEY,
@@ -289,9 +289,14 @@ function App() {
     const timer = setTimeout(() => {
       try {
         const hash = encodeCodeToHash(code);
-        // Only update if it's different to avoid history bloat
-        if (window.location.hash.slice(1) !== hash) {
+        const shareUrl = buildShareUrl(`${window.location.origin}${window.location.pathname}`, code);
+        // Only update if it's different to avoid history bloat. Oversized source
+        // stays in localStorage and is intentionally not written into the URL.
+        if (shareUrl && window.location.hash.slice(1) !== hash) {
           window.history.replaceState(null, '', `#${hash}`);
+        }
+        if (!shareUrl) {
+          setActionFeedback({ tone: 'error', message: 'Draft is too large for a share link; it remains saved locally.' });
         }
       } catch (e) {
         console.error('Failed to encode code into URL hash', e);
@@ -580,8 +585,11 @@ function App() {
 
   const handleShareLink = async (): Promise<boolean> => {
     try {
-      const hash = encodeCodeToHash(code);
-      const url = `${window.location.origin}${window.location.pathname}#${hash}`;
+      const url = buildShareUrl(`${window.location.origin}${window.location.pathname}`, code);
+      if (!url) {
+        setActionFeedback({ tone: 'error', message: 'Share link unavailable: this draft is too large.' });
+        return false;
+      }
       await copyText(url);
       setActionFeedback({ tone: 'success', message: 'Share link copied.' });
       return true;

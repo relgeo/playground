@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { decodeCodeFromHash, encodeCodeToHash } from '../share-code';
+import { buildShareUrl, decodeCodeFromHash, encodeCodeToHash, MAX_SHARE_URL_LENGTH } from '../share-code';
 
 describe('playground share code helpers', () => {
   it('round-trips ASCII DSL content', () => {
@@ -26,5 +26,15 @@ objects:
 
     const encoded = encodeCodeToHash(code);
     expect(decodeCodeFromHash(encoded)).toBe(code);
+  });
+
+  it('builds a bounded share URL for normal drafts', () => {
+    const url = buildShareUrl('https://relgeo.github.io/playground/', 'version: 0.5');
+    expect(url).toMatch(/^https:\/\/relgeo\.github\.io\/playground\/#/);
+  });
+
+  it('rejects a share URL that exceeds the conservative URL limit', () => {
+    const oversizedCode = 'x'.repeat(MAX_SHARE_URL_LENGTH);
+    expect(buildShareUrl('https://relgeo.github.io/playground/', oversizedCode)).toBeNull();
   });
 });
