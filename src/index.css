@@ -1141,6 +1141,27 @@ input[type='range'] {
   color: var(--brand);
 }
 
+.inspector-object-select {
+  justify-content: flex-start;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+}
+
+.inspector-object-select:hover {
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.inspector-object-select:focus-visible,
+.inspector-object-group-summary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
 .inspector-related-objects {
   margin-top: 0.5rem;
   padding-top: 0.45rem;

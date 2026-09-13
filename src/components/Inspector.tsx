@@ -758,32 +758,25 @@ export function Inspector({
             >
               {/* Header Card */}
               <div
-                role="button"
-                tabIndex={0}
-                aria-label={`${isExpanded ? 'Collapse' : 'Expand'} and select object ${id}`}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
-                onClick={() => toggleExpand(id)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    toggleExpand(id);
-                  }
-                }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <button
                     type="button"
                     aria-label={`${isExpanded ? 'Collapse' : 'Expand'} object ${id}`}
                     aria-expanded={isExpanded}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      toggleExpand(id);
-                    }}
+                    onClick={() => toggleExpand(id)}
                     style={{ border: 'none', background: 'transparent', padding: 0, width: '16px', height: '16px', color: 'var(--muted)' }}
                   >
                     {isExpanded ? ICONS.ChevronUp : ICONS.ChevronDown}
                   </button>
-                  <div>
+                  <button
+                    type="button"
+                    className="inspector-object-select"
+                    onClick={() => toggleExpand(id)}
+                    aria-expanded={isExpanded}
+                    aria-label={`${isExpanded ? 'Collapse' : 'Expand'} and select object ${id}`}
+                  >
                     <strong style={{ fontSize: '0.8rem', color: 'var(--ink)', fontFamily: 'var(--font-mono)' }}>{id}</strong>
                     <span
                       style={{
@@ -799,13 +792,15 @@ export function Inspector({
                     >
                       {obj.type}
                     </span>
-                  </div>
+                  </button>
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.35rem' }} onClick={(e) => e.stopPropagation()}>
+                <div style={{ display: 'flex', gap: '0.35rem' }}>
                   <button
+                    type="button"
                     onClick={() => handleJump(id)}
                     title="Jump to code definition"
+                    aria-label={`Jump to ${id} code definition`}
                     style={{
                       border: 'none',
                       background: 'var(--brand-soft)',
