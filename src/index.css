@@ -1327,7 +1327,7 @@ input[type='range'] {
   font-weight: 700;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 840px) {
   .graph-viewer-controls {
     grid-template-columns: minmax(0, 1fr) auto;
   }
@@ -1490,7 +1490,7 @@ input[type='range'] {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 840px) {
 
   .control-panel,
   .workspace {
@@ -1567,7 +1567,7 @@ input[type='range'] {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 840px) {
   body {
     overflow: auto;
   }
