@@ -247,7 +247,7 @@ function App() {
       const target = event.target as HTMLElement | null;
       if (target?.closest('input, textarea, [contenteditable="true"]')) return;
 
-      if (window.matchMedia('(max-width: 720px)').matches && sidebarVisible) {
+      if (window.matchMedia('(max-width: 840px)').matches && sidebarVisible) {
         setSidebarVisible(false);
         return;
       }
