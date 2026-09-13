@@ -20,6 +20,7 @@ interface InspectorProps {
   selectedObjectId?: string | null;
   onSelectObject?: (objectId: string | null) => void;
   onJumpToLine?: (lineNum: number) => void;
+  onJumpToPath?: (path: string) => void;
 }
 
 export function Inspector({
@@ -36,6 +37,7 @@ export function Inspector({
   selectedObjectId = null,
   onSelectObject,
   onJumpToLine,
+  onJumpToPath,
 }: InspectorProps) {
   const [expandedObjects, setExpandedObjects] = useState<Record<string, boolean>>({});
   const [objectQuery, setObjectQuery] = useState('');
@@ -973,6 +975,26 @@ export function Inspector({
             <p style={{ margin: '0 0 0.5rem', color: 'var(--error)', fontSize: '0.76rem', fontWeight: 600, lineHeight: 1.4 }}>
               {rError.message}
             </p>
+
+            {!rError.objectId && rError.path && onJumpToPath && (
+              <button
+                type="button"
+                onClick={() => onJumpToPath(rError.path!)}
+                aria-label="Jump to error location"
+                style={{
+                  fontSize: '0.68rem',
+                  background: '#fff7ed',
+                  color: '#9a3412',
+                  padding: '0.25rem 0.4rem',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(154, 52, 18, 0.2)',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                }}
+              >
+                Go to error location
+              </button>
+            )}
 
             {rError.dependencyChain && rError.dependencyChain.length > 0 && (
               <div style={{ marginTop: '0.6rem', padding: '0.4rem 0.5rem', background: 'rgba(0, 0, 0, 0.03)', borderRadius: '6px' }}>

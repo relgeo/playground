@@ -27,6 +27,7 @@ interface PreviewProps {
   errorHint?: string | null;
   fullError?: RelGeoError | null;
   onJumpToObject?: (objectId: string) => void;
+  onJumpToPath?: (path: string) => void;
   isShowingFallback?: boolean;
   onRestoreLastSuccessful?: () => void;
   violations?: ConstraintViolation[];
@@ -65,6 +66,7 @@ export function Preview({
   errorHint,
   fullError,
   onJumpToObject,
+  onJumpToPath,
   isShowingFallback = false,
   onRestoreLastSuccessful,
   dragState,
@@ -1095,6 +1097,15 @@ export function Preview({
                 onClick={() => onJumpToObject(fullError.objectId!)}
               >
                 Go to source definition
+              </button>
+            )}
+            {!fullError?.objectId && errorPath && onJumpToPath && (
+              <button
+                type="button"
+                className="error-action"
+                onClick={() => onJumpToPath(errorPath)}
+              >
+                Go to error location
               </button>
             )}
             {isShowingFallback && onRestoreLastSuccessful && (

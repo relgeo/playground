@@ -49,6 +49,7 @@ export type WorkerResponse =
       requestId: number;
       type: 'ERROR';
       error: string;
+      code?: string | null;
       path?: string | null;
       objectId?: string | null;
       dependencyChain?: string[] | null;

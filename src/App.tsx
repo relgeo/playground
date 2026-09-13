@@ -65,6 +65,19 @@ function findSourceLineForObject(code: string, objectId: string): number {
   });
 }
 
+function findSourceLineForErrorPath(code: string, path: string): number {
+  const segments = path.split(/[.[\]]/).filter(Boolean);
+  const objectSegmentIndex = segments.lastIndexOf('objects');
+  const candidates = objectSegmentIndex >= 0 && segments[objectSegmentIndex + 1]
+    ? [segments[objectSegmentIndex + 1], segments[0]]
+    : segments;
+
+  return code.split('\n').findIndex((line) => {
+    const trimmedLine = line.trim();
+    return candidates.some((candidate) => trimmedLine.startsWith(`${candidate}:`));
+  });
+}
+
 async function copyText(text: string): Promise<void> {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
@@ -191,6 +204,11 @@ function App() {
 
   const handleJumpToObject = (objectId: string) => {
     const lineIndex = findSourceLineForObject(code, objectId);
+    handleJumpToLine(lineIndex >= 0 ? lineIndex : 0);
+  };
+
+  const handleJumpToErrorPath = (path: string) => {
+    const lineIndex = findSourceLineForErrorPath(code, path);
     handleJumpToLine(lineIndex >= 0 ? lineIndex : 0);
   };
 
@@ -362,6 +380,7 @@ function App() {
         setErrorPath(res.path ?? null);
         setFullError({
           message: res.error,
+          code: res.code ?? undefined,
           path: res.path ?? null,
           objectId: res.objectId ?? null,
           dependencyChain: res.dependencyChain ?? null,
@@ -615,6 +634,7 @@ function App() {
                 selectedObjectId={visibleSelectedObjectId}
                 onSelectObject={handleSelectObject}
                 onJumpToLine={handleJumpToLine}
+                onJumpToPath={handleJumpToErrorPath}
               />
               </Suspense>
             ),
@@ -693,6 +713,7 @@ function App() {
                 errorHint={previewErrorHint}
                 fullError={fullError}
                 onJumpToObject={handleJumpToObject}
+                onJumpToPath={handleJumpToErrorPath}
                 isShowingFallback={isShowingFallback}
                 onRestoreLastSuccessful={handleRestoreLastSuccessful}
                 violations={displayResolvedData?.violations}

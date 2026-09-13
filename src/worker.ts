@@ -111,6 +111,7 @@ export function processWorkerRequest({
       requestId,
       type: 'ERROR',
       error: error?.message ?? 'Unknown error',
+      code: error?.code ?? null,
       path: error?.path ?? null,
       objectId: error?.objectId ?? null,
       dependencyChain: error?.dependencyChain ?? null,
