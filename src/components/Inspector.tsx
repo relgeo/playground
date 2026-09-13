@@ -3,7 +3,7 @@ import { ICONS } from './Icons';
 import type { InspectorTab } from '../types';
 import { getDependencyGraph } from '@relgeo/core';
 import type { RelGeoDocument, ResolvedScene, RelGeoError, ResolvedObject, PathResolvedSegment, ConstraintViolation } from '@relgeo/core';
-import { getClosedShapeMetricLabel } from '../inspector-helpers';
+import { getClosedShapeMetricLabel, getRelatedObjectIds } from '../inspector-helpers';
 
 const GraphViewer = lazy(() => import('./GraphViewer').then((m) => ({ default: m.GraphViewer })));
 
@@ -607,18 +607,6 @@ export function Inspector({
       groupedEntries.set(group, groupEntries);
     }
     const dependencyGraph = doc?.objects ? getDependencyGraph(doc.objects) : [];
-    const getRelatedObjectIds = (objectId: string): string[] => {
-      const baseObjectId = objectId.split('[')[0];
-      const graphObjectId = dependencyGraph.some((item) => item.id === objectId)
-        ? objectId
-        : baseObjectId;
-      const dependencies = dependencyGraph.find((item) => item.id === graphObjectId)?.deps ?? [];
-      const dependents = dependencyGraph
-        .filter((item) => item.deps.includes(graphObjectId))
-        .map((item) => item.id);
-      return Array.from(new Set([...dependencies, ...dependents]))
-        .filter((relatedId) => relatedId !== graphObjectId && rData.objects[relatedId]);
-    };
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
@@ -690,7 +678,12 @@ export function Inspector({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '0.35rem' }}>
         {entries.map(([id, obj]: [string, ResolvedObject]) => {
           const isExpanded = !!expandedObjects[id];
-          const objectRelatedIds = getRelatedObjectIds(id);
+          const objectRelatedIds = getRelatedObjectIds(
+            dependencyGraph,
+            id,
+            Object.keys(rData.objects),
+            2,
+          );
           const isRelated = relatedObjectIds.includes(id);
           return (
             <div

@@ -25,6 +25,7 @@ import {
   getPlaygroundStatusMeta,
   getPreviewRecoveryHint,
 } from './playground-status';
+import { getRelatedObjectIds } from './inspector-helpers';
 import {
   getNextWorkerRequestId,
   shouldApplyWorkerResponse,
@@ -371,17 +372,12 @@ function App() {
     if (!visibleSelectedObjectId || !displayDoc?.objects || !displayResolvedData?.objects) return [];
 
     const dependencyGraph = getDependencyGraph(displayDoc.objects, displayDoc);
-    const baseObjectId = visibleSelectedObjectId.split('[')[0];
-    const graphObjectId = dependencyGraph.some((item) => item.id === visibleSelectedObjectId)
-      ? visibleSelectedObjectId
-      : baseObjectId;
-    const dependencies = dependencyGraph.find((item) => item.id === graphObjectId)?.deps ?? [];
-    const dependents = dependencyGraph
-      .filter((item) => item.deps.includes(graphObjectId))
-      .map((item) => item.id);
-
-    return Array.from(new Set([...dependencies, ...dependents]))
-      .filter((relatedId) => relatedId !== visibleSelectedObjectId && displayResolvedData.objects[relatedId]);
+    return getRelatedObjectIds(
+      dependencyGraph,
+      visibleSelectedObjectId,
+      Object.keys(displayResolvedData.objects),
+      2,
+    );
   }, [displayDoc, displayResolvedData, visibleSelectedObjectId]);
 
   // Initialize Worker
