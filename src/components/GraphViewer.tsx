@@ -250,10 +250,11 @@ export function GraphViewer({
         width="100%"
         // height={height}
         viewBox={`0 0 ${width} ${height}`}
-        role="img"
+        role={onNodeSelect ? 'group' : 'img'}
         aria-label="RelGeo dependency graph"
         style={{ display: 'block' }}
       >
+        <title>RelGeo dependency graph</title>
         <defs>
           <marker
             id="relgeo-arrow"
@@ -330,6 +331,7 @@ export function GraphViewer({
               }}
               role={onNodeSelect ? 'button' : undefined}
               tabIndex={onNodeSelect ? 0 : undefined}
+              focusable={onNodeSelect ? 'true' : undefined}
               aria-label={onNodeSelect ? `Select object ${node.id}${isRelated ? ', related to current selection' : ''}` : undefined}
               aria-pressed={onNodeSelect ? isSelected : undefined}
               style={{ cursor: onNodeSelect ? 'pointer' : 'default', outline: 'none' }}
