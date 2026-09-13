@@ -1,4 +1,5 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
+import type { KeyboardEvent } from 'react';
 import { ICONS } from './Icons';
 import type { InspectorTab } from '../types';
 import { getDependencyGraph } from '@relgeo/core';
@@ -46,6 +47,31 @@ export function Inspector({
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [objectQuery, setObjectQuery] = useState('');
   const [showSelectedOnly, setShowSelectedOnly] = useState(false);
+  const inspectorTabs: InspectorTab[] = ['resolved', 'values', 'errors', 'graph', 'bom'];
+
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, currentTab: InspectorTab) => {
+    const currentIndex = inspectorTabs.indexOf(currentTab);
+    if (currentIndex < 0) return;
+
+    let nextIndex: number | null = null;
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % inspectorTabs.length;
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + inspectorTabs.length) % inspectorTabs.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = inspectorTabs.length - 1;
+    }
+
+    if (nextIndex === null) return;
+    event.preventDefault();
+    const nextTab = inspectorTabs[nextIndex];
+    setTab(nextTab);
+    window.requestAnimationFrame(() => {
+      document.getElementById(`inspector-tab-${nextTab === 'resolved' ? 'objects' : nextTab}`)?.focus();
+    });
+  };
 
   const toggleExpand = (objectId: string) => {
     onSelectObject?.(objectId);
@@ -1229,8 +1255,10 @@ export function Inspector({
           role="tab"
           aria-selected={tab === 'resolved'}
           aria-controls="inspector-tabpanel"
+          tabIndex={tab === 'resolved' ? 0 : -1}
           className={tab === 'resolved' ? 'active' : ''}
           onClick={() => setTab('resolved')}
+          onKeyDown={(event) => handleTabKeyDown(event, 'resolved')}
         >
           Objects
         </button>
@@ -1240,8 +1268,10 @@ export function Inspector({
           role="tab"
           aria-selected={tab === 'values'}
           aria-controls="inspector-tabpanel"
+          tabIndex={tab === 'values' ? 0 : -1}
           className={tab === 'values' ? 'active' : ''}
           onClick={() => setTab('values')}
+          onKeyDown={(event) => handleTabKeyDown(event, 'values')}
         >
           Values
         </button>
@@ -1251,8 +1281,10 @@ export function Inspector({
           role="tab"
           aria-selected={tab === 'errors'}
           aria-controls="inspector-tabpanel"
+          tabIndex={tab === 'errors' ? 0 : -1}
           className={tab === 'errors' ? 'active' : ''}
           onClick={() => setTab('errors')}
+          onKeyDown={(event) => handleTabKeyDown(event, 'errors')}
         >
           Errors
         </button>
@@ -1262,8 +1294,10 @@ export function Inspector({
           role="tab"
           aria-selected={tab === 'graph'}
           aria-controls="inspector-tabpanel"
+          tabIndex={tab === 'graph' ? 0 : -1}
           className={tab === 'graph' ? 'active' : ''}
           onClick={() => setTab('graph')}
+          onKeyDown={(event) => handleTabKeyDown(event, 'graph')}
         >
           Graph
         </button>
@@ -1273,8 +1307,10 @@ export function Inspector({
           role="tab"
           aria-selected={tab === 'bom'}
           aria-controls="inspector-tabpanel"
+          tabIndex={tab === 'bom' ? 0 : -1}
           className={tab === 'bom' ? 'active' : ''}
           onClick={() => setTab('bom')}
+          onKeyDown={(event) => handleTabKeyDown(event, 'bom')}
         >
           BOM
         </button>
