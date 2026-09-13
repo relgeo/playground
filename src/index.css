@@ -1755,6 +1755,7 @@ input[type='range'] {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
   }
 
   button:hover {

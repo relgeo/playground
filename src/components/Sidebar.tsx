@@ -1,4 +1,5 @@
-import { ReactNode, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import { ICONS } from './Icons';
 import type { SidebarPanels } from '../types';
 
@@ -53,6 +54,28 @@ export function Sidebar({
     return () => window.cancelAnimationFrame(frame);
   }, [visible, onClose]);
 
+  const handleDrawerKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (!visible || !onClose || event.key !== 'Tab' || typeof window === 'undefined') return;
+    if (!window.matchMedia('(max-width: 840px)').matches || !sidebarRef.current) return;
+
+    const focusable = Array.from(
+      sidebarRef.current.querySelectorAll<HTMLElement>(
+        'button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter((element) => !element.hasAttribute('disabled') && element.offsetParent !== null);
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
   return (
     <>
       {visible && onClose && (
@@ -67,6 +90,7 @@ export function Sidebar({
         ref={sidebarRef}
         className={sidebarClass}
         aria-label="Workspace tools"
+        onKeyDown={handleDrawerKeyDown}
         style={{ 
           width: `${sidebarWidth}px`,
           transition: isResizing ? 'none' : 'width 0.2s ease',
