@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import type { KeyboardEvent } from 'react';
 import { ICONS } from './Icons';
 import type { InspectorTab } from '../types';
@@ -51,6 +51,7 @@ export function Inspector({
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [objectQuery, setObjectQuery] = useState('');
   const [showSelectedOnly, setShowSelectedOnly] = useState(false);
+  const previousSelectedObjectId = useRef<string | null>(null);
   const inspectorTabs: InspectorTab[] = ['resolved', 'values', 'errors', 'graph', 'bom'];
 
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, currentTab: InspectorTab) => {
@@ -83,11 +84,15 @@ export function Inspector({
   };
 
   useEffect(() => {
-    if (!selectedObjectId) return;
+    if (!selectedObjectId) {
+      previousSelectedObjectId.current = null;
+      return;
+    }
     setExpandedObjects((prev) => ({ ...prev, [selectedObjectId]: true }));
-    if (tab !== 'resolved') {
+    if (previousSelectedObjectId.current !== selectedObjectId && tab !== 'resolved') {
       setTab('resolved');
     }
+    previousSelectedObjectId.current = selectedObjectId;
   }, [selectedObjectId, setTab, tab]);
 
   useEffect(() => {
