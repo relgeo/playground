@@ -174,6 +174,11 @@ function App() {
     }
   };
 
+  const handleJumpToObject = (objectId: string) => {
+    const lineIndex = code.split('\n').findIndex((line) => line.trim().startsWith(`${objectId}:`));
+    handleJumpToLine(lineIndex >= 0 ? lineIndex : 0);
+  };
+
   // Sync code to URL hash and localStorage draft
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -642,6 +647,7 @@ function App() {
                 errorPath={errorPath}
                 errorHint={previewErrorHint}
                 fullError={fullError}
+                onJumpToObject={handleJumpToObject}
                 violations={displayResolvedData?.violations}
                 dragState={dragState}
                 setDragState={setDragState}

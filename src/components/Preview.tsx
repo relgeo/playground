@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, type PointerEventHandler, type WheelEventHandler } from 'react';
 import { applyTransformPipeline, getObjectBoundingBox, calculateBoundingBox } from '@relgeo/core';
-import type { ConstraintViolation, ResolvedScene, ResolvedObject, ResolvedPath, ResolvedPolygon, ResolvedDimension, ResolvedAnnotation, ResolvedTransform } from '@relgeo/core';
+import type { ConstraintViolation, RelGeoError, ResolvedScene, ResolvedObject, ResolvedPath, ResolvedPolygon, ResolvedDimension, ResolvedAnnotation, ResolvedTransform } from '@relgeo/core';
 import type { DragState, OverlayConfig, PreviewLineMode } from '../types';
 import { ICONS } from './Icons';
 import { getPreviewToolbarHint, getPreviewToolbarLabel, getPreviewToolbarMode } from '../preview-toolbar';
@@ -25,7 +25,8 @@ interface PreviewProps {
   error: string | null;
   errorPath: string | null;
   errorHint?: string | null;
-  fullError?: unknown;
+  fullError?: RelGeoError | null;
+  onJumpToObject?: (objectId: string) => void;
   violations?: ConstraintViolation[];
   dragState: DragState;
   setDragState: (state: DragState) => void;
@@ -61,6 +62,7 @@ export function Preview({
   errorPath,
   errorHint,
   fullError,
+  onJumpToObject,
   dragState,
   setDragState,
   resolvedData,
@@ -776,7 +778,7 @@ export function Preview({
             {previewHint}
           </span>
         </div>
-        <div style={{ display: 'flex', gap: '0.35rem' }}>
+        <div role="group" aria-label="Preview overlays and line mode" style={{ display: 'flex', gap: '0.35rem' }}>
           {toolbarMode === 'model' && (
             <>
               <button
@@ -1081,6 +1083,15 @@ export function Preview({
                 <span className="chain-label">Chain:</span>
                 <code>{fullError.dependencyChain.join(' → ')}</code>
               </div>
+            )}
+            {fullError?.objectId && onJumpToObject && (
+              <button
+                type="button"
+                className="error-action"
+                onClick={() => onJumpToObject(fullError.objectId!)}
+              >
+                Go to source definition
+              </button>
             )}
           </div>
         </div>

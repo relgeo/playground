@@ -933,6 +933,16 @@ input[type='range'] {
   color: var(--error);
 }
 
+.error-action {
+  align-self: flex-start;
+  margin-top: 0.2rem;
+  border-color: rgba(194, 65, 12, 0.35);
+  background: var(--error-soft);
+  color: var(--error);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
 .dependency-chain {
   display: flex;
   align-items: center;

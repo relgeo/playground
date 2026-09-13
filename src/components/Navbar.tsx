@@ -173,7 +173,7 @@ export function Navbar({
         {viewMode !== 'editor-only' && (
           <>
             <div className="navbar-divider" />
-            <div className="control-group">
+            <div className="control-group" role="group" aria-label="Preview controls">
               <span
                 style={{
                   fontSize: '0.68rem',
@@ -240,7 +240,7 @@ export function Navbar({
         {viewMode !== 'preview-only' && (
           <>
             <div className="navbar-divider" />
-            <div className="control-group">
+            <div className="control-group" role="group" aria-label="Source actions">
               <button onClick={handleCopyCode} title="Copy Code" aria-label="Copy source code">
                 {ICONS.Copy}
                 {copiedCode && <span style={{ fontSize: '0.65rem', color: 'var(--ready)', marginLeft: '2px', fontWeight: 'bold' }}>Copied!</span>}
@@ -257,7 +257,7 @@ export function Navbar({
 
       <div className="navbar-right">
         {/* Layout Toggles */}
-        <div className="control-group">
+        <div className="control-group" role="group" aria-label="Workspace layout">
           <button
             className={viewMode === 'split-h' ? 'active' : ''}
             onClick={() => setViewMode('split-h')}
@@ -299,7 +299,7 @@ export function Navbar({
         <div className="navbar-divider" />
 
         {/* Sidebar Toggles */}
-        <div className="control-group">
+        <div className="control-group" role="group" aria-label="Sidebar placement">
           <button
             className={sidebarVisible && sidebarPosition === 'left' ? 'active' : ''}
             onClick={() => {
