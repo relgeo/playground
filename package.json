@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint .",
+    "audit:ux": "node scripts/audit-ux-contract.mjs",
     "test": "vitest run",
     "preview": "vite preview"
   },
