@@ -37,6 +37,15 @@ for (const relativePath of componentFiles) {
   }
 }
 
+const appSource = await readFile(resolve(root, 'src/App.tsx'), 'utf8');
+if (!appSource.includes('<main ')) fail('App is missing the main landmark');
+for (const target of ['#relgeo-editor', '#relgeo-preview']) {
+  if (!appSource.includes(`href="${target}"`)) fail(`missing skip link target: ${target}`);
+}
+for (const target of ['id="relgeo-editor"', 'id="relgeo-preview"']) {
+  if (!appSource.includes(target)) fail(`missing keyboard navigation anchor: ${target}`);
+}
+
 const css = await readFile(resolve(root, 'src/index.css'), 'utf8');
 const requiredCssContracts = [
   ['responsive breakpoint 840px', '@media (max-width: 840px)'],

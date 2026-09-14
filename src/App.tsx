@@ -631,6 +631,8 @@ function App() {
 
   return (
     <div className="playground-shell">
+      <a className="skip-link" href="#relgeo-editor">Skip to editor</a>
+      <a className="skip-link" href="#relgeo-preview">Skip to preview</a>
         <Navbar
         selectedExample={selectedExample}
         onExampleChange={handleExampleChange}
@@ -668,7 +670,7 @@ function App() {
         isDirty={code !== EXAMPLES[selectedExample].code}
       />
 
-      <div className={`main-area ${sidebarPosition === 'right' ? 'sidebar-right' : ''}`}>
+      <main className={`main-area ${sidebarPosition === 'right' ? 'sidebar-right' : ''}`}>
         <Suspense fallback={<aside className="sidebar component-loading" role="status">Loading sidebar…</aside>}>
         <Sidebar
           visible={sidebarVisible}
@@ -747,7 +749,8 @@ function App() {
 
         <div className={`workspace-split ${viewMode === 'split-v' ? 'is-vertical' : ''}`}>
           {viewMode !== 'preview-only' && (
-            <div 
+            <div
+              id="relgeo-editor"
               className={`split-panel editor-side ${viewMode === 'editor-only' ? 'is-editor-only' : ''}`}
               style={viewMode === 'editor-only' ? undefined : { flex: `0 0 ${splitRatio}%` }}
             >
@@ -790,7 +793,8 @@ function App() {
           )}
 
           {viewMode !== 'editor-only' && (
-            <div 
+            <div
+              id="relgeo-preview"
               className="split-panel preview-side"
             >
               <Suspense fallback={<div className="component-loading" role="status">Loading preview…</div>}>
@@ -844,7 +848,7 @@ function App() {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
