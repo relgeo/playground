@@ -748,8 +748,8 @@ function App() {
         <div className={`workspace-split ${viewMode === 'split-v' ? 'is-vertical' : ''}`}>
           {viewMode !== 'preview-only' && (
             <div 
-              className="split-panel editor-side" 
-              style={{ flex: viewMode === 'editor-only' ? '1 1 0%' : `0 0 ${splitRatio}%` }}
+              className={`split-panel editor-side ${viewMode === 'editor-only' ? 'is-editor-only' : ''}`}
+              style={viewMode === 'editor-only' ? undefined : { flex: `0 0 ${splitRatio}%` }}
             >
               <Suspense fallback={<div className="editor-loading" role="status">Loading editor…</div>}>
                 <Editor code={code} onChange={setCode} editorRef={editorRef} />
@@ -791,8 +791,7 @@ function App() {
 
           {viewMode !== 'editor-only' && (
             <div 
-              className="split-panel preview-side" 
-              style={{ flex: viewMode === 'preview-only' ? '1 1 0%' : '1 1 0%' }}
+              className="split-panel preview-side"
             >
               <Suspense fallback={<div className="component-loading" role="status">Loading preview…</div>}>
               <Preview

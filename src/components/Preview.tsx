@@ -790,81 +790,37 @@ export function Preview({
               <div className="preview-toolset" role="group" aria-label="Model overlays">
               <button
                 onClick={() => setOverlay(p => ({ ...p, showSegments: !p.showSegments }))}
-                className={overlay.showSegments ? 'active' : ''}
+                className={`preview-overlay-button ${overlay.showSegments ? 'active' : ''}`}
                 title="Toggle Indices"
                 aria-label="Toggle indices"
                 aria-pressed={overlay.showSegments}
-                style={{
-                  padding: '0.2rem 0.4rem',
-                  fontSize: '0.8rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: overlay.showSegments ? 'var(--brand-soft)' : 'white',
-                  color: overlay.showSegments ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
               >
                 {ICONS.Indices}
               </button>
               <button
                 onClick={() => setOverlay(p => ({ ...p, showAnchors: !p.showAnchors }))}
-                className={overlay.showAnchors ? 'active' : ''}
+                className={`preview-overlay-button ${overlay.showAnchors ? 'active' : ''}`}
                 title="Toggle Anchors"
                 aria-label="Toggle anchors"
                 aria-pressed={overlay.showAnchors}
-                style={{
-                  padding: '0.2rem 0.4rem',
-                  fontSize: '0.8rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: overlay.showAnchors ? 'var(--brand-soft)' : 'white',
-                  color: overlay.showAnchors ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
               >
                 {ICONS.Anchors}
               </button>
               <button
                 onClick={() => setOverlay(p => ({ ...p, showBoundingBoxes: !p.showBoundingBoxes }))}
-                className={overlay.showBoundingBoxes ? 'active' : ''}
+                className={`preview-overlay-button ${overlay.showBoundingBoxes ? 'active' : ''}`}
                 title="Toggle Bounds"
                 aria-label="Toggle bounds"
                 aria-pressed={overlay.showBoundingBoxes}
-                style={{
-                  padding: '0.2rem 0.4rem',
-                  fontSize: '0.8rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: overlay.showBoundingBoxes ? 'var(--brand-soft)' : 'white',
-                  color: overlay.showBoundingBoxes ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
               >
                 {ICONS.Bounds}
               </button>
               <button
                 onClick={() => setOverlay(p => ({ ...p, showLabels: !p.showLabels }))}
-                className={overlay.showLabels ? 'active' : ''}
+                className={`preview-overlay-button ${overlay.showLabels ? 'active' : ''}`}
                 title="Toggle Labels"
                 aria-label="Toggle labels"
                 aria-pressed={overlay.showLabels}
-                style={{
-                  padding: '0.2rem 0.4rem',
-                  fontSize: '0.8rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: overlay.showLabels ? 'var(--brand-soft)' : 'white',
-                  color: overlay.showLabels ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
               >
                 {ICONS.Labels}
               </button>
@@ -872,37 +828,17 @@ export function Preview({
               <div className="preview-toolset" role="group" aria-label="Line rendering">
               <button
                 onClick={() => setPreviewLineMode('static')}
-                className={previewLineMode === 'static' ? 'active' : ''}
+                className={`preview-line-mode-button ${previewLineMode === 'static' ? 'active' : ''}`}
                 title="Static Screen Line Preview"
                 aria-pressed={previewLineMode === 'static'}
-                style={{
-                  padding: '0.2rem 0.45rem',
-                  fontSize: '0.72rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: previewLineMode === 'static' ? 'var(--brand-soft)' : 'white',
-                  color: previewLineMode === 'static' ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  fontWeight: 700,
-                }}
               >
                 Static
               </button>
               <button
                 onClick={() => setPreviewLineMode('physical-relative')}
-                className={previewLineMode === 'physical-relative' ? 'active' : ''}
+                className={`preview-line-mode-button ${previewLineMode === 'physical-relative' ? 'active' : ''}`}
                 title="Physical Relative Line Preview"
                 aria-pressed={previewLineMode === 'physical-relative'}
-                style={{
-                  padding: '0.2rem 0.45rem',
-                  fontSize: '0.72rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: previewLineMode === 'physical-relative' ? 'var(--brand-soft)' : 'white',
-                  color: previewLineMode === 'physical-relative' ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  fontWeight: 700,
-                }}
               >
                 Relative
               </button>
@@ -914,101 +850,46 @@ export function Preview({
               <div className="preview-toolset" role="group" aria-label="Physical drawing overlays">
               <button
                 onClick={() => setShowAnchors(!showAnchors)}
-                className={showAnchors ? 'active' : ''}
+                className={`preview-overlay-button ${showAnchors ? 'active' : ''}`}
                 title="Toggle Anchors"
                 aria-label="Toggle anchors"
                 aria-pressed={showAnchors}
-                style={{
-                  padding: '0.2rem 0.4rem',
-                  fontSize: '0.8rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: showAnchors ? 'var(--brand-soft)' : 'white',
-                  color: showAnchors ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
               >
                 {ICONS.Anchors}
               </button>
               <button
                 onClick={() => setShowBoundingBox(!showBoundingBox)}
-                className={showBoundingBox ? 'active' : ''}
+                className={`preview-overlay-button ${showBoundingBox ? 'active' : ''}`}
                 title="Toggle Bounds"
                 aria-label="Toggle bounds"
                 aria-pressed={showBoundingBox}
-                style={{
-                  padding: '0.2rem 0.4rem',
-                  fontSize: '0.8rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: showBoundingBox ? 'var(--brand-soft)' : 'white',
-                  color: showBoundingBox ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
               >
                 {ICONS.Bounds}
               </button>
               <button
                 onClick={() => setShowLabels(!showLabels)}
-                className={showLabels ? 'active' : ''}
+                className={`preview-overlay-button ${showLabels ? 'active' : ''}`}
                 title="Toggle Labels"
                 aria-label="Toggle labels"
                 aria-pressed={showLabels}
-                style={{
-                  padding: '0.2rem 0.4rem',
-                  fontSize: '0.8rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: showLabels ? 'var(--brand-soft)' : 'white',
-                  color: showLabels ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
               >
                 {ICONS.Labels}
               </button>
               <button
                 onClick={() => setShowDimensions(!showDimensions)}
-                className={showDimensions ? 'active' : ''}
+                className={`preview-overlay-button ${showDimensions ? 'active' : ''}`}
                 title="Toggle Dimensions"
                 aria-label="Toggle dimensions"
                 aria-pressed={showDimensions}
-                style={{
-                  padding: '0.2rem 0.4rem',
-                  fontSize: '0.8rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: showDimensions ? 'var(--brand-soft)' : 'white',
-                  color: showDimensions ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
               >
                 {ICONS.Dimensions}
               </button>
               <button
                 onClick={() => setShowAnnotations(!showAnnotations)}
-                className={showAnnotations ? 'active' : ''}
+                className={`preview-overlay-button ${showAnnotations ? 'active' : ''}`}
                 title="Toggle Annotations"
                 aria-label="Toggle annotations"
                 aria-pressed={showAnnotations}
-                style={{
-                  padding: '0.2rem 0.4rem',
-                  fontSize: '0.8rem',
-                  borderRadius: '4px',
-                  border: '1px solid var(--line)',
-                  background: showAnnotations ? 'var(--brand-soft)' : 'white',
-                  color: showAnnotations ? 'var(--brand)' : 'var(--muted)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
               >
                 {ICONS.Annotations}
               </button>

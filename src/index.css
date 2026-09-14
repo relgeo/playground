@@ -217,6 +217,10 @@ button:disabled {
   position: relative;
 }
 
+.editor-side.is-editor-only {
+  flex: 1 1 0%;
+}
+
 .editor-loading {
   display: grid;
   min-height: 100%;
@@ -651,6 +655,39 @@ button:disabled {
 
 .preview-toolset:first-child {
   border-left: 0;
+}
+
+.preview-overlay-button {
+  display: flex;
+  align-items: center;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: white;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.preview-overlay-button.active {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.preview-line-mode-button {
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: white;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.preview-line-mode-button.active {
+  background: var(--brand-soft);
+  color: var(--brand);
 }
 
 .preview-shell {

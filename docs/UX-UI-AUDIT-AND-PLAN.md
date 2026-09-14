@@ -323,6 +323,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Inspector tab keyboard smoke: `End` dari tab Objects memindahkan fokus dan selected state ke tab BOM.
 - [x] Inspector geometry smoke pada contoh kompleks: rect dan component dapat dibuka, detail rows/child list tampil tanpa overflow, dan `.inspector-content` tidak memiliki inline style.
 - [x] Preview overlay smoke pada contoh kompleks: canvas overlay tetap `pointer-events: none`, layer passive/interactive terpisah, editor memakai class CodeMirror, dan preview tidak overflow.
+- [x] Preview toolbar smoke: overlay/line-mode buttons memakai class CSS dan state `active`; static style blocks inline sudah dihapus tanpa mengubah accessible names.
 - [ ] Uji keyboard traversal penuh untuk navbar, editor, preview, sidebar, inspector, graph, error, dan dialog.
 - [ ] Uji AX names, roles, expanded/selected/pressed/value states, dan alert announcements.
 - [x] Tambahkan reduced-motion rule; verifikasi recording/computed style masih perlu dilakukan.
@@ -440,7 +441,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] U01 — verifikasi camera fit/recenter untuk seluruh sheet, frame ekstrem nyata, resize viewport, dan handset.
 - [ ] U02 — verifikasi visual kepadatan desktop 1024px setelah mode compact; aksi sekunder sudah dipindahkan ke menu More.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
-- [ ] U18–U21 — cleanup CSS lanjutan masih perlu: inline style dinamis untuk split width, preview geometry/zoom, dan sidebar width dipertahankan sebagai state; selector legacy perlu sweep lanjutan dan stylesheet belum dipecah menjadi layer concern. Style statis Editor, GraphViewer, Preview overlay, Sidebar resizer, dan seluruh Inspector sudah class-based; README/license sudah selesai.
+- [ ] U18–U21 — cleanup CSS lanjutan masih perlu: inline style dinamis untuk split ratio, preview geometry/zoom/size, dan sidebar width dipertahankan sebagai state; selector legacy perlu sweep lanjutan dan stylesheet belum dipecah menjadi layer concern. Style statis Editor, GraphViewer, Preview toolbar/overlay, Sidebar resizer, dan seluruh Inspector sudah class-based; README/license sudah selesai.
 - [ ] Uji handset fisik.
 - [ ] Uji screen reader nyata dengan VoiceOver/TalkBack.
 - [ ] Verifikasi penuh camera-fit dan responsive contract.
