@@ -416,12 +416,14 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U14 — toolbar preview kini dipisah menjadi kelompok overlay dan line rendering serta wrap aman di mobile; pemisahan global-vs-contextual dan pengurangan duplikasi masih tersisa.
 - [x] Performance — dependency graph dikirim dari worker sehingga `@relgeo/core` tidak lagi eager di main bundle; ukuran main chunk turun dari sekitar 584 kB menjadi sekitar 307 kB, sementara worker/core tetap terpisah.
 - [x] U01 — coverage camera-fit menambahkan aspect ratio wide/tall, clamp zoom 0.01–10000, frame/container kosong-negatif, dan selected sheet invalid.
+- [x] U11/U18 — Inspector shell, metadata, object cards, values tree, BOM, anchors, dan filter controls kini memakai class CSS terpusat; inline detail geometry sengaja belum dipindahkan agar refactor berikutnya dapat dilakukan per concern tanpa mengubah output.
+- [x] U11 — Recursive value tree kini memakai button disclosure dengan `aria-expanded`, accessible name, dan keyboard activation; node values tidak lagi bergantung pada `div onClick`.
 
 ### Batch berikutnya yang sebagian sudah diterapkan
 
 - [x] U08 — Inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, related-object highlight lintas surface, dan Related depth 1/2/3 levels.
 - [ ] U09 — audit seluruh clickable affordance dan diagnostics tanpa target source masih belum; first-error actionable, recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia.
-- [ ] U11 — control utama, state yang tersentuh, drawer focus trap, dan roving focus graph sudah diaudit di browser; inventaris seluruh affordance dan verifikasi real screen reader masih perlu.
+- [ ] U11 — control utama, state yang tersentuh, drawer focus trap, roving focus graph, dan value-tree disclosure sudah diaudit sebagian di browser; inventaris seluruh affordance dan verifikasi real screen reader masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
@@ -434,11 +436,11 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] U01 — verifikasi camera fit/recenter untuk seluruh sheet, frame ekstrem nyata, resize viewport, dan handset.
 - [ ] U02 — verifikasi visual kepadatan desktop 1024px setelah mode compact; aksi sekunder sudah dipindahkan ke menu More.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
-- [ ] U18–U21 — cleanup CSS lanjutan dan penghapusan seluruh selector legacy; README/license sudah selesai.
+- [ ] U18–U21 — cleanup CSS lanjutan masih perlu: detail geometry Inspector masih inline, selector legacy perlu sweep lanjutan, dan stylesheet belum dipecah menjadi layer concern; README/license sudah selesai.
 - [ ] Uji handset fisik.
 - [ ] Uji screen reader nyata dengan VoiceOver/TalkBack.
 - [ ] Verifikasi penuh camera-fit dan responsive contract.
-- [ ] Inspector redesign.
+- [ ] Inspector redesign lanjutan: detail geometry masih perlu dipadatkan/ditokenkan setelah audit visual.
 - [ ] Visual token cleanup dan penghapusan CSS legacy.
 
 Dokumen ini menjadi baseline diskusi dan checklist perubahan playground. Setiap implementasi sebaiknya menandai checklist yang relevan bersamaan dengan commit yang mengerjakannya.

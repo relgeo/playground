@@ -180,79 +180,56 @@ export function Inspector({
       return null;
     }
 
-    const rowStyle = { display: 'flex', justifyContent: 'space-between', padding: '0.2rem 0', fontSize: '0.74rem' };
-    const labelStyle = { color: 'var(--muted)', fontWeight: 500 };
-    const valStyle = { fontFamily: 'var(--font-mono)', color: 'var(--ink)', fontWeight: 600 };
-    const hintStyle = {
-      color: 'var(--muted)',
-      fontSize: '0.66rem',
-      lineHeight: 1.45,
-      marginBottom: '0.35rem',
-    };
-    const chipWrapStyle = { display: 'flex', flexWrap: 'wrap', gap: '0.35rem', justifyContent: 'flex-end', maxWidth: '65%' };
-    const chipStyle = {
-      fontSize: '0.64rem',
-      borderRadius: '999px',
-      padding: '0.12rem 0.38rem',
-      background: 'var(--panel-strong)',
-      border: '1px solid var(--line)',
-      color: 'var(--ink)',
-      fontFamily: 'var(--font-mono)',
-      fontWeight: 600,
-    };
-
     return (
-      <div style={{ marginTop: '0.5rem', borderTop: '1px dashed var(--line)', paddingTop: '0.5rem' }}>
-        <span style={{ color: 'var(--muted)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>
-          Metadata
-        </span>
-        <div style={hintStyle}>
+      <div className="inspector-detail-section">
+        <span className="inspector-detail-label">Metadata</span>
+        <div className="inspector-meta-hint">
           Resolved values are shown below together with source hints from the current object declaration.
         </div>
         {role && (
-          <div style={rowStyle}>
-            <span style={labelStyle}>Resolved Role</span>
-            <span style={valStyle}>{role}</span>
+          <div className="inspector-detail-row">
+            <span className="inspector-detail-key">Resolved Role</span>
+            <span className="inspector-detail-value">{role}</span>
           </div>
         )}
         {intent && (
-          <div style={rowStyle}>
-            <span style={labelStyle}>Resolved Intent</span>
-            <span style={valStyle}>{intent}</span>
+          <div className="inspector-detail-row">
+            <span className="inspector-detail-key">Resolved Intent</span>
+            <span className="inspector-detail-value">{intent}</span>
           </div>
         )}
         {label && (
-          <div style={rowStyle}>
-            <span style={labelStyle}>Resolved Label</span>
-            <span style={valStyle}>{label}</span>
+          <div className="inspector-detail-row">
+            <span className="inspector-detail-key">Resolved Label</span>
+            <span className="inspector-detail-value">{label}</span>
           </div>
         )}
         {presetName && (
-          <div style={rowStyle}>
-            <span style={labelStyle}>Preset Ref</span>
-            <span style={valStyle}>{presetName}</span>
+          <div className="inspector-detail-row">
+            <span className="inspector-detail-key">Preset Ref</span>
+            <span className="inspector-detail-value">{presetName}</span>
           </div>
         )}
         {inheritText && (
-          <div style={rowStyle}>
-            <span style={labelStyle}>Inherit Ref</span>
-            <span style={{ ...valStyle, textAlign: 'right' }}>{inheritText}</span>
+          <div className="inspector-detail-row">
+            <span className="inspector-detail-key">Inherit Ref</span>
+            <span className="inspector-detail-value">{inheritText}</span>
           </div>
         )}
         {(presetName || inheritText || localMetaKeys.length > 0) && (
-          <div style={rowStyle}>
-            <span style={labelStyle}>Source Order</span>
-            <span style={{ ...valStyle, textAlign: 'right' }}>
+          <div className="inspector-detail-row">
+            <span className="inspector-detail-key">Source Order</span>
+            <span className="inspector-detail-value">
               metaPreset -&gt; inherit -&gt; local meta
             </span>
           </div>
         )}
         {localMetaKeys.length > 0 && (
-          <div style={rowStyle}>
-            <span style={labelStyle}>Local Meta Keys</span>
-            <div style={chipWrapStyle}>
+          <div className="inspector-detail-row">
+            <span className="inspector-detail-key">Local Meta Keys</span>
+            <div className="inspector-meta-keys">
               {localMetaKeys.map((key) => (
-                <span key={key} style={chipStyle}>
+                <span key={key} className="inspector-meta-key">
                   {key}
                 </span>
               ))}
@@ -616,7 +593,7 @@ export function Inspector({
     const rData = data;
     if (!rData || !rData.objects || Object.keys(rData.objects).length === 0) {
       return (
-        <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--muted)', fontSize: '0.8rem' }}>
+        <div className="inspector-empty-state">
           No resolved geometric objects available.
         </div>
       );
@@ -644,9 +621,9 @@ export function Inspector({
     const dependencyGraph = doc?.objects ? getDependencyGraph(doc.objects) : [];
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
-        <div className="inspector-filter" style={{ display: 'grid', gap: '0.4rem', padding: '0 0 0.65rem' }}>
-          <label htmlFor="inspector-object-filter" style={{ fontSize: '0.68rem', color: 'var(--muted)', fontWeight: 700 }}>
+      <div className="inspector-tab-content">
+        <div className="inspector-filter">
+          <label className="inspector-filter-label" htmlFor="inspector-object-filter">
             Find object
           </label>
           <input
@@ -656,9 +633,9 @@ export function Inspector({
             onChange={(event) => setObjectQuery(event.target.value)}
             placeholder="Name or type…"
             aria-label="Find object by name or type"
-            style={{ width: '100%', minWidth: 0 }}
+            className="inspector-filter-input"
           />
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.7rem', color: 'var(--muted)' }}>
+          <label className="inspector-filter-option">
             <input
               type="checkbox"
               checked={showSelectedOnly}
@@ -668,13 +645,12 @@ export function Inspector({
             Selected only
           </label>
           {onRelatedDepthChange && (
-            <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', fontSize: '0.7rem', color: 'var(--muted)' }}>
+            <label className="inspector-related-depth">
             <span>Related depth</span>
             <select
               value={relatedDepth}
               onChange={(event) => onRelatedDepthChange(Number(event.target.value))}
               aria-label="Related object depth"
-              style={{ minWidth: '5rem', padding: '0.2rem 0.3rem', fontSize: '0.7rem' }}
             >
               <option value={1}>1 level</option>
               <option value={2}>2 levels</option>
@@ -695,11 +671,11 @@ export function Inspector({
               Clear selection: {selectedObjectId}
             </button>
           )}
-          <span role="status" aria-live="polite" style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>
+          <span className="inspector-result-count" role="status" aria-live="polite">
             Showing {objectEntries.length} of {Object.keys(rData.objects).length} objects
           </span>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', overflowY: 'auto', flex: 1, paddingRight: '2px' }}>
+        <div className="inspector-object-list">
         {Array.from(groupedEntries.entries()).map(([group, entries]) => (
           (() => {
             const groupContainsSelection = Boolean(
@@ -737,7 +713,7 @@ export function Inspector({
                 <strong>{entries.length}</strong>
               </span>
             </summary>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '0.35rem' }}>
+            <div className="inspector-object-group-entries">
         {entries.map(([id, obj]: [string, ResolvedObject]) => {
           const isExpanded = !!expandedObjects[id];
           const objectRelatedIds = getRelatedObjectIds(
@@ -751,27 +727,17 @@ export function Inspector({
             <div
               key={id}
               data-inspector-object-id={id}
-              className={selectedObjectId === id ? 'inspector-object-card is-selected' : 'inspector-object-card'}
-              style={{
-                background: isExpanded || selectedObjectId === id || isRelated ? 'var(--panel-strong)' : 'rgba(255, 255, 255, 0.4)',
-                border: selectedObjectId === id ? '1px solid var(--brand)' : isRelated ? '1px dashed var(--accent)' : '1px solid var(--line)',
-                borderRadius: '6px',
-                padding: '0.5rem 0.65rem',
-                transition: 'all 150ms ease',
-                boxShadow: isExpanded || selectedObjectId === id || isRelated ? '0 4px 12px rgba(60, 44, 10, 0.08)' : 'none',
-              }}
+              className={`inspector-object-card${selectedObjectId === id ? ' is-selected' : ''}${isRelated ? ' is-related' : ''}${isExpanded ? ' is-expanded' : ''}`}
             >
               {/* Header Card */}
-              <div
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div className="inspector-object-card-header">
+                <div className="inspector-object-heading">
                   <button
                     type="button"
                     aria-label={`${isExpanded ? 'Collapse' : 'Expand'} object ${id}`}
                     aria-expanded={isExpanded}
                     onClick={() => toggleExpand(id)}
-                    style={{ border: 'none', background: 'transparent', padding: 0, width: '16px', height: '16px', color: 'var(--muted)' }}
+                    className="inspector-object-chevron"
                   >
                     {isExpanded ? ICONS.ChevronUp : ICONS.ChevronDown}
                   </button>
@@ -782,39 +748,20 @@ export function Inspector({
                     aria-expanded={isExpanded}
                     aria-label={`${isExpanded ? 'Collapse' : 'Expand'} and select object ${id}`}
                   >
-                    <strong style={{ fontSize: '0.8rem', color: 'var(--ink)', fontFamily: 'var(--font-mono)' }}>{id}</strong>
-                    <span
-                      style={{
-                        marginLeft: '0.4rem',
-                        fontSize: '0.62rem',
-                        textTransform: 'uppercase',
-                        padding: '0.12rem 0.32rem',
-                        borderRadius: '4px',
-                        background: 'var(--brand-soft)',
-                        color: 'var(--brand)',
-                        fontWeight: 700,
-                      }}
-                    >
+                    <strong className="inspector-object-id">{id}</strong>
+                    <span className="inspector-object-type">
                       {obj.type}
                     </span>
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', gap: '0.35rem' }}>
+                <div className="inspector-object-actions">
                   <button
                     type="button"
                     onClick={() => handleJump(id)}
                     title="Jump to code definition"
                     aria-label={`Jump to ${id} code definition`}
-                    style={{
-                      border: 'none',
-                      background: 'var(--brand-soft)',
-                      color: 'var(--brand)',
-                      width: '24px',
-                      height: '24px',
-                      borderRadius: '50%',
-                      padding: 0,
-                    }}
+                    className="inspector-source-jump"
                   >
                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="12" width="12" xmlns="http://www.w3.org/2000/svg">
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -827,30 +774,22 @@ export function Inspector({
 
               {/* Collapsed Detailed View */}
               {isExpanded && (
-                <div style={{ marginTop: '0.4rem', animation: 'fadeIn 0.2s ease-out' }}>
+                <div className="inspector-object-details">
                   {renderGeometryDetails(obj)}
                   {renderMetadataDetails(id, obj)}
 
                   {/* Render Anchors if they exist */}
                   {obj.anchors && Object.keys(obj.anchors).length > 0 && (
-                    <div style={{ marginTop: '0.5rem', borderTop: '1px dashed var(--line)', paddingTop: '0.5rem' }}>
-                      <span style={{ color: 'var(--muted)', fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>Anchors</span>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem' }}>
+                    <div className="inspector-anchor-section">
+                      <span className="inspector-detail-label">Anchors</span>
+                      <div className="inspector-anchor-grid">
                         {Object.entries(obj.anchors).map(([anchorName, anchorVal]) => (
                           <div
                             key={anchorName}
-                            style={{
-                              padding: '0.25rem 0.4rem',
-                              background: 'rgba(0, 0, 0, 0.02)',
-                              borderRadius: '4px',
-                              fontSize: '0.68rem',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              fontFamily: 'var(--font-mono)',
-                            }}
+                            className="inspector-anchor"
                           >
-                            <span style={{ color: 'var(--muted)' }}>{anchorName}</span>
-                            <span style={{ fontWeight: 600 }}>
+                            <span className="inspector-anchor-name">{anchorName}</span>
+                            <span className="inspector-detail-value">
                               {typeof anchorVal === 'number'
                                 ? anchorVal.toFixed(1)
                                 : anchorVal && typeof anchorVal.x === 'number' && typeof anchorVal.y === 'number'
@@ -890,7 +829,7 @@ export function Inspector({
           })()
         ))}
         {objectEntries.length === 0 && (
-          <div style={{ padding: '1rem 0.4rem', color: 'var(--muted)', fontSize: '0.76rem' }}>
+          <div className="inspector-filter-empty">
             No objects match this filter.
           </div>
         )}
@@ -903,24 +842,16 @@ export function Inspector({
     const values = data?.values ?? {};
     if (Object.keys(values).length === 0) {
       return (
-        <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--muted)', fontSize: '0.8rem' }}>
+        <div className="inspector-empty-state">
           No parameters or derived scalar values resolved.
         </div>
       );
     }
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', overflowY: 'auto', flex: 1, paddingRight: '2px' }}>
+      <div className="inspector-values-list">
         {Object.entries(values).map(([key, val]) => (
-          <div
-            key={key}
-            style={{
-              padding: '0.45rem 0.6rem',
-              background: 'white',
-              border: '1px solid var(--line)',
-              borderRadius: '6px',
-            }}
-          >
+          <div key={key} className="inspector-value-card">
             <RecursiveTree label={key} value={val} path={key} />
           </div>
         ))}
@@ -933,18 +864,10 @@ export function Inspector({
     const isObj = value !== null && typeof value === 'object';
     
     if (!isObj) {
-      const rowStyle = {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '0.15rem 0',
-        fontSize: '0.74rem',
-        fontFamily: 'var(--font-mono)',
-      };
       return (
-        <div style={rowStyle}>
-          <span style={{ color: 'var(--muted)', fontWeight: 500 }}>{label}</span>
-          <span style={{ fontWeight: 700, color: 'var(--brand)' }}>
+        <div className="inspector-value-row">
+          <span className="inspector-value-label">{label}</span>
+          <span className="inspector-value-result">
             {typeof value === 'number' ? value.toFixed(3).replace(/\.?0+$/, '') : String(value)}
           </span>
         </div>
@@ -957,19 +880,22 @@ export function Inspector({
     const typeLabel = isArr ? `Array[${keys.length}]` : `Object`;
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', fontSize: '0.74rem', padding: '0.1rem 0' }}>
-        <div 
-          style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: 'pointer', userSelect: 'none' }}
+      <div className="inspector-tree-node">
+        <button
+          type="button"
+          className="inspector-tree-toggle"
+          aria-expanded={isOpen}
+          aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${label} ${typeLabel}`}
           onClick={() => setIsOpen(!isOpen)}
         >
-          <span style={{ color: 'var(--muted)', fontSize: '0.55rem', width: '10px', display: 'inline-block' }}>
+          <span className="inspector-tree-caret">
             {isOpen ? '▼' : '▶'}
           </span>
-          <span style={{ fontWeight: 600, color: 'var(--ink)', fontFamily: 'var(--font-mono)' }}>{label}</span>
-          <span style={{ fontSize: '0.55rem', color: 'var(--brand)', background: 'var(--brand-soft)', padding: '0.02rem 0.2rem', borderRadius: '3px', fontWeight: 'bold' }}>{typeLabel}</span>
-        </div>
+          <span className="inspector-tree-key">{label}</span>
+          <span className="inspector-value-type">{typeLabel}</span>
+        </button>
         {isOpen && (
-          <div style={{ paddingLeft: '0.8rem', borderLeft: '1px dashed var(--line)', marginTop: '0.2rem', display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+          <div className="inspector-tree-branch">
             {keys.map(k => (
               <RecursiveTree key={k} label={k} value={valObj[k]} path={`${path}.${k}`} />
             ))}
@@ -1029,33 +955,33 @@ export function Inspector({
     });
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', overflowY: 'auto', flex: 1, paddingRight: '2px' }}>
-        <div style={{ padding: '0.65rem 0.8rem', background: 'var(--brand-soft)', border: '1px solid var(--line)', borderRadius: '6px', display: 'flex', justifyContent: 'space-between' }}>
-          <div>
-            <span style={{ display: 'block', fontSize: '0.62rem', color: 'var(--brand)', fontWeight: 700, textTransform: 'uppercase' }}>Total Cut Length</span>
-            <strong style={{ fontSize: '1rem', color: 'var(--ink)' }}>{totalCutLength.toFixed(2)} {unit}</strong>
+      <div className="inspector-bom-list">
+        <div className="inspector-bom-summary">
+          <div className="inspector-bom-metric">
+            <span className="inspector-bom-metric-label">Total Cut Length</span>
+            <strong>{totalCutLength.toFixed(2)} {unit}</strong>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <span style={{ display: 'block', fontSize: '0.62rem', color: 'var(--brand)', fontWeight: 700, textTransform: 'uppercase' }}>Material Area</span>
-            <strong style={{ fontSize: '1rem', color: 'var(--ink)' }}>{totalArea.toFixed(2)} {unit}²</strong>
+          <div className="inspector-bom-metric">
+            <span className="inspector-bom-metric-label">Material Area</span>
+            <strong>{totalArea.toFixed(2)} {unit}²</strong>
           </div>
         </div>
 
-        <div style={{ border: '1px solid var(--line)', borderRadius: '6px', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.74rem' }}>
+        <div className="inspector-bom-table-wrap">
+          <table className="inspector-bom-table">
             <thead>
-              <tr style={{ background: 'var(--panel-strong)', borderBottom: '1px solid var(--line)' }}>
-                <th style={{ padding: '0.5rem 0.6rem', color: 'var(--muted)', fontWeight: 600 }}>Part Item</th>
-                <th style={{ padding: '0.5rem 0.6rem', color: 'var(--muted)', fontWeight: 600, textAlign: 'center' }}>Qty</th>
-                <th style={{ padding: '0.5rem 0.6rem', color: 'var(--muted)', fontWeight: 600 }}>Specs</th>
+              <tr>
+                <th>Part Item</th>
+                <th>Qty</th>
+                <th>Specs</th>
               </tr>
             </thead>
             <tbody>
               {Object.entries(bomMap).map(([partName, item]) => (
-                <tr key={partName} style={{ borderBottom: '1px solid var(--line)' }}>
-                  <td style={{ padding: '0.5rem 0.6rem', fontWeight: 600, color: 'var(--ink)' }}>{partName}</td>
-                  <td style={{ padding: '0.5rem 0.6rem', textAlign: 'center', fontWeight: 700, color: 'var(--brand)' }}>{item.count}</td>
-                  <td style={{ padding: '0.5rem 0.6rem', color: 'var(--muted)' }}>{item.details}</td>
+                <tr key={partName}>
+                  <td>{partName}</td>
+                  <td>{item.count}</td>
+                  <td>{item.details}</td>
                 </tr>
               ))}
             </tbody>
@@ -1209,33 +1135,32 @@ export function Inspector({
 
   return (
     <div className="inspector-content">
-      <div className="meta-strip" style={{ padding: '0 0 1rem', borderBottom: '1px solid var(--line)', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <div className="meta-row" style={{ display: 'flex', gap: '0.5rem' }}>
-          <div className="meta-chip" style={{ minWidth: 'auto', flex: 1, padding: '0.4rem 0.6rem' }}>
+      <div className="meta-strip inspector-meta-strip">
+        <div className="meta-row inspector-meta-row">
+          <div className="meta-chip inspector-meta-chip">
             <span className="meta-label">Example</span>
-            <strong style={{ fontSize: '0.8rem' }}>{exampleName}</strong>
+            <strong>{exampleName}</strong>
           </div>
         </div>
-        <div className="meta-row" style={{ display: 'flex', gap: '0.5rem' }}>
-          <div className="meta-chip" style={{ minWidth: 'auto', flex: 1, padding: '0.4rem 0.6rem' }}>
+        <div className="meta-row inspector-meta-row">
+          <div className="meta-chip inspector-meta-chip">
             <span className="meta-label">Objects</span>
-            <strong style={{ fontSize: '0.8rem' }}>{objectCount}</strong>
+            <strong>{objectCount}</strong>
           </div>
-          <div className="meta-chip" style={{ minWidth: 'auto', flex: 1, padding: '0.4rem 0.6rem' }}>
+          <div className="meta-chip inspector-meta-chip">
             <span className="meta-label">Values</span>
-            <strong style={{ fontSize: '0.8rem' }}>{valueCount}</strong>
+            <strong>{valueCount}</strong>
           </div>
-          <div className="meta-chip" style={{ minWidth: 'auto', flex: 1, padding: '0.4rem 0.6rem' }}>
+          <div className="meta-chip inspector-meta-chip">
             <span className="meta-label">Unit</span>
-            <strong style={{ fontSize: '0.8rem' }}>{unit}</strong>
+            <strong>{unit}</strong>
           </div>
         </div>
       </div>
       <div
-        className="tab-strip"
         role="tablist"
         aria-label="Inspector views"
-        style={{ padding: '0.25rem 0 0.75rem', borderBottom: '1px solid var(--line)', marginBottom: '0.75rem' }}
+        className="tab-strip inspector-tab-strip"
       >
         <button
           type="button"
@@ -1308,11 +1233,10 @@ export function Inspector({
         id="inspector-tabpanel"
         role="tabpanel"
         aria-labelledby={`inspector-tab-${tab === 'resolved' ? 'objects' : tab}`}
-        className="inspector-body"
-        style={{ minHeight: '300px', maxHeight: '500px', display: 'flex', flexDirection: 'column' }}
+        className="inspector-body inspector-panel"
       >
         {tab === 'graph' ? (
-          <Suspense fallback={<div style={{ padding: '1rem', color: 'var(--muted)', fontSize: '0.8rem', fontFamily: 'var(--font-mono)' }}>Loading dependency graph...</div>}>
+          <Suspense fallback={<div className="inspector-tab-loading">Loading dependency graph...</div>}>
             <GraphViewer
               objects={doc?.objects || {}}
               selectedObjectId={selectedObjectId}
