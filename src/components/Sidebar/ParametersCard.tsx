@@ -147,12 +147,11 @@ export function ParametersCard({
   return (
     <div className="parameters-list">
       {hasOverrides && onReset && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
+        <div className="parameters-reset-row">
           <button
             type="button"
-            className="action-button secondary" 
             onClick={onReset}
-            style={{ fontSize: '11px', padding: '2px 8px' }}
+            className="action-button secondary parameters-reset"
           >
             Reset
           </button>

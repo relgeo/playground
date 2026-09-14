@@ -21,18 +21,11 @@ export function ProfilesCard({
   };
 
   return (
-    <div className="profiles-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
-      <div
-        style={{
-          fontSize: '0.72rem',
-          lineHeight: 1.45,
-          color: 'var(--muted)',
-          padding: '0.1rem 0.05rem 0',
-        }}
-      >
+    <div className="profiles-list">
+      <div className="profiles-description">
         Interactive presets for swapping many parameter override values at once in the Playground.
       </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+      <div className="profiles-actions">
         <button
           type="button"
           className={`profile-item ${selectedProfile === null ? 'active' : ''}`}

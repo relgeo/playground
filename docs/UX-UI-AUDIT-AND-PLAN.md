@@ -301,6 +301,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Preview memindahkan layout statis shell, toolbar, stage, viewport, dan wrapper SVG ke class CSS; style inline yang tersisa di Preview hanya untuk state geometry/zoom atau overlay interaktif.
 - [x] Inspector diagnostics tanpa source target kini tetap memberi recovery cue eksplisit (`Fix source or reset draft`), sementara action jump hanya dirender ketika target object/path memang tersedia.
 - [x] Browser error smoke memverifikasi invalid YAML menghasilkan `role=alert` summary/detail tanpa horizontal overflow, lalu `Reset to selected example` mengembalikan editor ke READY dan menghapus error banner.
+- [x] Sidebar Layers, Parameters, Profiles, dan Meta Presets memindahkan style statis ke class CSS; metadata entry menggunakan radius kontrol kecil, dan smoke test pergantian contoh tetap tanpa overflow.
 - [x] Graph memiliki filter nama/tipe, mode Focus selection berbasis neighborhood, count live, legend tipe/status, dan node keyboard-selectable.
 
 ### Phase 3 — Visual system dan cleanup

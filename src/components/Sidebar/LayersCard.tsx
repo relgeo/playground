@@ -7,9 +7,9 @@ interface LayersCardProps {
 
 export function LayersCard({ hiddenRoles, setHiddenRoles }: LayersCardProps) {
   return (
-    <div style={{ padding: '0.75rem' }}>
+    <div className="layers-list">
       {TECHNICAL_ROLES.map((role) => (
-        <label key={role} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', fontSize: '13px' }}>
+        <label key={role} className="layer-toggle">
           <input
             type="checkbox"
             aria-label={`Show ${role}`}
