@@ -321,6 +321,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Keyboard smoke pada viewport aktif 812×667: drawer sidebar mempertahankan fokus sampai ditutup, lalu 90 Tab stops workspace yang terobservasi seluruhnya terlihat dan bernama; kontrol layout desktop yang tersembunyi tidak masuk Tab order.
 - [x] Browser semantics smoke pada contoh kompleks 1280×720: lima tab Inspector diuji satu per satu; seluruh tab aktif benar-benar memiliki `aria-selected=true`, tidak ada horizontal overflow, dan 0 control terlihat tanpa accessible name/title/text.
 - [x] Inspector tab keyboard smoke: `End` dari tab Objects memindahkan fokus dan selected state ke tab BOM.
+- [x] Inspector geometry smoke pada contoh kompleks: rect dan component dapat dibuka, detail rows/child list tampil tanpa overflow, dan `.inspector-content` tidak memiliki inline style.
 - [ ] Uji keyboard traversal penuh untuk navbar, editor, preview, sidebar, inspector, graph, error, dan dialog.
 - [ ] Uji AX names, roles, expanded/selected/pressed/value states, dan alert announcements.
 - [x] Tambahkan reduced-motion rule; verifikasi recording/computed style masih perlu dilakukan.
@@ -418,7 +419,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U14 — toolbar preview kini dipisah menjadi kelompok overlay dan line rendering serta wrap aman di mobile; pemisahan global-vs-contextual dan pengurangan duplikasi masih tersisa.
 - [x] Performance — dependency graph dikirim dari worker sehingga `@relgeo/core` tidak lagi eager di main bundle; ukuran main chunk turun dari sekitar 584 kB menjadi sekitar 307 kB, sementara worker/core tetap terpisah.
 - [x] U01 — coverage camera-fit menambahkan aspect ratio wide/tall, clamp zoom 0.01–10000, frame/container kosong-negatif, dan selected sheet invalid.
-- [x] U11/U18 — Inspector shell, metadata, object cards, values tree, BOM, anchors, dan filter controls kini memakai class CSS terpusat; inline detail geometry sengaja belum dipindahkan agar refactor berikutnya dapat dilakukan per concern tanpa mengubah output.
+- [x] U11/U18 — seluruh Inspector, termasuk detail geometry, metadata, object cards, values tree, BOM, anchors, dan filter controls kini memakai class CSS terpusat; inline style Inspector menjadi 0.
 - [x] U11 — Recursive value tree kini memakai button disclosure dengan `aria-expanded`, accessible name, dan keyboard activation; node values tidak lagi bergantung pada `div onClick`.
 
 ### Batch berikutnya yang sebagian sudah diterapkan
@@ -438,11 +439,11 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] U01 — verifikasi camera fit/recenter untuk seluruh sheet, frame ekstrem nyata, resize viewport, dan handset.
 - [ ] U02 — verifikasi visual kepadatan desktop 1024px setelah mode compact; aksi sekunder sudah dipindahkan ke menu More.
 - [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
-- [ ] U18–U21 — cleanup CSS lanjutan masih perlu: detail geometry Inspector masih inline, selector legacy perlu sweep lanjutan, dan stylesheet belum dipecah menjadi layer concern; README/license sudah selesai.
+- [ ] U18–U21 — cleanup CSS lanjutan masih perlu: inline style dinamis di komponen lain, selector legacy perlu sweep lanjutan, dan stylesheet belum dipecah menjadi layer concern; seluruh Inspector sudah class-based dan README/license sudah selesai.
 - [ ] Uji handset fisik.
 - [ ] Uji screen reader nyata dengan VoiceOver/TalkBack.
 - [ ] Verifikasi penuh camera-fit dan responsive contract.
-- [ ] Inspector redesign lanjutan: detail geometry masih perlu dipadatkan/ditokenkan setelah audit visual.
+- [ ] Inspector redesign lanjutan: detail geometry sudah ditokenkan; pemadatan visual dan validasi kepadatan pada handset masih perlu.
 - [ ] Visual token cleanup dan penghapusan CSS legacy.
 
 Dokumen ini menjadi baseline diskusi dan checklist perubahan playground. Setiap implementasi sebaiknya menandai checklist yang relevan bersamaan dengan commit yang mengerjakannya.

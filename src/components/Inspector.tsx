@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, lazy, Suspense } from 'react';
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import { ICONS } from './Icons';
 import type { InspectorTab } from '../types';
 import { getDependencyGraph } from '@relgeo/core';
@@ -248,249 +248,150 @@ export function Inspector({
       return num.toFixed(decimals);
     };
 
-    const rowStyle = { display: 'flex', justifyContent: 'space-between', padding: '0.2rem 0', fontSize: '0.74rem' };
-    const labelStyle = { color: 'var(--muted)', fontWeight: 500 };
-    const valStyle = { fontFamily: 'var(--font-mono)', color: 'var(--ink)', fontWeight: 600 };
+    const row = (label: string, value: ReactNode, valueClassName = 'inspector-detail-value') => (
+      <div className="inspector-detail-row">
+        <span className="inspector-detail-key">{label}</span>
+        <span className={valueClassName}>{value}</span>
+      </div>
+    );
+    const section = (children: ReactNode) => <div className="inspector-detail-section">{children}</div>;
 
     switch (obj.type) {
       case 'point':
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Coordinate</span>
-              <span style={valStyle}>({fmt(obj.x)}, {fmt(obj.y)}) {unit}</span>
-            </div>
-          </div>
-        );
+        return section(row('Coordinate', `(${fmt(obj.x)}, ${fmt(obj.y)}) ${unit}`));
 
       case 'line':
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Start Point</span>
-              <span style={valStyle}>({fmt(obj.start?.x)}, {fmt(obj.start?.y)})</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>End Point</span>
-              <span style={valStyle}>({fmt(obj.end?.x)}, {fmt(obj.end?.y)})</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Length</span>
-              <span style={valStyle}>{fmt(obj.length)} {unit}</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Angle</span>
-              <span style={valStyle}>
-                {obj.end && obj.start
-                  ? fmt(Math.atan2(obj.end.y - obj.start.y, obj.end.x - obj.start.x) * (180 / Math.PI), 1) + '°'
-                  : '?'}
-              </span>
-            </div>
-          </div>
+        return section(
+          <>
+            {row('Start Point', `(${fmt(obj.start?.x)}, ${fmt(obj.start?.y)})`)}
+            {row('End Point', `(${fmt(obj.end?.x)}, ${fmt(obj.end?.y)})`)}
+            {row('Length', `${fmt(obj.length)} ${unit}`)}
+            {row('Angle', obj.end && obj.start
+              ? `${fmt(Math.atan2(obj.end.y - obj.start.y, obj.end.x - obj.start.x) * (180 / Math.PI), 1)}°`
+              : '?')}
+          </>,
         );
 
       case 'rect':
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Size</span>
-              <span style={valStyle}>{fmt(obj.width)} × {fmt(obj.height)} {unit}</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Area</span>
-              <span style={valStyle}>
-                {obj.width !== undefined && obj.height !== undefined
-                  ? fmt(obj.width * obj.height)
-                  : '?'} {unit}²
-              </span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Center</span>
-              <span style={valStyle}>({fmt(obj.center?.x)}, {fmt(obj.center?.y)})</span>
-            </div>
-          </div>
+        return section(
+          <>
+            {row('Size', `${fmt(obj.width)} × ${fmt(obj.height)} ${unit}`)}
+            {row('Area', `${obj.width !== undefined && obj.height !== undefined ? fmt(obj.width * obj.height) : '?'} ${unit}²`)}
+            {row('Center', `(${fmt(obj.center?.x)}, ${fmt(obj.center?.y)})`)}
+          </>,
         );
 
       case 'circle':
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Center</span>
-              <span style={valStyle}>({fmt(obj.center?.x)}, {fmt(obj.center?.y)})</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Radius</span>
-              <span style={valStyle}>{fmt(obj.radius)} {unit}</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Area</span>
-              <span style={valStyle}>
-                {obj.radius !== undefined
-                  ? fmt(Math.PI * obj.radius * obj.radius)
-                  : '?'} {unit}²
-              </span>
-            </div>
-          </div>
+        return section(
+          <>
+            {row('Center', `(${fmt(obj.center?.x)}, ${fmt(obj.center?.y)})`)}
+            {row('Radius', `${fmt(obj.radius)} ${unit}`)}
+            {row('Area', `${obj.radius !== undefined ? fmt(Math.PI * obj.radius * obj.radius) : '?'} ${unit}²`)}
+          </>,
         );
 
       case 'arc':
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Center</span>
-              <span style={valStyle}>({fmt(obj.center?.x)}, {fmt(obj.center?.y)})</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Radius</span>
-              <span style={valStyle}>{fmt(obj.radius)}</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Angles</span>
-              <span style={valStyle}>
-                {obj.startAngle !== undefined
-                  ? fmt(obj.startAngle * 180 / Math.PI, 0) + '°'
-                  : '?'} to {obj.endAngle !== undefined
-                    ? fmt(obj.endAngle * 180 / Math.PI, 0) + '°'
-                    : '?'}
-              </span>
-            </div>
-          </div>
+        return section(
+          <>
+            {row('Center', `(${fmt(obj.center?.x)}, ${fmt(obj.center?.y)})`)}
+            {row('Radius', fmt(obj.radius))}
+            {row('Angles', `${obj.startAngle !== undefined ? `${fmt(obj.startAngle * 180 / Math.PI, 0)}°` : '?'} to ${obj.endAngle !== undefined ? `${fmt(obj.endAngle * 180 / Math.PI, 0)}°` : '?'}`)}
+          </>,
         );
 
       case 'path':
       case 'polygon': {
         const closed = !!obj.closed || obj.type === 'polygon';
         const lengthLabel = getClosedShapeMetricLabel(obj.type, closed);
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Closed Status</span>
-              <span style={{ ...valStyle, color: closed ? 'var(--ready)' : 'var(--accent)' }}>{closed ? 'CLOSED' : 'OPEN'}</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>{lengthLabel}</span>
-              <span style={valStyle}>{fmt(obj.length)} {unit}</span>
-            </div>
-            {closed && obj.area !== undefined && (
-              <div style={rowStyle}>
-                <span style={labelStyle}>Subtracted Area</span>
-                <span style={valStyle}>{fmt(obj.area)} {unit}²</span>
-              </div>
-            )}
+        return section(
+          <>
+            {row('Closed Status', closed ? 'CLOSED' : 'OPEN', `inspector-detail-value ${closed ? 'is-positive' : 'is-warning'}`)}
+            {row(lengthLabel, `${fmt(obj.length)} ${unit}`)}
+            {closed && obj.area !== undefined && row('Subtracted Area', `${fmt(obj.area)} ${unit}²`)}
             {obj.segments && obj.segments.length > 0 && (
-              <div style={{ marginTop: '0.4rem' }}>
-                <span style={{ ...labelStyle, fontSize: '0.68rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>Segments ({obj.segments.length})</span>
-                <div style={{ paddingLeft: '0.4rem', borderLeft: '2px solid var(--brand-soft)', display: 'flex', flexDirection: 'column', gap: '0.15rem' }}>
+              <div className="inspector-subsection">
+                <span className="inspector-detail-label">Segments ({obj.segments.length})</span>
+                <div className="inspector-segment-list">
                   {obj.segments.map((seg: PathResolvedSegment, idx: number) => (
-                    <div key={idx} style={{ fontSize: '0.7rem', fontFamily: 'var(--font-mono)', display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--muted)' }}>#{idx} {seg.type}</span>
-                      <span>to ({fmt(seg.x2, 0)}, {fmt(seg.y2, 0)})</span>
+                    <div key={idx} className="inspector-segment-row">
+                      <span className="inspector-detail-key">#{idx} {seg.type}</span>
+                      <span className="inspector-detail-value">to ({fmt(seg.x2, 0)}, {fmt(seg.y2, 0)})</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
             {obj.holes && obj.holes.length > 0 && (
-              <div style={{ marginTop: '0.4rem' }}>
-                <span style={{ ...labelStyle, fontSize: '0.68rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem', color: 'var(--error)' }}>Holes ({obj.holes.length})</span>
-                <div style={{ paddingLeft: '0.4rem', borderLeft: '2px solid var(--error-soft)', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+              <div className="inspector-subsection is-error">
+                <span className="inspector-detail-label">Holes ({obj.holes.length})</span>
+                <div className="inspector-hole-list">
                   {obj.holes.map((hole: { segments: PathResolvedSegment[] }, idx: number) => (
-                    <div key={idx} style={{ fontSize: '0.7rem', display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: 'var(--muted)' }}>Hole #{idx}</span>
-                      <span style={valStyle}>Segs: {hole.segments?.length || 0}</span>
+                    <div key={idx} className="inspector-segment-row">
+                      <span className="inspector-detail-key">Hole #{idx}</span>
+                      <span className="inspector-detail-value">Segs: {hole.segments?.length || 0}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-          </div>
+          </>,
         );
       }
 
       case 'text':
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Content</span>
-              <span style={valStyle}>"{obj.content}"</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Font Size</span>
-              <span style={valStyle}>{obj.fontSize}px</span>
-            </div>
-          </div>
-        );
+        return section(<>{row('Content', `"${obj.content}"`)}{row('Font Size', `${obj.fontSize}px`)}</>);
 
       case 'group':
       case 'clone':
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Transform</span>
-              <span style={valStyle}>Matrix / Group</span>
-            </div>
-          </div>
-        );
+        return section(row('Transform', 'Matrix / Group'));
 
       case 'collection': {
         const children: string[] = obj.children ?? [];
         const points: { x: number; y: number }[] | undefined = (obj as Record<string, unknown>).points as { x: number; y: number }[] | undefined;
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Children</span>
-              <span style={valStyle}>{children.length} item{children.length !== 1 ? 's' : ''}</span>
-            </div>
+        return section(
+          <>
+            {row('Children', `${children.length} item${children.length !== 1 ? 's' : ''}`)}
             {points && points.length > 0 && (
-              <div style={rowStyle}>
-                <span style={labelStyle}>Points</span>
-                <span style={valStyle}>{points.length} pt{points.length !== 1 ? 's' : ''}</span>
-              </div>
+              row('Points', `${points.length} pt${points.length !== 1 ? 's' : ''}`)
             )}
             {children.length > 0 && (
-              <div style={{ marginTop: '0.35rem' }}>
-                <span style={{ ...labelStyle, fontSize: '0.68rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>IDs (Click to drill down)</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2rem' }}>
+              <div className="inspector-subsection">
+                <span className="inspector-detail-label">IDs (Click to drill down)</span>
+                <div className="inspector-child-list">
                   {children.slice(0, 16).map((cid: string) => (
                     <button
                       type="button"
                       key={cid} 
                       onClick={() => toggleExpand(cid)}
-                      style={{ fontSize: '0.64rem', fontFamily: 'var(--font-mono)', background: 'var(--brand-soft)', color: 'var(--brand)', padding: '0.1rem 0.3rem', borderRadius: '3px', border: 0, cursor: 'pointer', fontWeight: 'bold' }}
+                      className="inspector-child-id"
                     >
                       {cid}
                     </button>
                   ))}
-                  {children.length > 16 && <code style={{ fontSize: '0.64rem', color: 'var(--muted)' }}>+{children.length - 16} more</code>}
+                  {children.length > 16 && <code className="inspector-more-count">+{children.length - 16} more</code>}
                 </div>
               </div>
             )}
-          </div>
+          </>,
         );
       }
 
       case 'component': {
         const compChildren: string[] = obj.children ?? [];
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Uses</span>
-              <span style={valStyle}>{(obj as Record<string, unknown>).use as string ?? '?'}</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Inner Objects</span>
-              <span style={valStyle}>{compChildren.length}</span>
-            </div>
+        return section(
+          <>
+            {row('Uses', (obj as Record<string, unknown>).use as string ?? '?')}
+            {row('Inner Objects', compChildren.length)}
             {compChildren.length > 0 && (
-              <div style={{ marginTop: '0.35rem' }}>
-                <span style={{ ...labelStyle, fontSize: '0.68rem', textTransform: 'uppercase', display: 'block', marginBottom: '0.2rem' }}>Children (Click to drill down)</span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2rem' }}>
+              <div className="inspector-subsection">
+                <span className="inspector-detail-label">Children (Click to drill down)</span>
+                <div className="inspector-child-list">
                   {compChildren.map((cid: string) => (
                     <button
                       type="button"
                       key={cid} 
                       onClick={() => toggleExpand(cid)}
-                      style={{ fontSize: '0.64rem', fontFamily: 'var(--font-mono)', background: 'var(--brand-soft)', color: 'var(--brand)', padding: '0.1rem 0.3rem', borderRadius: '3px', border: 0, cursor: 'pointer', fontWeight: 'bold' }}
+                      className="inspector-child-id"
                     >
                       {cid.replace(`${obj.id}.`, '')}
                     </button>
@@ -499,88 +400,55 @@ export function Inspector({
               </div>
             )}
             {obj.anchors && Object.keys(obj.anchors).length > 0 && (
-              <div style={rowStyle}>
-                <span style={labelStyle}>Exports</span>
-                <span style={valStyle}>{Object.keys(obj.anchors).join(', ')}</span>
-              </div>
+              row('Exports', Object.keys(obj.anchors).join(', '))
             )}
-          </div>
+          </>,
         );
       }
 
       case 'dimension': {
         const dim = obj as unknown as Record<string, unknown>;
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Kind</span>
-              <span style={{ ...valStyle, textTransform: 'uppercase', fontSize: '0.68rem', background: 'var(--brand-soft)', color: 'var(--brand)', padding: '0.1rem 0.3rem', borderRadius: '3px' }}>{dim.kind}</span>
-            </div>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Value</span>
-              <span style={valStyle}>{dim.text || '?'}</span>
-            </div>
+        return section(
+          <>
+            {row('Kind', dim.kind, 'inspector-detail-value inspector-kind-value')}
+            {row('Value', dim.text || '?')}
             {dim.distance !== undefined && (
-              <div style={rowStyle}>
-                <span style={labelStyle}>Distance</span>
-                <span style={valStyle}>{fmt(dim.distance)} {unit}</span>
-              </div>
+              row('Distance', `${fmt(dim.distance)} ${unit}`)
             )}
             {dim.angle !== undefined && (
-              <div style={rowStyle}>
-                <span style={labelStyle}>Angle</span>
-                <span style={valStyle}>{fmt(dim.angle, 1)}°</span>
-              </div>
+              row('Angle', `${fmt(dim.angle, 1)}°`)
             )}
             {dim.from && dim.to && (
-              <div style={rowStyle}>
-                <span style={labelStyle}>From → To</span>
-                <span style={valStyle}>({fmt(dim.from.x, 0)},{fmt(dim.from.y, 0)}) → ({fmt(dim.to.x, 0)},{fmt(dim.to.y, 0)})</span>
-              </div>
+              row('From → To', `(${fmt(dim.from.x, 0)},${fmt(dim.from.y, 0)}) → (${fmt(dim.to.x, 0)},${fmt(dim.to.y, 0)})`)
             )}
-          </div>
+          </>,
         );
       }
 
       case 'annotation': {
         const ann = obj as unknown as Record<string, unknown>;
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Text</span>
-              <span style={valStyle}>"{ann.text}"</span>
-            </div>
+        return section(
+          <>
+            {row('Text', `"${ann.text}"`)}
             {ann.target && (
-              <div style={rowStyle}>
-                <span style={labelStyle}>Target</span>
-                <span style={valStyle}>{ann.target}</span>
-              </div>
+              row('Target', ann.target)
             )}
             {ann.leader && (
-              <div style={rowStyle}>
-                <span style={labelStyle}>Leader</span>
-                <span style={valStyle}>({fmt(ann.leader.from?.x, 0)},{fmt(ann.leader.from?.y, 0)}) → ({fmt(ann.leader.to?.x, 0)},{fmt(ann.leader.to?.y, 0)})</span>
-              </div>
+              row('Leader', `(${fmt(ann.leader.from?.x, 0)},${fmt(ann.leader.from?.y, 0)}) → (${fmt(ann.leader.to?.x, 0)},${fmt(ann.leader.to?.y, 0)})`)
             )}
-          </div>
+          </>,
         );
       }
 
       case 'boolean': {
         const b = obj as unknown as Record<string, unknown>;
-        return (
-          <div style={{ marginTop: '0.4rem', borderTop: '1px dashed var(--line)', paddingTop: '0.4rem' }}>
-            <div style={rowStyle}>
-              <span style={labelStyle}>Operation</span>
-              <span style={{ ...valStyle, textTransform: 'uppercase', color: 'var(--accent)' }}>{b.op || 'UNION'}</span>
-            </div>
+        return section(
+          <>
+            {row('Operation', b.op || 'UNION', 'inspector-detail-value is-warning')}
             {b.operands && b.operands.length > 0 && (
-              <div style={rowStyle}>
-                <span style={labelStyle}>Operands</span>
-                <span style={valStyle}>{b.operands.join(', ')}</span>
-              </div>
+              row('Operands', b.operands.join(', '))
             )}
-          </div>
+          </>,
         );
       }
 

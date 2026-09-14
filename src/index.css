@@ -1552,6 +1552,65 @@ input[type='range'] {
   text-align: right;
 }
 
+.inspector-detail-value.is-positive {
+  color: var(--ready);
+}
+
+.inspector-detail-value.is-warning {
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.inspector-kind-value {
+  padding: 0.1rem 0.3rem;
+  border-radius: var(--radius-control);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.inspector-subsection {
+  margin-top: 0.4rem;
+}
+
+.inspector-subsection.is-error .inspector-detail-label {
+  color: var(--error);
+}
+
+.inspector-segment-list,
+.inspector-hole-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-left: 0.4rem;
+  border-left: 2px solid var(--brand-soft);
+}
+
+.inspector-hole-list {
+  gap: 0.2rem;
+  border-left-color: var(--error-soft);
+}
+
+.inspector-segment-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.inspector-child-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+
+.inspector-more-count {
+  color: var(--muted);
+  font-size: 0.64rem;
+}
+
 .inspector-meta-hint {
   margin-bottom: 0.35rem;
   color: var(--muted);
