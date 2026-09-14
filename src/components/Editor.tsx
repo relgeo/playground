@@ -130,12 +130,7 @@ export function Editor({ code, onChange, editorRef }: EditorProps) {
             allowMultipleSelections: true,
             indentOnInput: true,
           }}
-          style={{
-            fontSize: '0.8rem',
-            fontFamily: "'IBM Plex Mono', 'JetBrains Mono', monospace",
-            height: '100%',
-            width: '100%',
-          }}
+          className="editor-code-mirror"
         />
       </div>
     </section>

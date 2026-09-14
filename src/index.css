@@ -258,9 +258,85 @@ button:disabled {
 }
 
 .sidebar-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 30;
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 150ms ease;
   touch-action: none;
 }
 
+.sidebar-resizer.is-left {
+  right: 0;
+}
+
+.sidebar-resizer.is-right {
+  left: 0;
+}
+
+.sidebar-resizer:hover {
+  background: var(--brand-soft);
+}
+
+.sidebar.is-resizing {
+  transition: none;
+}
+
+.sidebar:not(.is-resizing) {
+  transition: width 0.2s ease;
+}
+
+.sidebar-panel-chevron {
+  color: var(--muted);
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.editor-code-mirror {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.overlay-passive {
+  pointer-events: none;
+}
+
+.overlay-interactive {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.graph-node {
+  outline: none;
+  cursor: default;
+}
+
+.graph-node.is-interactive {
+  cursor: pointer;
+}
+
+.graph-node-rect {
+  transition: filter 150ms ease;
+}
+
+.graph-node-rect.selected {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+}
 
 .playground-shell.mode-editor .workspace {
   display: none;
@@ -1214,6 +1290,11 @@ input[type='range'] {
   margin: 0 0 0.6rem;
   font-weight: 500;
   color: var(--error);
+}
+
+.error-text.error-hint {
+  margin-top: 0.35rem;
+  color: var(--muted);
 }
 
 .error-action {

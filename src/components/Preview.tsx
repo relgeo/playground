@@ -427,7 +427,7 @@ export function Preview({
                 )}
 
                 {(selectedObjectId === id || isRelated) && bbox && (
-                  <g className="overlay-interactive" style={{ pointerEvents: 'none' }}>
+                  <g className="overlay-passive">
                     <rect
                       x={bbox.x}
                       y={bbox.y}
@@ -516,7 +516,6 @@ export function Preview({
                         <g
                           key={anchorName}
                           className="overlay-interactive"
-                          style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                           onPointerOver={() => setHoveredAnchor({ objectId: id, name: anchorName, x, y })}
                           onPointerOut={() => setHoveredAnchor(null)}
                           transform={`translate(${x}, ${y}) scale(${s})`}
@@ -536,7 +535,6 @@ export function Preview({
                   <g 
                     transform={`translate(${labelPos.x}, ${labelPos.y})${rData.orientation === 'y-up' ? ' scale(1, -1)' : ''} scale(${s})`}
                     className="overlay-interactive"
-                    style={{ pointerEvents: 'auto', cursor: 'pointer' }}
                     onPointerDown={(event) => {
                       event.stopPropagation();
                       onSelectObject?.(id);
@@ -569,7 +567,7 @@ export function Preview({
 
                 {/* Dimensions Overlay */}
                 {showDimensions && obj.type === 'dimension' && (
-                  <g className="overlay-interactive" style={{ pointerEvents: 'none' }}>
+                  <g className="overlay-passive">
                     {(() => {
                       const dim = obj as ResolvedDimension;
                       if (dim.kind === 'linear' && dim.from && dim.to) {
@@ -659,7 +657,7 @@ export function Preview({
 
                 {/* Annotations Overlay */}
                 {showAnnotations && obj.type === 'annotation' && (
-                  <g className="overlay-interactive" style={{ pointerEvents: 'none' }}>
+                  <g className="overlay-passive">
                     {(() => {
                       const ann = obj as ResolvedAnnotation;
                       if (!ann.leader) return null;
@@ -697,7 +695,7 @@ export function Preview({
           })}
 
         {hoveredAnchor && (
-          <g transform={`translate(${hoveredAnchor.x}, ${hoveredAnchor.y})${rData.orientation === 'y-up' ? ' scale(1, -1)' : ''} scale(${s})`} style={{ pointerEvents: 'none' }}>
+          <g className="overlay-passive" transform={`translate(${hoveredAnchor.x}, ${hoveredAnchor.y})${rData.orientation === 'y-up' ? ' scale(1, -1)' : ''} scale(${s})`}>
             <rect x={4} y={-8} width={55} height={10} rx="1.5" fill="rgba(15, 23, 42, 0.95)" stroke="var(--brand)" strokeWidth="0.4" />
             <text x={6} y={-4.5} fontSize="2.5" fontFamily="var(--font-mono)" fill="var(--brand-soft)" fontWeight="bold">{hoveredAnchor.objectId}.{hoveredAnchor.name}</text>
             <text x={6} y={-1} fontSize="2.2" fontFamily="var(--font-mono)" fill="white" opacity="0.9">({hoveredAnchor.x.toFixed(1)}, {hoveredAnchor.y.toFixed(1)})</text>
@@ -706,20 +704,10 @@ export function Preview({
       </g>
     );
 
-    const svgStyle = {
-      position: 'absolute' as const,
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      pointerEvents: 'none' as const,
-      zIndex: 10,
-    };
-
     if (selectedSheetId && rData.sheets?.[selectedSheetId]) {
       const sheet = rData.sheets[selectedSheetId];
       return (
-        <svg className="canvas-overlay" viewBox={`0 0 ${sheet.width} ${sheet.height}`} style={svgStyle}>
+        <svg className="canvas-overlay" viewBox={`0 0 ${sheet.width} ${sheet.height}`}>
           {sheet.views.map((vPlacement, idx) => {
             const view = rData.views?.[vPlacement.use];
             if (!view) return null;
@@ -733,7 +721,7 @@ export function Preview({
     }
 
     return (
-      <svg className="canvas-overlay" viewBox={viewBox} style={svgStyle}>
+      <svg className="canvas-overlay" viewBox={viewBox}>
         {renderObjects(rData.objects, sceneTransform)}
       </svg>
     );
@@ -1090,7 +1078,7 @@ export function Preview({
             </div>
             <p className="error-text">{error}</p>
             {errorHint && (
-              <p className="error-text" style={{ marginTop: '0.35rem', color: 'var(--muted)' }}>
+              <p className="error-text error-hint">
                 {errorHint}
               </p>
             )}

@@ -362,7 +362,7 @@ export function GraphViewer({
               focusable={onNodeSelect ? 'true' : undefined}
               aria-label={onNodeSelect ? `Select object ${node.id}${isRelated ? ', related to current selection' : ''}` : undefined}
               aria-pressed={onNodeSelect ? isSelected : undefined}
-              style={{ cursor: onNodeSelect ? 'pointer' : 'default', outline: 'none' }}
+              className={`graph-node${onNodeSelect ? ' is-interactive' : ''}`}
             >
               {/* Interactive Node Card */}
               <rect
@@ -372,10 +372,6 @@ export function GraphViewer({
                 fill={fill}
                 stroke={stroke}
                 strokeWidth={isSelected ? "2.5" : "1.25"}
-                style={{
-                  transition: 'all 150ms ease',
-                  filter: isSelected ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.12))' : 'none'
-                }}
                 className={`graph-node-rect ${isSelected ? 'selected' : ''}`}
               />
 

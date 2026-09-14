@@ -88,14 +88,10 @@ export function Sidebar({
       )}
       <aside
         ref={sidebarRef}
-        className={sidebarClass}
+        className={`${sidebarClass} ${isResizing ? 'is-resizing' : ''}`}
         aria-label="Workspace tools"
         onKeyDown={handleDrawerKeyDown}
-        style={{ 
-          width: `${sidebarWidth}px`,
-          transition: isResizing ? 'none' : 'width 0.2s ease',
-          position: 'relative'
-        }}
+        style={{ width: `${sidebarWidth}px` }}
       >
       <div className="sidebar-content">
         {hasProfiles && (
@@ -154,7 +150,7 @@ export function Sidebar({
 
       {visible && onResizeStart && (
         <div
-          className="sidebar-resizer"
+          className={`sidebar-resizer ${position === 'left' ? 'is-left' : 'is-right'}`}
           role="separator"
           tabIndex={0}
           aria-orientation="vertical"
@@ -178,19 +174,6 @@ export function Sidebar({
               onResizeKeyboard(600 - width);
             }
           }}
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            width: '5px',
-            cursor: 'col-resize',
-            zIndex: 30,
-            [position === 'left' ? 'right' : 'left']: 0,
-            background: 'transparent',
-            transition: 'background 150ms ease',
-          }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--brand-soft)'; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
         />
       )}
       </aside>
@@ -221,7 +204,7 @@ function SidebarPanel({ panelId, title, isExpanded, onToggle, children, large }:
         aria-controls={bodyId}
       >
         <h3>{title}</h3>
-        <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>
+        <span className="sidebar-panel-chevron">
           {isExpanded ? ICONS.ChevronUp : ICONS.ChevronDown}
         </span>
       </button>
