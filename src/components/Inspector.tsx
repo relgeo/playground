@@ -909,7 +909,7 @@ export function Inspector({
     const rData = data;
     if (!rData || !rData.objects || Object.keys(rData.objects).length === 0) {
       return (
-        <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--muted)', fontSize: '0.8rem' }}>
+        <div className="inspector-empty-state">
           No manufacturing data available.
         </div>
       );

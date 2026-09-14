@@ -2498,6 +2498,29 @@ input[type='range'] {
 }
 
 @media (max-width: 480px) {
+  .inspector-meta-row {
+    flex-wrap: wrap;
+  }
+
+  .inspector-detail-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .inspector-detail-value {
+    max-width: 100%;
+    margin-left: auto;
+  }
+
+  .inspector-meta-keys {
+    max-width: 100%;
+    justify-content: flex-start;
+  }
+
+  .inspector-anchor-grid {
+    grid-template-columns: 1fr;
+  }
+
   .navbar-left {
     flex-basis: 100%;
     flex-wrap: wrap;

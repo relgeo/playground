@@ -319,6 +319,8 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Jalankan typecheck, lint, unit test, dan production build.
 - [x] Browser smoke pada viewport aktif 1280×720 tidak menemukan horizontal overflow; audit DOM terhadap 196 control terlihat menemukan nama/label pada seluruh control.
 - [x] Keyboard smoke pada viewport aktif 812×667: drawer sidebar mempertahankan fokus sampai ditutup, lalu 90 Tab stops workspace yang terobservasi seluruhnya terlihat dan bernama; kontrol layout desktop yang tersembunyi tidak masuk Tab order.
+- [x] Browser semantics smoke pada contoh kompleks 1280×720: lima tab Inspector diuji satu per satu; seluruh tab aktif benar-benar memiliki `aria-selected=true`, tidak ada horizontal overflow, dan 0 control terlihat tanpa accessible name/title/text.
+- [x] Inspector tab keyboard smoke: `End` dari tab Objects memindahkan fokus dan selected state ke tab BOM.
 - [ ] Uji keyboard traversal penuh untuk navbar, editor, preview, sidebar, inspector, graph, error, dan dialog.
 - [ ] Uji AX names, roles, expanded/selected/pressed/value states, dan alert announcements.
 - [x] Tambahkan reduced-motion rule; verifikasi recording/computed style masih perlu dilakukan.
@@ -423,7 +425,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 - [x] U08 — Inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, related-object highlight lintas surface, dan Related depth 1/2/3 levels.
 - [ ] U09 — audit seluruh clickable affordance dan diagnostics tanpa target source masih belum; first-error actionable, recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia.
-- [ ] U11 — control utama, state yang tersentuh, drawer focus trap, roving focus graph, dan value-tree disclosure sudah diaudit sebagian di browser; inventaris seluruh affordance dan verifikasi real screen reader masih perlu.
+- [ ] U11 — control utama, state yang tersentuh, drawer focus trap, roving focus graph, value-tree disclosure, dan lima tab Inspector sudah diaudit sebagian di browser; verifikasi AX tree lintas state dan real screen reader masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
