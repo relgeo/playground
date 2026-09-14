@@ -449,6 +449,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U18/U21 — gate `audit:ux` ditambahkan untuk menjaga type button, breakpoint, reduced-motion, focus ring, overscroll, dan jumlah inline style dinamis yang diizinkan.
 - [x] U11 — shell memakai landmark `main` dan skip link kondisional ke editor/preview dengan target fokusable serta label region; verifikasi keyboard lintas mode dan screen reader nyata masih tersisa.
 - [x] U09 — tab Errors kini mempertahankan error code aktual dari worker dan hanya memakai fallback code bila data tidak menyediakannya; regression test ditambahkan.
+- [x] U11/U15 — anchor overlay kini dapat dipilih dengan pointer maupun keyboard, memiliki nama semantik, state pressed, dan focus ring; uji screen reader nyata masih tersisa.
 - [ ] U16 — verifikasi typography pada runtime/browser target; fallback contract sudah ditetapkan.
 - [ ] U18–U21 — inline style dinamis untuk split ratio, preview geometry/zoom/size, dan sidebar width memang masih diperlukan sebagai state; selector legacy sudah disweep, tetapi stylesheet belum dipecah menjadi layer concern.
 - [ ] Inspector redesign lanjutan — pemadatan visual dan validasi kepadatan pada handset.

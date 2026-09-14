@@ -49,6 +49,11 @@ for (const target of ['tabIndex={-1}', 'aria-label="RelGeo source editor"', 'ari
   if (!appSource.includes(target)) fail(`missing focusable landmark contract: ${target}`);
 }
 
+const previewSource = await readFile(resolve(root, 'src/components/Preview.tsx'), 'utf8');
+for (const target of ['className="overlay-interactive overlay-anchor"', 'role="button"', 'aria-pressed={selectedObjectId === id}']) {
+  if (!previewSource.includes(target)) fail(`missing keyboard anchor contract: ${target}`);
+}
+
 const css = await readFile(resolve(root, 'src/index.css'), 'utf8');
 const requiredCssContracts = [
   ['responsive breakpoint 840px', '@media (max-width: 840px)'],
@@ -57,6 +62,7 @@ const requiredCssContracts = [
   ['control target minimum', 'min-width: 2rem'],
   ['preview overscroll containment', 'overscroll-behavior: contain'],
   ['graph keyboard focus ring', '.graph-node:focus-visible .graph-node-rect'],
+  ['anchor keyboard focus ring', '.overlay-anchor:focus-visible'],
 ];
 
 for (const [label, contract] of requiredCssContracts) {

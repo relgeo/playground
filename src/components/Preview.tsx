@@ -128,7 +128,7 @@ export function Preview({
   const handlePointerDown: PointerEventHandler<HTMLDivElement> = (event) => {
     // Prevent dragging if clicking overlay elements
     const target = event.target as SVGElement;
-    if (target.closest('.overlay-interactive')) return;
+    if (target.closest('.overlay-interactive, .overlay-hover')) return;
 
     if (!svgContent) return;
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -515,9 +515,22 @@ export function Preview({
                       return (
                         <g
                           key={anchorName}
-                          className="overlay-interactive"
-                          onPointerOver={() => setHoveredAnchor({ objectId: id, name: anchorName, x, y })}
-                          onPointerOut={() => setHoveredAnchor(null)}
+                          className="overlay-interactive overlay-anchor"
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`${anchorName} anchor for ${id} at ${x.toFixed(1)}, ${y.toFixed(1)}`}
+                          aria-pressed={selectedObjectId === id}
+                          onPointerEnter={() => setHoveredAnchor({ objectId: id, name: anchorName, x, y })}
+                          onPointerLeave={() => setHoveredAnchor(null)}
+                          onFocus={() => setHoveredAnchor({ objectId: id, name: anchorName, x, y })}
+                          onBlur={() => setHoveredAnchor(null)}
+                          onClick={() => onSelectObject?.(id)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              onSelectObject?.(id);
+                            }
+                          }}
                           transform={`translate(${x}, ${y}) scale(${s})`}
                         >
                           {/* Crosshairs & Center target */}
