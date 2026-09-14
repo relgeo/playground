@@ -5,6 +5,7 @@ import type { InspectorTab } from '../types';
 import { getDependencyGraph } from '@relgeo/core';
 import type { RelGeoDocument, ResolvedScene, RelGeoError, ResolvedObject, PathResolvedSegment, ConstraintViolation } from '@relgeo/core';
 import { getClosedShapeMetricLabel, getRelatedObjectIds } from '../inspector-helpers';
+import { getDiagnosticCode } from '../diagnostic-code';
 
 const GraphViewer = lazy(() => import('./GraphViewer').then((m) => ({ default: m.GraphViewer })));
 
@@ -868,6 +869,7 @@ export function Inspector({
     const firstErrorPath = !firstErrorObjectId ? rError?.path : undefined;
     const hasFirstErrorTarget = Boolean(firstErrorObjectId || firstErrorPath);
     const errorCount = (rError ? 1 : 0) + (rData?.violations?.length ?? 0);
+    const diagnosticCode = rError ? getDiagnosticCode(rError) : null;
 
     const handleJumpToFirstError = () => {
       if (firstErrorObjectId) {
@@ -919,7 +921,7 @@ export function Inspector({
           >
             <div className="inspector-error-header">
               <span className="inspector-error-code" id="inspector-error-code">
-                Error Code: {rError.path ? 'VALIDATION_FAILED' : 'COMPILE_ERROR'}
+                Error Code: {diagnosticCode}
               </span>
               {rError.objectId && (
                 <button
