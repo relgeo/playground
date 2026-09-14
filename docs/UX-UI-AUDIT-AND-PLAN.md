@@ -445,7 +445,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] U11 — verifikasi AX tree lintas state dan screen reader nyata dengan VoiceOver/TalkBack.
 - [ ] U13 — validasi final visual language/radius agar control, card, dan pill hanya rounded saat semantik membutuhkan.
 - [ ] U14 — pisahkan lebih tegas control global dan contextual serta evaluasi pengurangan duplikasi toolbar.
-- [ ] U15 — audit discoverability icon-only pada browser dan perangkat kecil.
+- [x] U15 — target minimum control toolbar, resizer, chevron Inspector, dan source-jump diperbesar agar kontrol icon-only dan separator lebih mudah dioperasikan; validasi perangkat sentuh nyata masih tersisa.
 - [ ] U16 — verifikasi typography pada runtime/browser target; fallback contract sudah ditetapkan.
 - [ ] U18–U21 — inline style dinamis untuk split ratio, preview geometry/zoom/size, dan sidebar width memang masih diperlukan sebagai state; selector legacy sudah disweep, tetapi stylesheet belum dipecah menjadi layer concern.
 - [ ] Inspector redesign lanjutan — pemadatan visual dan validasi kepadatan pada handset.
