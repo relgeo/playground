@@ -427,7 +427,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 ### Batch berikutnya yang sebagian sudah diterapkan
 
 - [x] U08 — Inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, related-object highlight lintas surface, dan Related depth 1/2/3 levels.
-- [ ] U09 — audit seluruh clickable affordance dan diagnostics tanpa target source masih belum; first-error actionable, recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia.
+- [ ] U09 — first-error actionable, recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia; audit seluruh clickable affordance dan diagnostics tanpa target source masih perlu ditutup.
 - [ ] U11 — control utama, state yang tersentuh, drawer focus trap, roving focus graph, value-tree disclosure, dan lima tab Inspector sudah diaudit sebagian di browser; verifikasi AX tree lintas state dan real screen reader masih perlu.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
@@ -436,16 +436,18 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] U09 — alert/error actions, error code/path, fallback restore, reset tanpa fallback, dan first-error actionable sudah tersedia; seluruh clickable affordance dan diagnostics tanpa target source belum selesai.
 - [ ] U12 — `touch-action` sudah diperlonggar, tetapi gesture contract belum diuji pada touch nyata.
 
-### Belum dikerjakan
+### Sisa terbuka
 
 - [ ] U01 — verifikasi camera fit/recenter untuk seluruh sheet, frame ekstrem nyata, resize viewport, dan handset.
 - [ ] U02 — verifikasi visual kepadatan desktop 1024px setelah mode compact; aksi sekunder sudah dipindahkan ke menu More.
-- [ ] U13–U16 — visual language, radius, discoverability, dan typography contract.
-- [ ] U18–U21 — cleanup CSS lanjutan masih perlu: inline style dinamis untuk split ratio, preview geometry/zoom/size, dan sidebar width dipertahankan sebagai state; selector legacy perlu sweep lanjutan dan stylesheet belum dipecah menjadi layer concern. Style statis Editor, GraphViewer, Preview toolbar/overlay, Sidebar resizer, dan seluruh Inspector sudah class-based; README/license sudah selesai.
-- [ ] Uji handset fisik.
-- [ ] Uji screen reader nyata dengan VoiceOver/TalkBack.
-- [ ] Verifikasi penuh camera-fit dan responsive contract.
-- [ ] Inspector redesign lanjutan: detail geometry sudah ditokenkan; pemadatan visual dan validasi kepadatan pada handset masih perlu.
-- [ ] Visual token cleanup dan penghapusan CSS legacy.
+- [ ] U03/U12 — jalankan matrix viewport lengkap dan uji gesture touch pada perangkat nyata.
+- [ ] U09 — sweep seluruh clickable affordance dan diagnostics yang tidak memiliki target source.
+- [ ] U11 — verifikasi AX tree lintas state dan screen reader nyata dengan VoiceOver/TalkBack.
+- [ ] U13 — validasi final visual language/radius agar control, card, dan pill hanya rounded saat semantik membutuhkan.
+- [ ] U14 — pisahkan lebih tegas control global dan contextual serta evaluasi pengurangan duplikasi toolbar.
+- [ ] U15 — audit discoverability icon-only pada browser dan perangkat kecil.
+- [ ] U16 — verifikasi typography pada runtime/browser target; fallback contract sudah ditetapkan.
+- [ ] U18–U21 — inline style dinamis untuk split ratio, preview geometry/zoom/size, dan sidebar width memang masih diperlukan sebagai state; selector legacy sudah disweep, tetapi stylesheet belum dipecah menjadi layer concern.
+- [ ] Inspector redesign lanjutan — pemadatan visual dan validasi kepadatan pada handset.
 
 Dokumen ini menjadi baseline diskusi dan checklist perubahan playground. Setiap implementasi sebaiknya menandai checklist yang relevan bersamaan dengan commit yang mengerjakannya.

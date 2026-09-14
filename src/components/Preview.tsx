@@ -789,6 +789,7 @@ export function Preview({
             <>
               <div className="preview-toolset" role="group" aria-label="Model overlays">
               <button
+                type="button"
                 onClick={() => setOverlay(p => ({ ...p, showSegments: !p.showSegments }))}
                 className={`preview-overlay-button ${overlay.showSegments ? 'active' : ''}`}
                 title="Toggle Indices"
@@ -798,6 +799,7 @@ export function Preview({
                 {ICONS.Indices}
               </button>
               <button
+                type="button"
                 onClick={() => setOverlay(p => ({ ...p, showAnchors: !p.showAnchors }))}
                 className={`preview-overlay-button ${overlay.showAnchors ? 'active' : ''}`}
                 title="Toggle Anchors"
@@ -807,6 +809,7 @@ export function Preview({
                 {ICONS.Anchors}
               </button>
               <button
+                type="button"
                 onClick={() => setOverlay(p => ({ ...p, showBoundingBoxes: !p.showBoundingBoxes }))}
                 className={`preview-overlay-button ${overlay.showBoundingBoxes ? 'active' : ''}`}
                 title="Toggle Bounds"
@@ -816,6 +819,7 @@ export function Preview({
                 {ICONS.Bounds}
               </button>
               <button
+                type="button"
                 onClick={() => setOverlay(p => ({ ...p, showLabels: !p.showLabels }))}
                 className={`preview-overlay-button ${overlay.showLabels ? 'active' : ''}`}
                 title="Toggle Labels"
@@ -827,6 +831,7 @@ export function Preview({
               </div>
               <div className="preview-toolset" role="group" aria-label="Line rendering">
               <button
+                type="button"
                 onClick={() => setPreviewLineMode('static')}
                 className={`preview-line-mode-button ${previewLineMode === 'static' ? 'active' : ''}`}
                 title="Static Screen Line Preview"
@@ -835,6 +840,7 @@ export function Preview({
                 Static
               </button>
               <button
+                type="button"
                 onClick={() => setPreviewLineMode('physical-relative')}
                 className={`preview-line-mode-button ${previewLineMode === 'physical-relative' ? 'active' : ''}`}
                 title="Physical Relative Line Preview"
@@ -849,6 +855,7 @@ export function Preview({
             <>
               <div className="preview-toolset" role="group" aria-label="Physical drawing overlays">
               <button
+                type="button"
                 onClick={() => setShowAnchors(!showAnchors)}
                 className={`preview-overlay-button ${showAnchors ? 'active' : ''}`}
                 title="Toggle Anchors"
@@ -858,6 +865,7 @@ export function Preview({
                 {ICONS.Anchors}
               </button>
               <button
+                type="button"
                 onClick={() => setShowBoundingBox(!showBoundingBox)}
                 className={`preview-overlay-button ${showBoundingBox ? 'active' : ''}`}
                 title="Toggle Bounds"
@@ -867,6 +875,7 @@ export function Preview({
                 {ICONS.Bounds}
               </button>
               <button
+                type="button"
                 onClick={() => setShowLabels(!showLabels)}
                 className={`preview-overlay-button ${showLabels ? 'active' : ''}`}
                 title="Toggle Labels"
@@ -876,6 +885,7 @@ export function Preview({
                 {ICONS.Labels}
               </button>
               <button
+                type="button"
                 onClick={() => setShowDimensions(!showDimensions)}
                 className={`preview-overlay-button ${showDimensions ? 'active' : ''}`}
                 title="Toggle Dimensions"
@@ -885,6 +895,7 @@ export function Preview({
                 {ICONS.Dimensions}
               </button>
               <button
+                type="button"
                 onClick={() => setShowAnnotations(!showAnnotations)}
                 className={`preview-overlay-button ${showAnnotations ? 'active' : ''}`}
                 title="Toggle Annotations"

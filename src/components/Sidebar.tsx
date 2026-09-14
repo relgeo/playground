@@ -157,7 +157,8 @@ export function Sidebar({
           aria-valuemin={240}
           aria-valuemax={600}
           aria-valuenow={width}
-          aria-label={`Resize sidebar ${position === 'left' ? 'width' : 'width'}`}
+          aria-valuetext={`${width}px sidebar width`}
+          aria-label={`Resize ${position === 'left' ? 'left' : 'right'} sidebar width`}
           onPointerDown={onResizeStart}
           onKeyDown={(event) => {
             if (!onResizeKeyboard) return;

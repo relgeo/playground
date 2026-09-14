@@ -342,6 +342,12 @@ button:disabled {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
 }
 
+.graph-node:focus-visible .graph-node-rect {
+  stroke: var(--ink);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 0.25rem var(--brand-soft));
+}
+
 .playground-shell.mode-editor .workspace {
   display: none;
 }
@@ -1181,12 +1187,14 @@ input[type='range'] {
   background: var(--bg);
   cursor: grab;
   touch-action: pan-x pan-y;
+  overscroll-behavior: contain;
   display: block;
   /* Gunakan block agar scrollbar bekerja secara natural */
 }
 
 .preview-stage.is-dragging {
   cursor: grabbing;
+  user-select: none;
 }
 
 .preview-viewport {
