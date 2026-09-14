@@ -45,6 +45,9 @@ for (const target of ['#relgeo-editor', '#relgeo-preview']) {
 for (const target of ['id="relgeo-editor"', 'id="relgeo-preview"']) {
   if (!appSource.includes(target)) fail(`missing keyboard navigation anchor: ${target}`);
 }
+for (const target of ['tabIndex={-1}', 'aria-label="RelGeo source editor"', 'aria-label="RelGeo preview"']) {
+  if (!appSource.includes(target)) fail(`missing focusable landmark contract: ${target}`);
+}
 
 const css = await readFile(resolve(root, 'src/index.css'), 'utf8');
 const requiredCssContracts = [

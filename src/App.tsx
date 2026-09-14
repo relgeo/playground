@@ -631,8 +631,12 @@ function App() {
 
   return (
     <div className="playground-shell">
-      <a className="skip-link" href="#relgeo-editor">Skip to editor</a>
-      <a className="skip-link" href="#relgeo-preview">Skip to preview</a>
+      {viewMode !== 'preview-only' && (
+        <a className="skip-link" href="#relgeo-editor">Skip to editor</a>
+      )}
+      {viewMode !== 'editor-only' && (
+        <a className="skip-link" href="#relgeo-preview">Skip to preview</a>
+      )}
         <Navbar
         selectedExample={selectedExample}
         onExampleChange={handleExampleChange}
@@ -751,6 +755,8 @@ function App() {
           {viewMode !== 'preview-only' && (
             <div
               id="relgeo-editor"
+              tabIndex={-1}
+              aria-label="RelGeo source editor"
               className={`split-panel editor-side ${viewMode === 'editor-only' ? 'is-editor-only' : ''}`}
               style={viewMode === 'editor-only' ? undefined : { flex: `0 0 ${splitRatio}%` }}
             >
@@ -795,6 +801,8 @@ function App() {
           {viewMode !== 'editor-only' && (
             <div
               id="relgeo-preview"
+              tabIndex={-1}
+              aria-label="RelGeo preview"
               className="split-panel preview-side"
             >
               <Suspense fallback={<div className="component-loading" role="status">Loading preview…</div>}>
