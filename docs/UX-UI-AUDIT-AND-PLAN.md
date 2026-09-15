@@ -1,8 +1,8 @@
 # RelGeo Playground — UX/UI Audit & Improvement Plan
 
-**Status:** audit baseline  
-**Tanggal:** 2026-09-13  
-**Baseline:** `381b29a` (`main`)  
+**Status:** implementasi lokal dan browser verification selesai; gate eksternal masih terbuka
+**Tanggal audit terakhir:** 2026-09-15
+**Implementation baseline:** `09ac1cb` (`main`)
 **Ruang lingkup:** browser IDE playground: editor, resolver, preview, inspector, graph, sidebar, responsive behavior, accessibility, share, dan export.
 
 ## 1. Ringkasan eksekutif
@@ -11,7 +11,9 @@ Playground memiliki fondasi teknis yang sehat dan kemampuan yang cukup lengkap: 
 
 > pilih contoh → baca/edit source → resolve → lihat preview → inspeksi hasil → share/export
 
-Masalah utamanya bukan kekurangan fitur, melainkan kepadatan dan prioritas. Banyak kemampuan ditempatkan sekaligus dalam satu workbench, sementara tugas utama pengguna belum cukup dominan. Dampaknya:
+Audit awal menemukan bahwa masalah utamanya bukan kekurangan fitur, melainkan kepadatan dan prioritas. Banyak kemampuan ditempatkan sekaligus dalam satu workbench, sementara tugas utama pengguna belum cukup dominan. Sebagian besar temuan tersebut kini sudah ditangani pada baseline `09ac1cb` melalui pemisahan toolbar, camera-fit, responsive surface switch, semantic controls, inspector/graph navigation, feedback state, dan CSS token/layer cleanup. Dampak yang masih relevan terutama berasal dari validasi yang membutuhkan perangkat atau deployment eksternal.
+
+Temuan baseline yang menjadi alasan pekerjaan ini:
 
 - pengguna baru tidak selalu segera melihat hasil gambar yang berguna;
 - navbar, preview toolbar, dan sidebar membagi kontrol ke terlalu banyak tempat;
@@ -65,30 +67,31 @@ Validasi baseline:
 - AX tree standalone playground: kontrol yang terdeteksi memiliki nama, termasuk editor, combobox, slider, button, dan checkbox.
 - Baseline screenshot persisted untuk first open/READY, error/recovery, Inspector, Graph, dan handset 410px di `docs/screenshots/ux-baseline-2026-09-15/`; manifest dan SHA-256 tercatat di folder tersebut.
 
-Validasi itu membuktikan baseline tidak sedang rusak secara teknis. Itu belum membuktikan alur nyaman, jelas, dan optimal pada perangkat fisik.
+Validasi itu membuktikan baseline lokal tidak sedang rusak secara teknis. Itu belum membuktikan alur nyaman, jelas, dan optimal pada perangkat fisik atau screen reader nyata.
 
 ### Keterbatasan
 
-- Belum ada uji handset fisik.
-- Belum ada traversal penuh dengan VoiceOver, TalkBack, atau screen reader nyata.
-- Screenshot lokal adalah spot check, bukan usability study.
-- Beberapa temuan visual harus dikonfirmasi lagi setelah camera dan responsive layout berubah.
+- [ ] Belum ada uji handset fisik untuk pan/pinch, target sentuh, dan performa layout.
+- [ ] Belum ada traversal penuh dengan VoiceOver, TalkBack, atau screen reader nyata.
+- [x] Screenshot lokal adalah spot check yang sudah dipersistenkan, bukan usability study.
+- [x] Camera dan responsive layout sudah diuji ulang setelah perubahan lokal; review visual lintas perangkat tetap menjadi gate eksternal/opsional.
+- [ ] Website publik belum mengonsumsi dan men-deploy baseline Playground `09ac1cb` secara eksplisit.
 
 ## 4. Peta alur pengguna
 
 | Tahap | Kondisi saat ini | Penilaian |
 | --- | --- | --- |
-| First open | Banyak kontrol langsung terlihat, tetapi hasil gambar pada spot check berada terlalu rendah dalam canvas | Friksi tinggi |
-| Pilih contoh | Selector ada, tetapi nama contoh terpotong pada toolbar | Friksi sedang |
-| Edit source | Editor berfungsi dan accessible; feedback resolve belum cukup komunikatif | Friksi sedang |
-| Resolve | Status READY/error ada, tetapi feedback aksi belum seragam | Friksi sedang |
-| Preview | Kaya fitur, namun kontrol tersebar dan framing awal kurang meyakinkan | Friksi tinggi |
-| Inspect | Data tersedia, tetapi object list flat dan panjang | Friksi tinggi |
-| Recover error | Jump-to-code ada, tetapi sebagian affordance mouse-only | Friksi tinggi |
-| Parameters/layers | Kemampuan ada; grouping dan state panel belum cukup jelas | Friksi sedang |
-| Graph | Ada dan berguna dengan mouse; navigasi accessible belum memadai | Friksi tinggi |
-| Share/export | Aksi tersedia, tetapi kegagalan dan hasil belum selalu diinformasikan | Friksi sedang |
-| Reset/ganti contoh | Source dapat terganti; belum ada dirty-state/konfirmasi | Risiko tinggi |
+| First open | Default example kini fit setelah resolve; review handset nyata masih terbuka | Friksi rendah secara lokal |
+| Pilih contoh | Selector memiliki nama penuh melalui title/accessible name dan option list; label dapat ellipsis pada handset | Friksi rendah |
+| Edit source | Editor keyboard-accessible; status resolve dan recovery memiliki feedback | Friksi rendah secara lokal |
+| Resolve | READY/error, diagnostics, fallback, dan stale response memiliki kontrak status | Friksi rendah secara lokal |
+| Preview | Kontrol global/contextual terpisah, fit/recenter tersedia, dan surface switch aktif | Friksi rendah secara lokal |
+| Inspect | Search, grouping, selected/related filter, depth, source jump, dan cross-surface highlight tersedia | Friksi sedang untuk dokumen sangat besar |
+| Recover error | Error summary, first-error, source target, reset/restore, dan dialog konfirmasi tersedia | Friksi rendah secara lokal |
+| Parameters/layers | Panel semantic disclosure dan state visual tersedia | Friksi rendah |
+| Graph | Filter, focus mode, legend, roving focus, dan keyboard navigation tersedia | Friksi rendah secara lokal |
+| Share/export | Feedback, fallback clipboard, batas hash, dan error state tersedia | Friksi rendah secara lokal |
+| Reset/ganti contoh | Dirty-state dan confirmation dialog semantic tersedia | Risiko rendah |
 
 ## 5. Temuan audit
 
@@ -240,6 +243,36 @@ Code disimpan ke localStorage dan URL hash setelah jeda, tetapi UI tidak membeda
 
 Graph memiliki overflow tetapi belum memiliki legend, search, zoom/minimap, atau focus mode. Mulai dari filter/focus selected dan legend sederhana; jangan memaksa semua node terlihat sekaligus.
 
+## 5a. Status temuan pada implementation baseline
+
+Bagian temuan di atas mempertahankan observasi audit awal agar keputusan desain tetap dapat ditelusuri. Status aktualnya pada `09ac1cb` adalah:
+
+| ID | Status lokal | Sisa atau batasan |
+| --- | --- | --- |
+| U01 | [x] Selesai pada browser | Review visual handset nyata masih terbuka |
+| U02 | [x] Selesai pada browser | Review visual lintas perangkat tetap opsional |
+| U03 | [x] Selesai pada browser | Uji handset fisik masih terbuka |
+| U04 | [x] Selesai | — |
+| U05 | [x] Selesai pada browser | Uji target sentuh/perangkat nyata masih terbuka |
+| U06 | [x] Selesai pada CSS dan audit gate | Verifikasi preference OS dengan VoiceOver/TalkBack belum dilakukan |
+| U07 | [x] Selesai pada unit/browser contract | Permission dan clipboard pada perangkat nyata tetap bergantung environment |
+| U08 | [x] Selesai | Dokumen graph/inspector yang sangat besar masih dapat membutuhkan focus/filter lebih lanjut |
+| U09 | [x] Selesai pada browser | Screen reader nyata masih terbuka |
+| U10 | [x] Selesai pada browser | Screen reader nyata masih terbuka |
+| U11 | [x] Selesai untuk AX tree dan keyboard lokal | VoiceOver/TalkBack nyata masih terbuka |
+| U12 | [x] Selesai pada unit/browser contract | Pan/pinch pada handset fisik masih terbuka |
+| U13 | [x] Selesai pada token dan CSS gate | Review estetika manusia lintas perangkat bersifat opsional |
+| U14 | [x] Selesai | Duplikasi Fit/Recenter disengaja dan terdokumentasi |
+| U15 | [x] Selesai pada browser | Ergonomi sentuh nyata masih terbuka |
+| U16 | [x] Selesai pada runtime browser lokal | Fallback font lintas perangkat merupakan QA opsional |
+| U17 | [x] Selesai | — |
+| U18 | [x] Selesai | — |
+| U19 | [x] Selesai | README, `package.json`, dan `LICENSE` memakai MIT |
+| U20 | [x] Selesai pada persistence/share contract | Strategi hash sangat panjang masih dapat dikembangkan jika kebutuhan meningkat |
+| U21 | [x] Selesai untuk scope filter/focus/legend | Zoom/minimap belum menjadi kebutuhan release saat ini |
+
+Dengan demikian, tidak ada lagi temuan U01–U21 yang menunggu implementasi lokal wajib. Sisa pekerjaan berada pada validasi eksternal dan deployment website.
+
 ## 6. Arah UX target
 
 Gunakan tiga zona mental yang jelas:
@@ -332,7 +365,10 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Uji browser responsive pada viewport matrix 1024/940/840/480; tidak ada horizontal overflow dan mode surface/drawer tablet berhasil.
 - [ ] Uji handset fisik dan VoiceOver/TalkBack.
 - [x] Smoke test URL deployment publik saat ini pada 1280px: halaman mencapai `READY`, canvas terlihat ter-render, dan tidak ada alert.
-- [ ] Deploy perubahan lokal terbaru lalu pin versi/commit playground yang dipakai website agar hasil publik dapat dibandingkan dengan baseline ini.
+- [x] Playground implementation baseline `09ac1cb` sudah di-commit dan di-push ke `relgeo/playground`.
+- [x] Pin workflow Pages sudah disiapkan secara lokal ke commit Playground `09ac1cb`; website `build`, `astro check`, built-output assertions, dan Pages artifact assertions lulus setelah artifact Playground dimasukkan.
+- [x] Dokumentasi Getting Started website EN/ID tidak lagi mengklaim Playground belum memiliki URL publik; keduanya kini menaut ke `/playground/` dan build/output assertions tetap lulus.
+- [ ] Commit/push perubahan workflow `relgeo.github.io`, tunggu deploy GitHub Pages, lalu ulangi smoke URL publik pada hasil deploy baru.
 
 ## 8. Acceptance criteria terukur
 
@@ -483,7 +519,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U03 — responsive CSS, surface switch, dan drawer/sidebar mobile sudah ditambahkan serta gate teknis lulus; Chrome smoke pada viewport CSS 1024, 940, 840, dan 480 tidak menemukan horizontal overflow, dan pada 840/480 surface switcher, mode Source/Preview, serta penutupan drawer berhasil.
 - [x] U12 — preview stage memakai `touch-action: none` dan implementasi Pointer Events untuk pan/pinch touch/stylus; browser/unit contract sudah lulus, sedangkan perangkat touch nyata belum tersedia.
 
-### Sisa terbuka
+### Rekap verifikasi lokal dan sisa terbuka
 
 - [x] U01 — fresh-browser smoke seluruh 17 fixture dan tiga pilihan sheet sudah lolos dengan SVG serta tanpa alert; ResizeObserver kini melakukan fit ulang saat resize/split berubah, dan smoke 840/480/1024 menjaga stage tetap pas tanpa horizontal overflow.
 - [x] U02 — screenshot visual desktop 1024px setelah mode compact menunjukkan hierarchy toolbar tetap terbaca, preview utama utuh, dan aksi sekunder berada di menu More; nama example yang dipendekkan tetap tersedia melalui title/accessible name.
@@ -500,5 +536,23 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U16 — typography runtime/browser lokal sudah diverifikasi terhadap token dan fallback contract; verifikasi font rendering pada perangkat pengguna lain tetap menjadi QA visual opsional.
 - [x] U18–U21 — inline style dinamis untuk split ratio, preview geometry/zoom/size, dan sidebar width dipertahankan karena merupakan state runtime yang sah; stylesheet kini sudah memiliki layer `foundation`, `layout`, `components`, dan `responsive`.
 - [x] Inspector redesign lanjutan — pemadatan visual handset sudah diterapkan dan dijaga oleh kontrak audit; validasi perangkat nyata/visual final tetap menjadi QA eksternal opsional.
+
+### Gate eksternal yang masih tersisa
+
+Item berikut tidak dapat dibuktikan hanya melalui unit test atau browser emulation di sesi ini:
+
+- [ ] **Perangkat touch nyata:** uji pan, pinch-zoom, target sentuh, keyboard virtual, dan scroll halaman pada handset/tablet.
+- [ ] **Screen reader nyata:** traversal dan pengumuman state dengan VoiceOver atau TalkBack, termasuk dialog konfirmasi, drawer, tab Inspector, error alert, dan graph node.
+- [x] **Persiapan deployment website:** workflow lokal `relgeo.github.io` sudah mem-pin Playground ke `09ac1cb`; build website dan Pages artifact assertions lulus.
+- [x] **Konsistensi dokumentasi publik:** Getting Started EN/ID sudah menunjuk ke hosted Playground `/playground/`.
+- [ ] **Deployment website:** commit/push workflow, deploy GitHub Pages, lalu ulangi smoke URL publik untuk memastikan baseline baru benar-benar live.
+
+Semua item lain pada U01–U21 sudah memiliki implementasi lokal dan bukti browser/unit yang memadai untuk baseline ini. Review estetika lintas perangkat, pengujian font pada perangkat lain, dan zoom/minimap graph dicatat sebagai peningkatan opsional, bukan blocker release.
+
+### Bukti penutupan gate yang harus dicatat
+
+- **Touch fisik:** catat model/OS/viewport, hasil pan satu jari, pinch-zoom, scroll di luar canvas, pembukaan drawer, target sentuh, dan tidak adanya halaman yang terjebak pada `touch-action: none`.
+- **Screen reader:** catat platform/reader, urutan landmark, pengumuman status READY/error, operasi drawer dan dialog, selected state tab/graph, serta jalur kembali ke source.
+- **Deployment:** catat commit website, run URL GitHub Actions yang berhasil, commit Playground yang ter-checkout, URL Pages yang diuji, dan hasil smoke `/`, `/docs/`, `/docs/language-spec/`, `/playground/`, `/sitemap.xml`.
 
 Dokumen ini menjadi baseline diskusi dan checklist perubahan playground. Setiap implementasi sebaiknya menandai checklist yang relevan bersamaan dengan commit yang mengerjakannya.
