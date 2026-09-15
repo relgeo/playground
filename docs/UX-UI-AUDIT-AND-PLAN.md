@@ -1,6 +1,6 @@
 # RelGeo Playground — UX/UI Audit & Improvement Plan
 
-**Status:** implementasi lokal dan browser verification selesai; gate eksternal masih terbuka
+**Status:** implementasi lokal, browser verification, workflow Pages, dan smoke URL publik selesai; gate perangkat eksternal masih terbuka
 **Tanggal audit terakhir:** 2026-09-15
 **Implementation baseline:** `09ac1cb` (`main`)
 **Ruang lingkup:** browser IDE playground: editor, resolver, preview, inspector, graph, sidebar, responsive behavior, accessibility, share, dan export.
@@ -66,6 +66,8 @@ Validasi baseline:
 - Sweep browser viewport 390×844 dengan reduced-motion: 37 kontrol DOM terlihat, seluruhnya memiliki accessible name, seluruhnya tercapai dengan Tab, dan `scrollWidth` tetap 390.
 - AX tree standalone playground: kontrol yang terdeteksi memiliki nama, termasuk editor, combobox, slider, button, dan checkbox.
 - Baseline screenshot persisted untuk first open/READY, error/recovery, Inspector, Graph, dan handset 410px di `docs/screenshots/ux-baseline-2026-09-15/`; manifest dan SHA-256 tercatat di folder tersebut.
+- Workflow `Deploy RelGeo website` run #18 pada commit website `5d103b2` sukses: build, Pages artifact, deploy, dan smoke-test job semuanya hijau.
+- Smoke browser publik setelah deploy baru lulus untuk `/`, `/en/`, `/id/`, `/docs/`, `/docs/language-spec/`, dan `/playground/`; semua route terbaca tanpa alert dan Playground memiliki judul `RelGeo Playground`.
 
 Validasi itu membuktikan baseline lokal tidak sedang rusak secara teknis. Itu belum membuktikan alur nyaman, jelas, dan optimal pada perangkat fisik atau screen reader nyata.
 
@@ -75,7 +77,8 @@ Validasi itu membuktikan baseline lokal tidak sedang rusak secara teknis. Itu be
 - [ ] Belum ada traversal penuh dengan VoiceOver, TalkBack, atau screen reader nyata.
 - [x] Screenshot lokal adalah spot check yang sudah dipersistenkan, bukan usability study.
 - [x] Camera dan responsive layout sudah diuji ulang setelah perubahan lokal; review visual lintas perangkat tetap menjadi gate eksternal/opsional.
-- [ ] Website publik belum mengonsumsi dan men-deploy baseline Playground `09ac1cb` secara eksplisit.
+- [x] Website publik mengonsumsi baseline Playground `09ac1cb` melalui workflow yang dipin dan sudah ter-deploy.
+- [ ] Endpoint publik `/sitemap.xml` belum dapat dibaca langsung oleh browser harness karena download XML diblokir `ERR_BLOCKED_BY_CLIENT`; Pages artifact assertion lokal tetap lulus.
 
 ## 4. Peta alur pengguna
 
@@ -366,9 +369,10 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] Uji handset fisik dan VoiceOver/TalkBack.
 - [x] Smoke test URL deployment publik saat ini pada 1280px: halaman mencapai `READY`, canvas terlihat ter-render, dan tidak ada alert.
 - [x] Playground implementation baseline `09ac1cb` sudah di-commit dan di-push ke `relgeo/playground`.
-- [x] Pin workflow Pages sudah disiapkan secara lokal ke commit Playground `09ac1cb`; website `build`, `astro check`, built-output assertions, dan Pages artifact assertions lulus setelah artifact Playground dimasukkan.
+- [x] Pin workflow Pages sudah dipush ke website pada commit `5d103b2`, tetap merujuk commit Playground `09ac1cb`; website `build`, `astro check`, built-output assertions, dan Pages artifact assertions lulus setelah artifact Playground dimasukkan.
 - [x] Dokumentasi Getting Started website EN/ID tidak lagi mengklaim Playground belum memiliki URL publik; keduanya kini menaut ke `/playground/` dan build/output assertions tetap lulus.
-- [ ] Commit/push perubahan workflow `relgeo.github.io`, tunggu deploy GitHub Pages, lalu ulangi smoke URL publik pada hasil deploy baru.
+- [x] Commit/push workflow selesai; Pages run #18 sukses dan smoke publik pascadeploy lulus pada route HTML utama. Verifikasi independen `/sitemap.xml` masih terbuka karena keterbatasan browser harness.
+- [x] Warning workflow dirapikan: action resmi dipindah ke runtime Node 24 dan input checkout `sparse-checkout-cone-mode` digunakan; run #18 tidak lagi memiliki annotation warning.
 
 ## 8. Acceptance criteria terukur
 
@@ -545,23 +549,24 @@ Item berikut tidak dapat dibuktikan hanya melalui unit test atau browser emulati
 - [ ] **Screen reader nyata:** traversal dan pengumuman state dengan VoiceOver atau TalkBack, termasuk dialog konfirmasi, drawer, tab Inspector, error alert, dan graph node.
 - [x] **Persiapan deployment website:** workflow lokal `relgeo.github.io` sudah mem-pin Playground ke `09ac1cb`; build website dan Pages artifact assertions lulus.
 - [x] **Konsistensi dokumentasi publik:** Getting Started EN/ID sudah menunjuk ke hosted Playground `/playground/`.
-- [ ] **Deployment website:** commit/push workflow, deploy GitHub Pages, lalu ulangi smoke URL publik untuk memastikan baseline baru benar-benar live.
+- [x] **Deployment website:** website commit `5d103b2` sudah dipush; workflow run #18 sukses dan hosted route HTML utama sudah di-smoke-test setelah deploy.
+- [ ] **Sitemap publik:** `/sitemap.xml` belum diverifikasi langsung oleh browser harness karena `ERR_BLOCKED_BY_CLIENT`; artifact assertion lokal sudah memverifikasi file sitemap pada hasil build.
 
 Semua item lain pada U01–U21 sudah memiliki implementasi lokal dan bukti browser/unit yang memadai untuk baseline ini. Review estetika lintas perangkat, pengujian font pada perangkat lain, dan zoom/minimap graph dicatat sebagai peningkatan opsional, bukan blocker release.
 
 ### Handoff release yang sudah siap
 
-`push --dry-run` lulus untuk ketiga repository. Push aktual harus dilakukan berurutan agar pointer submodule dan checkout Pages selalu merujuk commit yang tersedia:
+`push --dry-run` lulus untuk ketiga repository. Push aktual sudah dilakukan berurutan agar pointer submodule dan checkout Pages merujuk commit yang tersedia:
 
-1. [ ] Push `relgeo/playground` pada commit terbaru yang memuat audit handoff ini.
-2. [ ] Push `relgeo/relgeo.github.io` pada commit `c998bb9`; workflow-nya mem-pin baseline fungsional Playground `09ac1cb`.
-3. [ ] Push `relgeo/workspace` pada commit terbaru setelah pointer kedua repository anak tersedia.
-4. [ ] Tunggu workflow Pages selesai, lalu jalankan smoke test URL publik.
+1. [x] Push `relgeo/playground` pada commit `0860145` yang memuat audit handoff.
+2. [x] Push `relgeo/relgeo.github.io` pada commit `c998bb9`, lalu workflow cleanup pada `5d103b2`; keduanya mem-pin baseline fungsional Playground `09ac1cb`.
+3. [x] Push `relgeo/workspace` pada commit `dcdcd2d`, lalu sinkronisasi workflow terbaru pada `2c05f16`.
+4. [x] Workflow Pages run #18 selesai sukses dan smoke URL publik pascadeploy lulus untuk route HTML utama.
 
 ### Bukti penutupan gate yang harus dicatat
 
 - **Touch fisik:** catat model/OS/viewport, hasil pan satu jari, pinch-zoom, scroll di luar canvas, pembukaan drawer, target sentuh, dan tidak adanya halaman yang terjebak pada `touch-action: none`.
 - **Screen reader:** catat platform/reader, urutan landmark, pengumuman status READY/error, operasi drawer dan dialog, selected state tab/graph, serta jalur kembali ke source.
-- **Deployment:** catat commit website, run URL GitHub Actions yang berhasil, commit Playground yang ter-checkout, URL Pages yang diuji, dan hasil smoke `/`, `/docs/`, `/docs/language-spec/`, `/playground/`, `/sitemap.xml`.
+- **Deployment:** website `5d103b2`, run [#18](https://github.com/relgeo/relgeo.github.io/actions/runs/34931665545), Playground checkout `09ac1cb`, URL Pages `https://relgeo.github.io/`, serta smoke lulus untuk `/`, `/en/`, `/id/`, `/docs/`, `/docs/language-spec/`, dan `/playground/`. `/sitemap.xml` ter-cover oleh artifact assertion lokal, tetapi belum dapat dibaca langsung oleh browser harness karena `ERR_BLOCKED_BY_CLIENT`.
 
 Dokumen ini menjadi baseline diskusi dan checklist perubahan playground. Setiap implementasi sebaiknya menandai checklist yang relevan bersamaan dengan commit yang mengerjakannya.
