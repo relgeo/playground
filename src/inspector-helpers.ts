@@ -10,6 +10,39 @@ export function getClosedShapeMetricLabel(type: string, closed: boolean): string
   return 'Total Length';
 }
 
+export interface DiagnosticTargetInput {
+  error?: {
+    objectId?: string | null;
+    path?: string | null;
+    dependencyChain?: readonly string[] | null;
+  } | null;
+  firstViolation?: {
+    objectId?: string | null;
+  } | null;
+}
+
+export interface DiagnosticTarget {
+  kind: 'object' | 'path' | 'dependency';
+  value: string;
+}
+
+/**
+ * Chooses the most useful source navigation target for the first diagnostic.
+ * Object targets are preferred, followed by a violation object, source path,
+ * and finally the first node in a dependency chain.
+ */
+export function getFirstDiagnosticTarget({
+  error,
+  firstViolation,
+}: DiagnosticTargetInput): DiagnosticTarget | null {
+  if (error?.objectId) return { kind: 'object', value: error.objectId };
+  if (firstViolation?.objectId) return { kind: 'object', value: firstViolation.objectId };
+  if (error?.path) return { kind: 'path', value: error.path };
+  const dependencyNode = error?.dependencyChain?.[0];
+  if (dependencyNode) return { kind: 'dependency', value: dependencyNode };
+  return null;
+}
+
 export interface InspectorDependencyGraphEntry {
   id: string;
   deps: string[];

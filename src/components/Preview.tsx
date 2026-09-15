@@ -1,15 +1,22 @@
-import { useRef, useEffect, useState, type PointerEventHandler, type WheelEventHandler } from 'react';
+import { useCallback, useRef, useEffect, useState, type PointerEventHandler, type WheelEventHandler } from 'react';
 import { applyTransformPipeline, getObjectBoundingBox, calculateBoundingBox } from '@relgeo/core';
 import type { ConstraintViolation, RelGeoError, ResolvedScene, ResolvedObject, ResolvedPath, ResolvedPolygon, ResolvedDimension, ResolvedAnnotation, ResolvedTransform } from '@relgeo/core';
 import type { DragState, OverlayConfig, PreviewLineMode } from '../types';
 import { ICONS } from './Icons';
-import { getPreviewToolbarHint, getPreviewToolbarLabel, getPreviewToolbarMode } from '../preview-toolbar';
+import {
+  getPreviewStageHint,
+  getPreviewToolbarAriaLabel,
+  getPreviewToolbarHint,
+  getPreviewToolbarLabel,
+  getPreviewToolbarMode,
+} from '../preview-toolbar';
 import {
   computePreviewScreenScale,
   computeFitZoomPercent,
   formatPreviewFrameCssLength,
   getPreviewFrameSize,
 } from '../preview-geometry';
+import { computePinchPan, computePinchZoom, getPointerCenter, getPointerDistance, type PointerPosition } from '../preview-gestures';
 
 interface PreviewProps {
   svgContent: string;
@@ -99,9 +106,19 @@ export function Preview({
   onSelectObject,
 }: PreviewProps) {
   const stageRef = useRef<HTMLDivElement>(null);
+  const activePointersRef = useRef(new Map<number, PointerPosition>());
+  const pinchStateRef = useRef<{
+    distance: number;
+    zoom: number;
+    center: PointerPosition;
+    pan: { x: number; y: number };
+    stageOrigin: PointerPosition;
+  } | null>(null);
   const toolbarMode = getPreviewToolbarMode(isPrintMode);
   const previewLabel = getPreviewToolbarLabel(toolbarMode);
+  const previewToolbarAriaLabel = getPreviewToolbarAriaLabel(toolbarMode);
   const previewHint = getPreviewToolbarHint(toolbarMode, selectedSheetId);
+  const previewStageHint = getPreviewStageHint(toolbarMode);
   
   // Custom overlay settings state
   const [overlay, setOverlay] = useState<OverlayConfig>({
@@ -132,6 +149,28 @@ export function Preview({
 
     if (!svgContent) return;
     event.currentTarget.setPointerCapture(event.pointerId);
+    activePointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (activePointersRef.current.size >= 2) {
+      const [first, second] = Array.from(activePointersRef.current.values());
+      const stageRect = event.currentTarget.getBoundingClientRect();
+      pinchStateRef.current = {
+        distance: getPointerDistance(first, second),
+        zoom,
+        center: getPointerCenter(first, second),
+        pan: {
+          x: event.currentTarget.scrollLeft,
+          y: event.currentTarget.scrollTop,
+        },
+        stageOrigin: {
+          x: stageRect.left,
+          y: stageRect.top,
+        },
+      };
+      setDragState(null);
+      return;
+    }
+
     setDragState({
       startX: event.clientX,
       startY: event.clientY,
@@ -141,6 +180,34 @@ export function Preview({
   };
 
   const handlePointerMove: PointerEventHandler<HTMLDivElement> = (event) => {
+    if (!activePointersRef.current.has(event.pointerId)) return;
+    activePointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (activePointersRef.current.size >= 2 && pinchStateRef.current) {
+      const [first, second] = Array.from(activePointersRef.current.values());
+      const distance = getPointerDistance(first, second);
+      const currentCenter = getPointerCenter(first, second);
+      const nextZoom = computePinchZoom(
+        pinchStateRef.current.zoom,
+        pinchStateRef.current.distance,
+        distance,
+      );
+      setZoomClamped(nextZoom);
+      const stageRect = event.currentTarget.getBoundingClientRect();
+      setPan(computePinchPan(
+        pinchStateRef.current.pan,
+        pinchStateRef.current.center,
+        currentCenter,
+        pinchStateRef.current.zoom,
+        nextZoom,
+        {
+          x: stageRect.left,
+          y: stageRect.top,
+        },
+      ));
+      return;
+    }
+
     if (!dragState) return;
     setPan({
       x: dragState.originX - (event.clientX - dragState.startX),
@@ -152,8 +219,27 @@ export function Preview({
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
-    setDragState(null);
+    activePointersRef.current.delete(event.pointerId);
+    pinchStateRef.current = null;
+
+    const remainingPointer = Array.from(activePointersRef.current.values())[0];
+    if (remainingPointer) {
+      const stage = stageRef.current;
+      setDragState({
+        startX: remainingPointer.x,
+        startY: remainingPointer.y,
+        originX: stage?.scrollLeft ?? pan.x,
+        originY: stage?.scrollTop ?? pan.y,
+      });
+    } else {
+      setDragState(null);
+    }
   };
+
+  useEffect(() => () => {
+    activePointersRef.current.clear();
+    pinchStateRef.current = null;
+  }, []);
 
   // Sync pan with scroll
   useEffect(() => {
@@ -238,26 +324,60 @@ export function Preview({
     };
   }, [selectedObjectId, selectedSheetId, setPan, svgContent, zoom]);
 
-  // Handle auto "fit all" triggered by props
-  useEffect(() => {
-    if (stageRef.current) {
-      const containerWidth = stageRef.current.clientWidth - 40;
-      const containerHeight = stageRef.current.clientHeight - 40;
-      // Both model preview and print-oriented preview fit against the physical
-      // frame; their difference is in presentation policy, not geometry basis.
-      const frame = getPreviewFrameSize(resolvedData, selectedSheetId, 'physical');
-      const fitZoom = computeFitZoomPercent(frame, containerWidth, containerHeight);
+  const fitPreviewToStage = useCallback(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
 
-      if (fitZoom !== null) {
-        setZoom(fitZoom);
-        setPan({ x: 0, y: 0 });
-        if (stageRef.current) {
-          stageRef.current.scrollLeft = 0;
-          stageRef.current.scrollTop = 0;
-        }
-      }
-    }
-  }, [fitAllTrigger, isPrintMode, resolvedData, selectedSheetId, setPan, setZoom]);
+    const viewport = stage.querySelector<HTMLElement>('.preview-viewport');
+    const viewportStyles = viewport ? window.getComputedStyle(viewport) : null;
+    const horizontalPadding = viewportStyles
+      ? (Number.parseFloat(viewportStyles.paddingLeft) || 0) + (Number.parseFloat(viewportStyles.paddingRight) || 0)
+      : 40;
+    const verticalPadding = viewportStyles
+      ? (Number.parseFloat(viewportStyles.paddingTop) || 0) + (Number.parseFloat(viewportStyles.paddingBottom) || 0)
+      : 40;
+    const containerWidth = stage.clientWidth - horizontalPadding;
+    const containerHeight = stage.clientHeight - verticalPadding;
+    // Both model preview and print-oriented preview fit against the physical
+    // frame; their difference is in presentation policy, not geometry basis.
+    const frame = getPreviewFrameSize(resolvedData, selectedSheetId, 'physical');
+    const fitZoom = computeFitZoomPercent(frame, containerWidth, containerHeight);
+
+    if (fitZoom === null) return;
+
+    setZoom(fitZoom);
+    setPan({ x: 0, y: 0 });
+    stage.scrollLeft = 0;
+    stage.scrollTop = 0;
+  }, [resolvedData, selectedSheetId, setPan, setZoom]);
+
+  // Handle explicit "fit all" requests from the toolbar and initial render.
+  useEffect(() => {
+    fitPreviewToStage();
+  }, [fitAllTrigger, fitPreviewToStage, isPrintMode]);
+
+  // Keep the camera usable when a split panel, sidebar, or handset viewport
+  // changes the stage dimensions. ResizeObserver also covers drag-resizing a
+  // panel, which a window resize listener alone would miss.
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (isPrintMode || !stage || !resolvedData || !svgContent || typeof ResizeObserver === 'undefined') return;
+
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      if (frame) window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        fitPreviewToStage();
+      });
+    });
+
+    observer.observe(stage);
+    return () => {
+      observer.disconnect();
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [fitPreviewToStage, isPrintMode, resolvedData, svgContent]);
 
   const getBoundingBox = (id: string, obj: ResolvedObject, parentMap?: Map<string, string>) => {
     if (!obj || !obj.type) return null;
@@ -775,13 +895,17 @@ export function Preview({
     <section className="canvas-panel preview-shell">
       {/* Dynamic Overlay Control Bar */}
       <div
-        className="overlay-toolbar preview-toolbar"
+        className={`overlay-toolbar preview-toolbar preview-toolbar-${toolbarMode}`}
+        role="group"
+        aria-label={previewToolbarAriaLabel}
+        aria-describedby="preview-toolbar-hint"
+        data-preview-mode={toolbarMode}
       >
         <div className="preview-toolbar-heading">
-          <span className="preview-toolbar-label">
+          <span className="preview-toolbar-label" id="preview-toolbar-label">
             {previewLabel}
           </span>
-          <span className="preview-toolbar-hint">
+          <span className="preview-toolbar-hint" id="preview-toolbar-hint">
             {previewHint}
           </span>
         </div>
@@ -848,6 +972,7 @@ export function Preview({
                 onClick={() => setPreviewLineMode('static')}
                 className={`preview-line-mode-button ${previewLineMode === 'static' ? 'active' : ''}`}
                 title="Static Screen Line Preview"
+                aria-label="Static screen line preview"
                 aria-pressed={previewLineMode === 'static'}
               >
                 Static
@@ -857,6 +982,7 @@ export function Preview({
                 onClick={() => setPreviewLineMode('physical-relative')}
                 className={`preview-line-mode-button ${previewLineMode === 'physical-relative' ? 'active' : ''}`}
                 title="Physical Relative Line Preview"
+                aria-label="Physical relative line preview"
                 aria-pressed={previewLineMode === 'physical-relative'}
               >
                 Relative
@@ -926,12 +1052,22 @@ export function Preview({
       <div
         ref={stageRef}
         className={`preview-stage ${dragState ? 'is-dragging' : ''}`}
+        role="region"
+        aria-labelledby="preview-stage-label"
+        aria-describedby="preview-stage-hint"
+        data-preview-mode={toolbarMode}
         onWheel={handleWheelZoom}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
+        <span className="visually-hidden" id="preview-stage-label">
+          {previewLabel} canvas
+        </span>
+        <span className="visually-hidden" id="preview-stage-hint">
+          {previewStageHint}
+        </span>
         <div className="preview-viewport">
           <div
             className="svg-wrapper-container"

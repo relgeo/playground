@@ -17,8 +17,9 @@ export function resolveDisplayRenderState({
   current,
   fallback,
 }: ResolveDisplayStateInput): PlaygroundRenderSnapshot {
-  const hasCurrentRender =
-    current.doc !== null || current.resolvedData !== null || current.svgContent !== '';
+  // The SVG is the user-facing render contract. A partially populated
+  // response must not hide the last known-good canvas behind an empty one.
+  const hasCurrentRender = current.svgContent !== '';
 
   if (hasCurrentRender || !fallback) {
     return current;
@@ -31,8 +32,7 @@ export function isUsingFallbackRender({
   current,
   fallback,
 }: ResolveDisplayStateInput): boolean {
-  const hasCurrentRender =
-    current.doc !== null || current.resolvedData !== null || current.svgContent !== '';
+  const hasCurrentRender = current.svgContent !== '';
 
   return !hasCurrentRender && fallback !== null;
 }

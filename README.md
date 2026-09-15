@@ -8,6 +8,25 @@ The Playground package metadata version is currently `0.4.0`, while the document
 
 For package-owned docs that should grow closer to this package over time, see `docs/README.md`.
 
+## Quick Start
+
+The Playground is a private workspace application. Run it locally from the repository root:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+Open the URL printed by Vite, normally [`http://localhost:5173/playground/`](http://localhost:5173/playground/).
+
+To use a fixed local address instead:
+
+```bash
+pnpm dev --host 127.0.0.1 --port 4335
+```
+
+Then open [`http://127.0.0.1:4335/playground/`](http://127.0.0.1:4335/playground/). Stop the server with `Ctrl+C`.
+
 Pada repo aktif saat ini, Playground ini ditujukan untuk mengedit dan memeriksa dokumen `RelGeo DSL v0.5`.
 
 Status packaging saat ini:
@@ -105,7 +124,7 @@ flowchart TD
     B --> D[Auto Completion]
     B --> E[Hover Intelligence]
 
-    A --> F[@relgeo/core]
+    A --> F["@relgeo/core"]
 
     F --> G[Parser]
     F --> H[Dependency Graph Resolver]
@@ -341,39 +360,63 @@ objects:
 
 # Getting Started
 
-## Install Workspace Dependencies
+## Prerequisites
+
+Install Node.js and pnpm. The expected package manager version is recorded in [`package.json`](./package.json).
+
+## Install Dependencies
+
+For reproducible installs, use the lockfile:
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
 ```
 
----
+Use `pnpm install` when intentionally updating dependencies and the lockfile.
 
-## Start Development Server
+## Development Server
 
 ```bash
 pnpm dev
 ```
 
-or:
+Vite prints the local URL in the terminal. Because the application is served under the `/playground/` base path, open the URL with that path appended, normally:
 
-```bash
-pnpm playground
+```text
+http://localhost:5173/playground/
 ```
 
----
-
-## Production Build
+For a fixed host and port:
 
 ```bash
+pnpm dev --host 127.0.0.1 --port 4335
+```
+
+Open:
+
+```text
+http://127.0.0.1:4335/playground/
+```
+
+## Quality Checks
+
+Run the checks before committing changes:
+
+```bash
+pnpm audit:ux
+pnpm lint
+pnpm test
 pnpm build
 ```
 
-## Run Tests
+## Preview the Production Build
 
 ```bash
-pnpm test
+pnpm build
+pnpm preview
 ```
+
+Open the preview URL printed by Vite, using the `/playground/` path. The default preview port is usually `4173`.
 
 ---
 
@@ -442,4 +485,4 @@ More precisely, "lightweight" here means:
 
 # License
 
-ISC
+MIT. See [`LICENSE`](./LICENSE).

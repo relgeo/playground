@@ -4,7 +4,7 @@ import { ICONS } from './Icons';
 import type { InspectorTab } from '../types';
 import { getDependencyGraph } from '@relgeo/core';
 import type { RelGeoDocument, ResolvedScene, RelGeoError, ResolvedObject, PathResolvedSegment, ConstraintViolation } from '@relgeo/core';
-import { getClosedShapeMetricLabel, getRelatedObjectIds } from '../inspector-helpers';
+import { getClosedShapeMetricLabel, getFirstDiagnosticTarget, getRelatedObjectIds } from '../inspector-helpers';
 import { getDiagnosticCode } from '../diagnostic-code';
 
 const GraphViewer = lazy(() => import('./GraphViewer').then((m) => ({ default: m.GraphViewer })));
@@ -865,25 +865,23 @@ export function Inspector({
     const rError = fullError;
     const hasViolations = rData?.violations && rData.violations.length > 0;
     const firstViolation = rData?.violations?.[0];
-    const firstErrorObjectId = rError?.objectId ?? firstViolation?.objectId;
-    const firstErrorPath = !firstErrorObjectId ? rError?.path : undefined;
-    const hasFirstErrorTarget = Boolean(firstErrorObjectId || firstErrorPath);
+    const firstErrorTarget = getFirstDiagnosticTarget({ error: rError, firstViolation });
+    const hasFirstErrorTarget = Boolean(firstErrorTarget);
     const errorCount = (rError ? 1 : 0) + (rData?.violations?.length ?? 0);
     const diagnosticCode = rError ? getDiagnosticCode(rError) : null;
 
     const handleJumpToFirstError = () => {
-      if (firstErrorObjectId) {
-        handleJump(firstErrorObjectId);
+      if (!firstErrorTarget) return;
+      if (firstErrorTarget.kind === 'object' || firstErrorTarget.kind === 'dependency') {
+        handleJump(firstErrorTarget.value);
         return;
       }
-      if (firstErrorPath && onJumpToPath) {
-        onJumpToPath(firstErrorPath);
-      }
+      onJumpToPath?.(firstErrorTarget.value);
     };
 
     if (!rError && !hasViolations) {
       return (
-        <div className="inspector-empty-success">
+        <div className="inspector-empty-success" role="status" aria-live="polite">
           ✨ No errors or constraint violations detected!
         </div>
       );
@@ -893,24 +891,25 @@ export function Inspector({
       <div className="inspector-errors-list">
         <div
           className="inspector-error-summary"
-          role="alert"
-          aria-live="assertive"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
           aria-label={`${errorCount} diagnostic${errorCount === 1 ? '' : 's'} found${hasFirstErrorTarget ? '. A first-error action is available.' : '.'}`}
-          >
-            <span>{errorCount} diagnostic{errorCount === 1 ? '' : 's'} found</span>
-            {hasFirstErrorTarget && (
-              <button
+        >
+          <span>{errorCount} diagnostic{errorCount === 1 ? '' : 's'} found</span>
+          {hasFirstErrorTarget && (
+            <button
               type="button"
               onClick={handleJumpToFirstError}
               aria-label="Jump to first error"
-              >
-                Go to first error
-              </button>
-            )}
-            {!hasFirstErrorTarget && (
-              <span className="inspector-error-summary-hint">Fix source or reset draft</span>
-            )}
-          </div>
+            >
+              Go to first error
+            </button>
+          )}
+          {!hasFirstErrorTarget && (
+            <span className="inspector-error-summary-hint">Fix source or reset draft</span>
+          )}
+        </div>
         {rError && (
           <div
             className="inspector-error-card"
@@ -938,6 +937,12 @@ export function Inspector({
             <p className="inspector-error-message" id="inspector-error-message">
               {rError.message}
             </p>
+
+            {!rError.objectId && !rError.path && (!rError.dependencyChain || rError.dependencyChain.length === 0) && (
+              <p className="inspector-error-location-hint">
+                No source location is available for this diagnostic. Fix the source or reset the draft.
+              </p>
+            )}
 
             {!rError.objectId && rError.path && onJumpToPath && (
               <button
@@ -992,6 +997,9 @@ export function Inspector({
                     >
                       {violation.objectId} ↗
                     </button>
+                  )}
+                  {!violation.objectId && (
+                    <span className="inspector-violation-location">No source target</span>
                   )}
                 </div>
                 <p className="inspector-violation-message">{violation.message}</p>

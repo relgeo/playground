@@ -28,6 +28,20 @@ objects:
     expect(decodeCodeFromHash(encoded)).toBe(code);
   });
 
+  it('uses a URL-safe hash alphabet without padding', () => {
+    const encoded = encodeCodeToHash('\u00fb'.repeat(32));
+
+    expect(encoded).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(encoded).not.toContain('=');
+    expect(decodeCodeFromHash(encoded)).toBe('\u00fb'.repeat(32));
+  });
+
+  it('continues to decode legacy padded Base64 hashes', () => {
+    const legacyHash = btoa('version: 0.5');
+
+    expect(decodeCodeFromHash(legacyHash)).toBe('version: 0.5');
+  });
+
   it('builds a bounded share URL for normal drafts', () => {
     const url = buildShareUrl('https://relgeo.github.io/playground/', 'version: 0.5');
     expect(url).toMatch(/^https:\/\/relgeo\.github\.io\/playground\/#/);

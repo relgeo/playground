@@ -44,6 +44,36 @@ describe('playground display state helpers', () => {
     ).toBe(fallback);
   });
 
+  it('falls back when a partial response has data but no SVG preview', () => {
+    const fallback = {
+      doc: {} as never,
+      resolvedData: {} as never,
+      svgContent: '<svg>last-good</svg>',
+    };
+
+    expect(
+      resolveDisplayRenderState({
+        current: {
+          doc: {} as never,
+          resolvedData: {} as never,
+          svgContent: '',
+        },
+        fallback,
+      })
+    ).toBe(fallback);
+
+    expect(
+      isUsingFallbackRender({
+        current: {
+          doc: {} as never,
+          resolvedData: {} as never,
+          svgContent: '',
+        },
+        fallback,
+      })
+    ).toBe(true);
+  });
+
   it('detects when fallback render is being used', () => {
     expect(
       isUsingFallbackRender({

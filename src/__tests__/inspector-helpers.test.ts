@@ -1,5 +1,31 @@
 import { describe, expect, it } from 'vitest';
-import { getClosedShapeMetricLabel, getRelatedObjectIds } from '../inspector-helpers';
+import { getClosedShapeMetricLabel, getFirstDiagnosticTarget, getRelatedObjectIds } from '../inspector-helpers';
+
+describe('first diagnostic navigation', () => {
+  it('prefers object, violation, path, and dependency targets in that order', () => {
+    expect(getFirstDiagnosticTarget({
+      error: { objectId: 'error-object', path: 'objects.error' },
+      firstViolation: { objectId: 'violation-object' },
+    })).toEqual({ kind: 'object', value: 'error-object' });
+
+    expect(getFirstDiagnosticTarget({
+      error: { path: 'objects.error' },
+      firstViolation: { objectId: 'violation-object' },
+    })).toEqual({ kind: 'object', value: 'violation-object' });
+
+    expect(getFirstDiagnosticTarget({
+      error: { path: 'objects.error' },
+    })).toEqual({ kind: 'path', value: 'objects.error' });
+
+    expect(getFirstDiagnosticTarget({
+      error: { dependencyChain: ['first-node', 'second-node'] },
+    })).toEqual({ kind: 'dependency', value: 'first-node' });
+  });
+
+  it('returns no target for a diagnostic without source navigation data', () => {
+    expect(getFirstDiagnosticTarget({ error: { dependencyChain: [] } })).toBeNull();
+  });
+});
 
 describe('inspector helpers', () => {
   it('uses perimeter wording for closed shapes', () => {

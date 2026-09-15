@@ -48,12 +48,11 @@ objects:
   # 3. Speaker Vent Array
   speaker_vents:
     type: repeat
+    place:
+      topRight: ["width - 10", 10]
     item:
       type: rect
       size: [2, 10]
-      place:
-        top: 10
-        right: "width - 10"
       meta: { visible: true, fill: "white", stroke: "#475569" }
     grid:
       rows: 1

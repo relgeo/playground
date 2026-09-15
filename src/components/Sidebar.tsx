@@ -43,6 +43,7 @@ export function Sidebar({
   const sidebarWidth = visible ? width : 0;
   const sidebarClass = `sidebar ${!visible ? 'is-hidden' : ''}`;
   const sidebarRef = useRef<HTMLElement>(null);
+  const backdropRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!visible || !onClose || typeof window === 'undefined') return;
@@ -63,6 +64,9 @@ export function Sidebar({
         'button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])'
       )
     ).filter((element) => !element.hasAttribute('disabled') && element.offsetParent !== null);
+    if (backdropRef.current && !backdropRef.current.hasAttribute('disabled') && backdropRef.current.getClientRects().length > 0) {
+      focusable.push(backdropRef.current);
+    }
     if (focusable.length === 0) return;
 
     const first = focusable[0];
@@ -81,9 +85,11 @@ export function Sidebar({
       {visible && onClose && (
         <button
           type="button"
+          ref={backdropRef}
           className="sidebar-backdrop"
           aria-label="Close sidebar"
           onClick={onClose}
+          onKeyDown={handleDrawerKeyDown}
         />
       )}
       <aside

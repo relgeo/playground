@@ -168,7 +168,13 @@ export function Navbar({
         {viewMode !== 'editor-only' && (
           <>
             <div className="navbar-divider" />
-            <div className="control-group" role="group" aria-label="Preview controls">
+            <div
+              className="control-group preview-global-controls"
+              role="group"
+              aria-label={`Global preview controls for ${currentPreviewLabel}`}
+              aria-controls="relgeo-preview"
+              data-preview-mode={isPrintMode ? 'physical' : 'model'}
+            >
               <span
                 className={`preview-mode-label${isPrintMode ? ' is-physical' : ''}`}
                 title={hasSheets
@@ -204,7 +210,7 @@ export function Navbar({
               <button type="button" onClick={onZoomOut} title="Zoom Out" aria-label="Zoom out">{ICONS.ZoomOut}</button>
               <span className="zoom-readout" aria-live="polite" aria-label={`Zoom ${formatZoomLabel(zoom)}`}>{formatZoomLabel(zoom)}</span>
               <button type="button" onClick={onZoomIn} title="Zoom In" aria-label="Zoom in">{ICONS.ZoomIn}</button>
-              <button type="button" onClick={onRecenter} title="Recenter" aria-label="Fit and recenter preview">{ICONS.Recenter}</button>
+              <button type="button" onClick={onRecenter} title="Fit and recenter active preview" aria-label="Fit and recenter active preview">{ICONS.Recenter}</button>
               <button type="button" onClick={onExport} title="Export SVG" aria-label="Export SVG">{ICONS.Export}</button>
             </div>
           </>

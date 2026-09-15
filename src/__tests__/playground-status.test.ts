@@ -50,6 +50,21 @@ describe('playground status helpers', () => {
     });
   });
 
+  it('keeps resolving explicit when no fallback preview exists yet', () => {
+    expect(
+      getPlaygroundStatusMeta({
+        hasError: false,
+        hasRenderablePreview: false,
+        isResolving: true,
+        isShowingFallback: false,
+      })
+    ).toEqual({
+      tone: 'resolving',
+      label: 'RESOLVING',
+      detail: null,
+    });
+  });
+
   it('returns a recovery hint for stale and first-error states', () => {
     expect(
       getPreviewRecoveryHint({

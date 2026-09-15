@@ -2,8 +2,31 @@
   "name": "relgeo-playground",
   "private": true,
   "version": "0.4.0",
+  "description": "Lightweight browser IDE for authoring, previewing, and inspecting RelGeo DSL documents",
   "type": "module",
+  "homepage": "https://relgeo.github.io/playground/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/relgeo/playground.git"
+  },
+  "bugs": {
+    "url": "https://github.com/relgeo/playground/issues"
+  },
+  "keywords": [
+    "relgeo",
+    "playground",
+    "geometry",
+    "parametric",
+    "dsl",
+    "svg"
+  ],
+  "author": {
+    "name": "Agus Made",
+    "email": "krisnaparta@gmail.com",
+    "url": "https://github.com/agusmade"
+  },
   "license": "MIT",
+  "packageManager": "pnpm@10.33.3",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

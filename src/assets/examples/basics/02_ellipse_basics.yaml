@@ -1,7 +1,7 @@
 version: 0.5
 meta:
   name: 02. Ellipse Basics
-  description: Introduction to the active ellipse primitive: size/radii, rotation, pointAt, area, and holes.
+  description: "Introduction to the active ellipse primitive: size/radii, rotation, pointAt, area, and holes."
 
 scene:
   unit: mm
@@ -74,8 +74,8 @@ objects:
     type: text
     content: "pointAt(plate, 0.25)"
     place:
-      left: top_marker.right + 8
-      centerY: top_marker.centerY
+      left: top_marker.x + 8
+      centerY: top_marker.y
     anchor: centerLeft
     meta:
       fontSize: 4

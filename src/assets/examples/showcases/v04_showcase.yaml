@@ -13,7 +13,6 @@ parameters:
 
 constants:
   small_r: 2
-  grid_offset_x: 0
   grid_offset_y: 115
 
 objects:
@@ -78,9 +77,10 @@ objects:
   # ── 4. Repeat (grid) — lingkaran kecil tersusun rapi menggunakan nested param ──
   dot_grid:
     type: repeat
+    place:
+      topLeft: [0, "grid_offset_y"]
     item:
       type: circle
-      center: ["grid_offset_x + item.x", "grid_offset_y + item.y"]
       radius: "small_r"
       meta:
         fill: "#7c3aed"

@@ -4,12 +4,14 @@ import { DEFAULT_EXAMPLE_KEY, EXAMPLES } from './examples';
 
 // Components
 import { Navbar } from './components/Navbar';
+import { ConfirmDialog } from './components/ConfirmDialog';
 import {
   getEffectiveSheetId,
   getExportFileName,
   getNextPrintModeForSheetSelection,
 } from './view-state';
 import { buildShareUrl, decodeCodeFromHash, encodeCodeToHash } from './share-code';
+import { copyText } from './clipboard';
 import {
   DRAFT_STORAGE_KEY,
   SELECTED_EXAMPLE_STORAGE_KEY,
@@ -49,6 +51,13 @@ const MIN_PREVIEW_ZOOM = 0.01;
 const MAX_PREVIEW_ZOOM = 10000;
 const DEFAULT_STATIC_PREVIEW_STROKE_PX = 2;
 
+interface ConfirmationRequest {
+  title: string;
+  message: string;
+  confirmLabel: string;
+  onConfirm: () => void;
+}
+
 function clampPreviewZoom(value: number): number {
   return Math.min(MAX_PREVIEW_ZOOM, Math.max(MIN_PREVIEW_ZOOM, Math.round(value * 100) / 100));
 }
@@ -77,46 +86,6 @@ function findSourceLineForErrorPath(code: string, path: string): number {
     const trimmedLine = line.trim();
     return candidates.some((candidate) => trimmedLine.startsWith(`${candidate}:`));
   });
-}
-
-async function copyText(text: string): Promise<void> {
-  let modernClipboardError: unknown;
-  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return;
-    } catch (error) {
-      // Some browsers expose the API but reject it for an insecure context or
-      // a denied permission. Continue to the legacy gesture-based fallback.
-      modernClipboardError = error;
-    }
-  }
-
-  if (typeof document === 'undefined' || !document.body || typeof document.execCommand !== 'function') {
-    throw modernClipboardError instanceof Error
-      ? modernClipboardError
-      : new Error('Clipboard access is unavailable.');
-  }
-
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  textarea.setAttribute('readonly', '');
-  textarea.setAttribute('aria-hidden', 'true');
-  textarea.tabIndex = -1;
-  textarea.style.position = 'fixed';
-  textarea.style.opacity = '0';
-  try {
-    document.body.appendChild(textarea);
-    textarea.focus({ preventScroll: true });
-    textarea.select();
-    if (!document.execCommand('copy')) {
-      throw modernClipboardError instanceof Error
-        ? modernClipboardError
-        : new Error('Clipboard access is unavailable.');
-    }
-  } finally {
-    textarea.remove();
-  }
 }
 
 function App() {
@@ -199,6 +168,7 @@ function App() {
   const [isResizingSplit, setIsResizingSplit] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
   const [actionFeedback, setActionFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
+  const [confirmationRequest, setConfirmationRequest] = useState<ConfirmationRequest | null>(null);
   const sidebarReturnFocusRef = useRef<HTMLElement | null>(null);
 
   const openSidebar = useCallback(() => {
@@ -209,6 +179,15 @@ function App() {
   }, []);
 
   const closeSidebar = useCallback(() => {
+    if (
+      typeof document !== 'undefined'
+      && !sidebarReturnFocusRef.current
+      && document.activeElement instanceof HTMLElement
+      && document.activeElement.classList.contains('sidebar-backdrop')
+    ) {
+      sidebarReturnFocusRef.current = document.querySelector<HTMLElement>('.navbar-secondary-actions summary')
+        ?? document.querySelector<HTMLElement>('.example-select');
+    }
     setSidebarVisible(false);
   }, []);
 
@@ -223,6 +202,16 @@ function App() {
   }, [sidebarVisible]);
 
   const requestFitAll = () => setFitAllTrigger((trigger) => trigger + 1);
+
+  const cancelConfirmation = useCallback(() => {
+    setConfirmationRequest(null);
+  }, []);
+
+  const confirmConfirmation = useCallback(() => {
+    const request = confirmationRequest;
+    setConfirmationRequest(null);
+    request?.onConfirm();
+  }, [confirmationRequest]);
 
   const workerRef = useRef<Worker | null>(null);
   const latestRequestIdRef = useRef(0);
@@ -511,10 +500,7 @@ function App() {
     workerRef.current.postMessage(reqPayload);
   }, [deferredCode, paramOverrides, selectedProfile, effectiveSheetId, isPrintMode, showDimensions, showAnnotations, showAnchors, showBoundingBox, showLabels, hiddenRoles]);
 
-  const handleExampleChange = (key: string) => {
-    if (code !== EXAMPLES[selectedExample].code && !window.confirm('Replace the current draft with this example?')) {
-      return;
-    }
+  const applyExampleChange = (key: string) => {
     startTransition(() => {
       setSelectedExample(key);
       setCode(EXAMPLES[key].code);
@@ -531,24 +517,44 @@ function App() {
     });
   };
 
+  const handleExampleChange = (key: string) => {
+    if (code !== EXAMPLES[selectedExample].code) {
+      setConfirmationRequest({
+        title: 'Replace the current draft?',
+        message: 'The selected example will replace the source currently open in the editor.',
+        confirmLabel: 'Use example',
+        onConfirm: () => applyExampleChange(key),
+      });
+      return;
+    }
+    applyExampleChange(key);
+  };
+
   const handleParamChange = (key: string, value: number) => {
     setParamOverrides((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleRestoreLastSuccessful = () => {
-    if (!lastSuccessfulCode || lastSuccessfulCode === code) {
-      setActionFeedback({ tone: 'error', message: 'No earlier successful draft is available to restore.' });
-      return;
-    }
-    if (!window.confirm('Restore the last successful draft and replace the current source?')) {
-      return;
-    }
-    setCode(lastSuccessfulCode);
+  const applyRestoreLastSuccessful = (codeToRestore: string) => {
+    setCode(codeToRestore);
     setSelectedObjectId(null);
     setError(null);
     setErrorPath(null);
     setFullError(null);
     setActionFeedback({ tone: 'success', message: 'Restored the last successful draft.' });
+  };
+
+  const handleRestoreLastSuccessful = () => {
+    const codeToRestore = lastSuccessfulCode;
+    if (!codeToRestore || codeToRestore === code) {
+      setActionFeedback({ tone: 'error', message: 'No earlier successful draft is available to restore.' });
+      return;
+    }
+    setConfirmationRequest({
+      title: 'Restore the last successful draft?',
+      message: 'The current source will be replaced with the last draft that resolved successfully.',
+      confirmLabel: 'Restore draft',
+      onConfirm: () => applyRestoreLastSuccessful(codeToRestore),
+    });
   };
 
   const handleExport = () => {
@@ -600,10 +606,7 @@ function App() {
     }
   };
 
-  const handleReset = () => {
-    if (code !== EXAMPLES[selectedExample].code && !window.confirm('Reset the current draft to the example source?')) {
-      return;
-    }
+  const applyReset = () => {
     startTransition(() => {
       setCode(EXAMPLES[selectedExample].code);
       setParamOverrides({});
@@ -625,12 +628,26 @@ function App() {
     });
   };
 
+  const handleReset = () => {
+    if (code !== EXAMPLES[selectedExample].code) {
+      setConfirmationRequest({
+        title: 'Reset the current draft?',
+        message: 'Your current source will be replaced with the selected example.',
+        confirmLabel: 'Reset draft',
+        onConfirm: applyReset,
+      });
+      return;
+    }
+    applyReset();
+  };
+
   const toggleSidebarPanel = (panel: keyof SidebarPanels) => {
     setSidebarPanels(prev => ({ ...prev, [panel]: !prev[panel] }));
   };
 
   return (
-    <div className="playground-shell">
+    <>
+    <div className="playground-shell" aria-hidden={confirmationRequest ? true : undefined}>
       {viewMode !== 'preview-only' && (
         <a className="skip-link" href="#relgeo-editor">Skip to editor</a>
       )}
@@ -858,6 +875,15 @@ function App() {
         </div>
       </main>
     </div>
+    <ConfirmDialog
+      open={confirmationRequest !== null}
+      title={confirmationRequest?.title ?? ''}
+      message={confirmationRequest?.message ?? ''}
+      confirmLabel={confirmationRequest?.confirmLabel ?? 'Confirm'}
+      onConfirm={confirmConfirmation}
+      onCancel={cancelConfirmation}
+    />
+    </>
   );
 }
 

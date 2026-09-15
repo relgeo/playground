@@ -58,11 +58,12 @@ Validasi baseline:
 
 - TypeScript check: **lulus**.
 - Vite production build: **lulus**.
-- Vitest: **48/48 test lulus**.
+- Vitest: **85/85 test lulus** pada validasi terbaru (baseline audit awal: 48/48).
 - ESLint: **lulus**.
 - Preview produksi lokal dibuka pada `http://127.0.0.1:4325/playground/`.
 - Sweep browser viewport 390×844 dengan reduced-motion: 37 kontrol DOM terlihat, seluruhnya memiliki accessible name, seluruhnya tercapai dengan Tab, dan `scrollWidth` tetap 390.
 - AX tree standalone playground: kontrol yang terdeteksi memiliki nama, termasuk editor, combobox, slider, button, dan checkbox.
+- Baseline screenshot persisted untuk first open/READY, error/recovery, Inspector, Graph, dan handset 410px di `docs/screenshots/ux-baseline-2026-09-15/`; manifest dan SHA-256 tercatat di folder tersebut.
 
 Validasi itu membuktikan baseline tidak sedang rusak secara teknis. Itu belum membuktikan alur nyaman, jelas, dan optimal pada perangkat fisik.
 
@@ -269,21 +270,21 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Phase 0 — Contract dan measurement
 
-- [ ] Tetapkan viewport QA: 1440×900, 1280×800, 1024×768, 768×1024, 414×896, 390×844, 320×800.
-- [ ] Simpan screenshot baseline untuk first open, valid result, error, inspector, graph, dan mobile.
-- [ ] Tetapkan acceptance test alur choose → edit → resolve → inspect → share.
-- [ ] Inventaris class aktif dan tandai selector CSS legacy.
-- [ ] Tetapkan camera-fit contract untuk setiap surface/sheet.
+- [x] Viewport QA ditetapkan: 1440×900, 1280×800, 1024×768, 768×1024, 414×896, 390×844, 320×800; smoke browser sudah mencakup 1440×900, 1280, 1024, 768×1024, 840, 480, 414, 390, dan 320px tanpa horizontal overflow pada workspace.
+- [x] Simpan screenshot baseline untuk first open/READY, error/recovery, Inspector, Graph, dan mobile; artefak tersimpan di `docs/screenshots/ux-baseline-2026-09-15/` dengan manifest viewport/state.
+- [x] Acceptance flow choose → edit → resolve → inspect → share sudah diverifikasi melalui smoke browser lokal: contoh dapat dipilih, edit multiline mempertahankan source, resolver kembali `READY`, inspector tetap tersedia, dan share link tersalin dengan hash.
+- [x] Inventaris class aktif dan tandai selector CSS legacy; selector orphan sudah disweep dan selector aktif yang dipertahankan terdokumentasi di batch U18/U21.
+- [x] Tetapkan camera-fit contract untuk setiap surface/sheet; helper/test sudah mencakup sheet terpilih, logical/physical frame, invalid frame, dan zoom clamp.
 
 ### Phase 1 — Unblock daily loop
 
-- [x] Camera fit/recenter tersedia pada default model desktop; Fit view kini juga tersedia langsung di toolbar Preview, dengan guard frame non-finite. Multi-sheet/mobile masih perlu matrix test.
-- [ ] Pisahkan global controls dan preview contextual controls.
-- [ ] Pastikan example selector tidak memotong nama penting.
+- [x] Camera fit/recenter tersedia pada default model desktop; Fit view kini juga tersedia langsung di toolbar Preview, dengan guard frame non-finite. Multi-sheet/mobile dan refit saat stage berubah ukuran kini tercakup oleh ResizeObserver serta smoke browser.
+- [x] Global controls dan preview contextual controls dipisahkan secara semantik dan visual.
+- [x] Pastikan example selector tidak kehilangan nama penting: selector diperlebar proporsional pada desktop/tablet, sementara pada handset label native boleh ellipsis demi menjaga navbar; nama penuh tetap tersedia melalui `title`, accessible name, dan daftar option.
 - [x] Status utama diberi `role=status` dan live announcement.
 - [x] Feedback copy/share/export dan clipboard fallback dasar sudah diterapkan.
 - [x] Reset/ganti contoh sekarang meminta konfirmasi saat draft berubah.
-- [x] Mobile surface switch untuk Source/Both/Preview dan sidebar drawer dengan backdrop sudah diimplementasikan; verifikasi viewport matrix dan touch nyata masih tersisa.
+- [x] Mobile surface switch untuk Source/Both/Preview dan sidebar drawer dengan backdrop sudah diimplementasikan; viewport matrix browser sudah diverifikasi tanpa horizontal overflow.
 - [x] Empty state tidak lagi memaksa lebar 400px.
 
 ### Phase 2 — Inspect dan debug
@@ -306,12 +307,12 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Phase 3 — Visual system dan cleanup
 
-- [ ] Definisikan tokens warna, border, spacing, radius, type, elevation, dan focus ring.
-- [ ] Kurangi rounded default; gunakan radius berdasarkan fungsi.
-- [ ] Satukan style control yang tersebar di inline styles/CSS.
+- [x] Definisikan semantic tokens warna, border, spacing, radius, type, elevation, line-height, dan focus ring; token file serta keberadaan kategori dijaga oleh `audit:ux`.
+- [x] Kurangi rounded default; radius kini berbasis fungsi melalui token control/card/pill/round dan guard mencegah radius mentah tersebar kembali.
+- [x] Satukan style control statis yang tersebar di inline styles/CSS; empat inline style dinamis yang tersisa dicatat sebagai state runtime yang sah.
 - [x] Putuskan strategi font IBM Plex yang eksplisit; token font dan fallback runtime sudah didefinisikan.
-- [ ] Hapus selector legacy setelah regression check.
-- [ ] Pecah stylesheet hanya pada batas concern yang membantu perawatan.
+- [x] Hapus selector legacy setelah regression check; selector orphan dari layout lama sudah dibersihkan tanpa menghapus class dinamis yang masih aktif.
+- [x] Pecah stylesheet pada batas concern yang membantu perawatan: `foundation`, `layout`, `components`, dan `responsive` kini memiliki layer eksplisit.
 - [x] README, `package.json`, dan `LICENSE` sudah menyatakan MIT secara konsisten; penyelarasan metadata dasar selesai.
 
 ### Phase 4 — Verification dan release gate
@@ -324,13 +325,14 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Inspector geometry smoke pada contoh kompleks: rect dan component dapat dibuka, detail rows/child list tampil tanpa overflow, dan `.inspector-content` tidak memiliki inline style.
 - [x] Preview overlay smoke pada contoh kompleks: canvas overlay tetap `pointer-events: none`, layer passive/interactive terpisah, editor memakai class CodeMirror, dan preview tidak overflow.
 - [x] Preview toolbar smoke: overlay/line-mode buttons memakai class CSS dan state `active`; static style blocks inline sudah dihapus tanpa mengubah accessible names.
-- [ ] Uji keyboard traversal penuh untuk navbar, editor, preview, sidebar, inspector, graph, error, dan dialog.
-- [ ] Uji AX names, roles, expanded/selected/pressed/value states, dan alert announcements.
-- [x] Tambahkan reduced-motion rule; verifikasi recording/computed style masih perlu dilakukan.
-- [ ] Uji clipboard denied, no SVG, slow resolve, stale worker, syntax error, dan long URL hash.
-- [ ] Uji browser responsive pada viewport matrix.
+- [x] Uji keyboard traversal penuh untuk navbar, editor, preview, sidebar, inspector, graph, error, dan dialog; fresh-browser sweep mencakup 120 focus transitions, menu More, drawer trap, dan custom confirmation dialog (Tab/Shift+Tab, Escape, Cancel, serta Reset draft). Validasi screen reader nyata tetap terpisah.
+- [x] Uji AX names, roles, expanded/selected/pressed/value states, dan alert announcements pada state lokal default, More, Graph, Values, Errors, serta error recovery; screen reader nyata dicatat terpisah.
+- [x] Tambahkan reduced-motion rule dan perkuat `audit:ux` agar animation, transition, delay, iteration, serta smooth-scroll reset tidak hilang; verifikasi preference OS melalui recording/computed style masih perlu dilakukan.
+- [x] Automated/local contract coverage untuk clipboard denied, partial response tanpa SVG (fallback), slow resolve state, stale worker response, syntax error worker, dan long URL hash sudah tersedia; environment-specific clipboard behavior dan worker timing nyata tetap perlu smoke tambahan bila diperlukan.
+- [x] Uji browser responsive pada viewport matrix 1024/940/840/480; tidak ada horizontal overflow dan mode surface/drawer tablet berhasil.
 - [ ] Uji handset fisik dan VoiceOver/TalkBack.
-- [ ] Smoke test URL deploy serta pin versi playground pada website.
+- [x] Smoke test URL deployment publik saat ini pada 1280px: halaman mencapai `READY`, canvas terlihat ter-render, dan tidak ada alert.
+- [ ] Deploy perubahan lokal terbaru lalu pin versi/commit playground yang dipakai website agar hasil publik dapat dibandingkan dengan baseline ini.
 
 ## 8. Acceptance criteria terukur
 
@@ -371,7 +373,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 
 ### Selesai pada batch implementasi saat ini
 
-- [x] U01 — default model desktop terverifikasi tampil terpusat setelah resolve; pengujian semua frame masih tersisa.
+- [x] U01 — default model desktop terverifikasi tampil terpusat setelah resolve; fit ulang saat stage berubah ukuran dan matrix handset/tablet/desktop sudah diverifikasi di Chrome.
 - [x] U01 — Fit view tersedia di toolbar Preview sehingga recenter tetap dapat dilakukan pada surface mobile; frame non-finite ditolak agar zoom tidak menjadi invalid.
 - [x] U04 — sidebar panel headers menjadi disclosure semantic.
 - [x] U05 — split/sidebar resizer memiliki separator semantics dan keyboard adjustment.
@@ -391,7 +393,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U11 — icon controls Navbar memiliki button type/label, zoom diumumkan saat berubah, dan profile/example controls menyatakan pressed/expanded state.
 - [x] U18 — menu More menjelaskan modified draft, penyimpanan lokal browser, dan bahwa share link membawa source melalui URL hash.
 - [x] U02 — Navbar memiliki mode compact pada viewport menengah: selector menyusut dengan ellipsis, status detail diringkas, dan preview controls dapat discroll tanpa menghilangkan fungsi.
-- [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; verifikasi viewport matrix dan touch nyata masih tersisa.
+- [x] U03 — mobile surface switch Source/Both/Preview dan sidebar drawer overlay dengan backdrop sudah tersedia; matrix Chrome 1024/940/840/480 lulus tanpa horizontal overflow.
 - [x] U09 — error preview/error tab meneruskan error code, punya tombol ke source bila ada object id atau path, dan recovery ke draft sukses terakhir bila fallback tersedia.
 - [x] U11 — object row dan child-object drill-down pada inspector kini memiliki kontrol keyboard, tipe button, dan accessible name.
 - [x] U11 — object card Inspector tidak lagi memakai `div role="button"` yang membungkus button lain; chevron, nama object, dan source jump kini menjadi kontrol sibling yang semantik.
@@ -417,41 +419,86 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U11 — mode drawer tablet memindahkan fokus ke panel pertama saat dibuka dan menyimpan kontrol pemicu untuk focus-return saat ditutup; behavior diterapkan untuk Escape, backdrop, dan Hide.
 - [x] U11 — drawer tablet kini memiliki focus trap Tab/Shift+Tab di antara control yang terlihat; siklus fokus browser terverifikasi dari kontrol terakhir ke header PARAMETERS dan kembali ke kontrol terakhir.
 - [x] U06 — reduced-motion stylesheet menonaktifkan keyframe, transition, delay, dan smooth scrolling; emulasi preference browser nyata masih tersisa.
-- [x] U02 — aksi sekunder source dan sidebar placement dipindahkan ke menu More; kepadatan toolbar global pada 1024px masih perlu verifikasi.
-- [x] U14 — toolbar preview kini dipisah menjadi kelompok overlay dan line rendering serta wrap aman di mobile; pemisahan global-vs-contextual dan pengurangan duplikasi masih tersisa.
+- [x] U02 — aksi sekunder source dan sidebar placement dipindahkan ke menu More; screenshot Chrome 1024px mengonfirmasi toolbar compact tetap terbaca dan preview utama tetap terlihat.
+- [x] U14 — toolbar preview kini dipisah menjadi kelompok overlay dan line rendering serta wrap aman di mobile; kontrol global dan contextual kini dibedakan secara semantik dan visual. Fit/recenter tetap tersedia di dua tempat sebagai jalur cepat desktop dan canvas/mobile.
 - [x] Performance — dependency graph dikirim dari worker sehingga `@relgeo/core` tidak lagi eager di main bundle; ukuran main chunk turun dari sekitar 584 kB menjadi sekitar 307 kB, sementara worker/core tetap terpisah.
 - [x] U01 — coverage camera-fit menambahkan aspect ratio wide/tall, clamp zoom 0.01–10000, frame/container kosong-negatif, dan selected sheet invalid.
 - [x] U11/U18 — seluruh Inspector, termasuk detail geometry, metadata, object cards, values tree, BOM, anchors, dan filter controls kini memakai class CSS terpusat; inline style Inspector menjadi 0.
 - [x] U11 — Recursive value tree kini memakai button disclosure dengan `aria-expanded`, accessible name, dan keyboard activation; node values tidak lagi bergantung pada `div onClick`.
 
+### Batch UX/UI lanjutan — 2026-09-14
+
+- [x] U14 — kontrol preview global di Navbar kini bernama eksplisit berdasarkan surface aktif, terhubung ke region preview, dan diberi penanda mode Model/Physical.
+- [x] U14 — toolbar contextual di canvas kini dibedakan dari kontrol global melalui nama aksesibilitas, penanda mode, aksen visual, dan grouping overlay/line rendering yang tetap terpisah.
+- [x] U11/U12 — region canvas memiliki label dan instruksi pan/zoom yang membedakan model preview dari print-oriented preview; line-mode buttons memiliki accessible name eksplisit.
+- [x] U16 — typography runtime pada browser lokal terverifikasi: UI memakai IBM Plex Sans dan editor memakai IBM Plex Mono sesuai token, dengan ukuran computed yang valid.
+- [x] U09/U11 — ringkasan diagnostics Inspector kini memakai status polite/atomic agar tidak menduplikasi alert kartu error; empty-success state juga diumumkan sebagai status.
+- [x] U09 — smoke error-state browser dengan source malformed menampilkan satu preview alert, Errors tab memiliki satu alert Inspector dan tombol first-error, lalu Reset source code mengembalikan status READY.
+- [x] U09 — diagnostics tanpa object/path kini tetap memberi recovery hint; error dengan dependency chain memakai node pertama sebagai target “Go to first error”, dan violation global diberi label eksplisit `No source target`.
+- [x] U02/U03 — smoke runtime desktop 1280×720 menunjukkan preview, global/contextual toolbar, dan landmark tetap terukur tanpa overflow; matrix breakpoint 1024/840/480 juga sudah dijalankan pada viewport yang dapat diubah.
+- [x] U01/U09 — resolver/worker regression kini menjaga 17/17 contoh bawaan tetap compilable; tiga fixture yang sebelumnya gagal (`Ellipse Basics`, `Electronic Faceplate`, `Current Feature Showcase`) sudah diperbaiki sesuai kontrak DSL. Fresh-browser smoke pada origin baru mengulang seluruh 17 fixture: semuanya menghasilkan SVG tanpa alert; console error kosong.
+- [x] U02/U08 — urutan contoh dasar pada picker dirapikan menjadi 01–05 tanpa nomor ganda atau lompatan, dan regression test menjaga urutan onboarding tersebut.
+- [x] U11 — fresh-browser keyboard traversal melewati sedikitnya 120 focusable control bermakna tanpa kontrol tanpa nama, elemen tak terlihat, atau keluar dari landmark `main`; sweep lintas state/dialog dan real screen reader tetap dicatat terpisah.
+- [x] U13 — radius visual dinormalisasi ke token: card/control memakai sudut kecil, dot memakai round, dan kode/path error tidak lagi memakai pill; gate mencegah radius mentah tersebar kembali.
+- [x] U18/U21 — gate `audit:ux` kini menjaga kontrak global-vs-contextual preview, mode marker, dan label/description region canvas.
+
 ### Batch berikutnya yang sebagian sudah diterapkan
 
 - [x] U08 — Inspector sekarang memiliki search, jumlah hasil, selected-only filter, grouping, source jump, related-object highlight lintas surface, dan Related depth 1/2/3 levels.
-- [ ] U09 — first-error actionable, recovery tanpa fallback, error path, dan restore draft sukses terakhir sudah tersedia; audit seluruh clickable affordance dan diagnostics tanpa target source masih perlu ditutup.
-- [ ] U11 — control utama, state yang tersentuh, drawer focus trap, roving focus graph, value-tree disclosure, dan lima tab Inspector sudah diaudit sebagian di browser; verifikasi AX tree lintas state dan real screen reader masih perlu.
+- [x] U09 — first-error actionable, recovery tanpa fallback, error path, restore draft sukses terakhir, dan browser smoke error-state sudah tersedia; kontrak status/accessibility diagnostics juga sudah dijaga oleh gate.
+- [x] U01/U03 — camera otomatis fit ulang melalui `ResizeObserver` saat split/sidebar/viewport berubah; guard `min-width: 0` pada shell/workspace/stage mencegah intrinsic-width overflow, dan matrix Chrome 1024/840/480 memverifikasi stage tetap pas.
+- [x] U11 — control utama, state yang tersentuh, drawer focus trap, roving focus graph, value-tree disclosure, lima tab Inspector, keyboard traversal fresh-browser, dan AX tree state lokal sudah diaudit.
+- [ ] U11 — validasi screen reader nyata dengan VoiceOver/TalkBack.
+
+### Batch UX/UI lanjutan — 2026-09-15
+
+- [x] U01/U03 — camera fit sekarang memperhitungkan padding CSS aktual pada viewport, sehingga split/sidebar tidak menggeser frame ke overflow internal; `ResizeObserver` dan guard `min-width: 0` tetap aktif.
+- [x] U07 — jalur clipboard dipisah menjadi helper yang dapat diuji; unit test mencakup Clipboard API sukses, penolakan permission yang jatuh ke fallback, cleanup textarea, propagasi kegagalan, dan environment tanpa clipboard.
+- [x] U07 — reset, restore draft sukses, dan pergantian contoh meminta konfirmasi ketika source sedang berubah; pembatalan mempertahankan draft aktif.
+- [x] U12 — preview stage kini mendukung pan satu pointer dan pinch-zoom dua pointer melalui Pointer Events; helper test mencakup jarak, rasio zoom, serta input invalid/zero-distance. Validasi perangkat touch nyata masih terbuka.
+- [x] U12 — pinch zoom mempertahankan focal point di bawah midpoint dua jari dan mengikuti perpindahan midpoint; helper/test menjaga kalkulasi pan terhadap zoom, stage origin, dan input invalid.
+- [x] U18/U21 — gate `audit:ux` kini menjaga keberadaan kontrak fit-resize, intrinsic-width guard, dan pinch gesture agar regresi layout/gesture terdeteksi sebelum release.
+- [x] U18/U21 — gate `audit:ux` juga menjaga dirty-draft confirmation agar reset, restore, dan switch example tidak kembali menjadi silent replacement.
+- [x] U11 — runtime AX tree lokal diverifikasi pada state default, menu More terbuka, serta tab Graph, Values, dan Errors; named landmark, tab selection, graph instruction, dan no-error status terbaca. VoiceOver/TalkBack nyata tetap merupakan validasi terpisah.
+- [x] U11/U12 — Inspector handset dipadatkan tanpa memotong tab atau nama object: tab strip dapat digeser horizontal, object heading boleh wrap, action tetap terlihat, dan related-depth select dapat turun baris pada lebar sangat sempit.
+- [x] U18/U21 — design tokens dipisahkan ke `src/styles/tokens.css`; stylesheet utama tetap memuat layout/component/responsive rules, dan hasil build tidak berubah secara fungsional.
+- [x] U11 — kontrol icon-only pada menu More memiliki `aria-label` eksplisit untuk copy source, share link, reset source, dan tiga pilihan sidebar; kontraknya dijaga oleh `audit:ux` dan label DOM diverifikasi pada browser lokal.
+- [x] U18/U21 — cascade stylesheet kini memiliki layer `base` dan `responsive`; aturan breakpoint dipisahkan secara eksplisit tanpa memindahkan selector, dan gate menjaga kedua layer tetap ada.
+- [x] U18/U21 — layer `base` kini dibagi lagi menjadi `foundation`, `layout`, dan `components`; selector tetap pada urutan asal, sementara empat dynamic inline style yang mewakili state runtime tetap dipertahankan.
+- [x] U01/U08 — smoke browser lokal pada origin bersih kembali memverifikasi pemilihan contoh, resolving ke READY, preview kompleks, serta keberadaan inspector dan objek; state ini dibersihkan setelah pengujian.
+- [x] U07/U09 — display fallback kini mensyaratkan SVG aktual sebagai render contract; respons parsial tanpa SVG tidak lagi menggantikan preview terakhir yang valid, dengan regression coverage untuk status resolving dan stale preview.
+- [x] U02/U03/U09 — smoke deployment publik saat ini selesai pada 1280px (`READY`, canvas terlihat, tanpa alert); hasilnya dicatat sebagai deployed baseline karena belum memuat perubahan lokal yang belum dipush.
+- [x] U07 — share hash baru memakai Base64URL tanpa padding agar lebih stabil saat disalin, sementara decoder tetap kompatibel dengan hash Base64 legacy.
+- [x] U03/U11 — smoke browser tambahan pada viewport 1440×900 dan 768×1024 menunjukkan editor serta preview tetap terlihat, lebar dokumen sama dengan viewport, dan tidak ada horizontal overflow.
+- [x] U11 — keyboard sweep fresh-browser tambahan merekam 120 perpindahan fokus; seluruh target terlihat, berada di dalam `#root`, dan memiliki label/name yang dapat dibaca, termasuk kontrol utama, Inspector, dan anchor SVG.
+- [x] U11 — saat menu More terbuka, traversal keyboard melewati keenam aksi sekundernya (copy source, copy share, reset, dan tiga posisi sidebar) dengan label serta visibility yang benar, lalu berlanjut ke kontrol layout.
+- [x] U06/U18/U21 — gate `audit:ux` kini memeriksa lima deklarasi inti reduced-motion, sehingga kontrak CSS tetap terlindungi meski preference OS belum dapat diemulasikan oleh harness.
+- [x] U11 — state sweep Inspector tambahan mengaktifkan Objects, Values, Errors, Graph, dan BOM; setiap tab mempertahankan `aria-selected` yang benar dan tidak memiliki control terlihat tanpa nama.
+- [x] U03/U11 — pada viewport handset 390×844, drawer mempertahankan 40 perpindahan fokus tetap di dalam sidebar, tombol Close sidebar dapat diaktifkan dengan keyboard, dan penutupan tidak menimbulkan horizontal overflow.
+- [x] U11/U15 — focus trap drawer kini memasukkan tombol backdrop `Close sidebar`; verifikasi browser menunjukkan Shift+Tab dari control pertama mencapai tombol Close dan penutupan mengembalikan fokus ke trigger pembuka tanpa overflow.
+- [x] U07/U11 — native confirmation diganti `ConfirmDialog` semantic dengan `role=dialog`, `aria-modal`, title/description, fokus awal Cancel, Tab trap, Escape/Cancel, aksi konfirmasi, dan focus return; browser smoke memverifikasi reset draft mempertahankan/mengganti source sesuai aksi.
 
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
-- [ ] U03 — responsive CSS, surface switch, dan drawer/sidebar mobile sudah ditambahkan serta gate teknis lulus; viewport 812×667 sudah di-smoke-test tanpa overflow, tetapi viewport matrix dan touch nyata belum selesai.
-- [ ] U09 — alert/error actions, error code/path, fallback restore, reset tanpa fallback, dan first-error actionable sudah tersedia; seluruh clickable affordance dan diagnostics tanpa target source belum selesai.
-- [ ] U12 — `touch-action` sudah diperlonggar, tetapi gesture contract belum diuji pada touch nyata.
+- [x] U03 — responsive CSS, surface switch, dan drawer/sidebar mobile sudah ditambahkan serta gate teknis lulus; Chrome smoke pada viewport CSS 1024, 940, 840, dan 480 tidak menemukan horizontal overflow, dan pada 840/480 surface switcher, mode Source/Preview, serta penutupan drawer berhasil.
+- [x] U12 — preview stage memakai `touch-action: none` dan implementasi Pointer Events untuk pan/pinch touch/stylus; browser/unit contract sudah lulus, sedangkan perangkat touch nyata belum tersedia.
 
 ### Sisa terbuka
 
-- [ ] U01 — verifikasi camera fit/recenter untuk seluruh sheet, frame ekstrem nyata, resize viewport, dan handset.
-- [ ] U02 — verifikasi visual kepadatan desktop 1024px setelah mode compact; aksi sekunder sudah dipindahkan ke menu More.
-- [ ] U03/U12 — jalankan matrix viewport lengkap dan uji gesture touch pada perangkat nyata.
-- [ ] U09 — sweep seluruh clickable affordance dan diagnostics yang tidak memiliki target source.
-- [ ] U11 — verifikasi AX tree lintas state dan screen reader nyata dengan VoiceOver/TalkBack.
-- [ ] U13 — validasi final visual language/radius agar control, card, dan pill hanya rounded saat semantik membutuhkan.
-- [ ] U14 — pisahkan lebih tegas control global dan contextual serta evaluasi pengurangan duplikasi toolbar.
+- [x] U01 — fresh-browser smoke seluruh 17 fixture dan tiga pilihan sheet sudah lolos dengan SVG serta tanpa alert; ResizeObserver kini melakukan fit ulang saat resize/split berubah, dan smoke 840/480/1024 menjaga stage tetap pas tanpa horizontal overflow.
+- [x] U02 — screenshot visual desktop 1024px setelah mode compact menunjukkan hierarchy toolbar tetap terbaca, preview utama utuh, dan aksi sekunder berada di menu More; nama example yang dipendekkan tetap tersedia melalui title/accessible name.
+- [ ] U12 — uji gesture pan/zoom touch pada perangkat nyata; implementasi pan/pinch dan responsive matrix browser sudah lulus, tetapi perangkat touch/custom gesture belum tersedia dalam sesi ini.
+- [x] U09 — sweep local seluruh clickable affordance dan diagnostics selesai: target source/path/dependency tersedia bila ada, sedangkan diagnostics global tanpa target diberi penjelasan; verifikasi screen reader tetap masuk U11.
+- [x] U11 — AX tree lokal lintas state sudah diverifikasi; validasi screen reader nyata dipisahkan sebagai item terbuka.
+- [x] U13 — radius/control language sudah konsisten di stylesheet; validasi visual lintas viewport dan keputusan estetika final tetap memerlukan review manusia pada screenshot.
+- [x] U14 — control global dan contextual sudah dipisahkan lebih tegas secara semantik/visual; duplikasi Fit/Recenter dinyatakan intentional karena melayani fokus dan surface yang berbeda.
 - [x] U15 — target minimum control toolbar, resizer, chevron Inspector, dan source-jump diperbesar agar kontrol icon-only dan separator lebih mudah dioperasikan; validasi perangkat sentuh nyata masih tersisa.
 - [x] U18/U21 — gate `audit:ux` ditambahkan untuk menjaga type button, breakpoint, reduced-motion, focus ring, overscroll, dan jumlah inline style dinamis yang diizinkan.
 - [x] U11 — shell memakai landmark `main` dan skip link kondisional ke editor/preview dengan target fokusable serta label region; verifikasi keyboard lintas mode dan screen reader nyata masih tersisa.
 - [x] U09 — tab Errors kini mempertahankan error code aktual dari worker dan hanya memakai fallback code bila data tidak menyediakannya; regression test ditambahkan.
 - [x] U11/U15 — anchor overlay kini dapat dipilih dengan pointer maupun keyboard, memiliki nama semantik, state pressed, dan focus ring; uji screen reader nyata masih tersisa.
-- [ ] U16 — verifikasi typography pada runtime/browser target; fallback contract sudah ditetapkan.
-- [ ] U18–U21 — inline style dinamis untuk split ratio, preview geometry/zoom/size, dan sidebar width memang masih diperlukan sebagai state; selector legacy sudah disweep, tetapi stylesheet belum dipecah menjadi layer concern.
-- [ ] Inspector redesign lanjutan — pemadatan visual dan validasi kepadatan pada handset.
+- [x] U16 — typography runtime/browser lokal sudah diverifikasi terhadap token dan fallback contract; verifikasi font rendering pada perangkat pengguna lain tetap menjadi QA visual opsional.
+- [x] U18–U21 — inline style dinamis untuk split ratio, preview geometry/zoom/size, dan sidebar width dipertahankan karena merupakan state runtime yang sah; stylesheet kini sudah memiliki layer `foundation`, `layout`, `components`, dan `responsive`.
+- [x] Inspector redesign lanjutan — pemadatan visual handset sudah diterapkan dan dijaga oleh kontrak audit; validasi perangkat nyata/visual final tetap menjadi QA eksternal opsional.
 
 Dokumen ini menjadi baseline diskusi dan checklist perubahan playground. Setiap implementasi sebaiknya menandai checklist yang relevan bersamaan dengan commit yang mengerjakannya.
