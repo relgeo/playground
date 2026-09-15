@@ -549,6 +549,15 @@ Item berikut tidak dapat dibuktikan hanya melalui unit test atau browser emulati
 
 Semua item lain pada U01–U21 sudah memiliki implementasi lokal dan bukti browser/unit yang memadai untuk baseline ini. Review estetika lintas perangkat, pengujian font pada perangkat lain, dan zoom/minimap graph dicatat sebagai peningkatan opsional, bukan blocker release.
 
+### Handoff release yang sudah siap
+
+`push --dry-run` lulus untuk ketiga repository. Push aktual harus dilakukan berurutan agar pointer submodule dan checkout Pages selalu merujuk commit yang tersedia:
+
+1. [ ] Push `relgeo/playground` pada commit terbaru yang memuat audit handoff ini.
+2. [ ] Push `relgeo/relgeo.github.io` pada commit `c998bb9`; workflow-nya mem-pin baseline fungsional Playground `09ac1cb`.
+3. [ ] Push `relgeo/workspace` pada commit terbaru setelah pointer kedua repository anak tersedia.
+4. [ ] Tunggu workflow Pages selesai, lalu jalankan smoke test URL publik.
+
 ### Bukti penutupan gate yang harus dicatat
 
 - **Touch fisik:** catat model/OS/viewport, hasil pan satu jari, pinch-zoom, scroll di luar canvas, pembukaan drawer, target sentuh, dan tidak adanya halaman yang terjebak pada `touch-action: none`.
