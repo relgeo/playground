@@ -78,7 +78,7 @@ Validasi itu membuktikan baseline lokal tidak sedang rusak secara teknis. Itu be
 - [x] Screenshot lokal adalah spot check yang sudah dipersistenkan, bukan usability study.
 - [x] Camera dan responsive layout sudah diuji ulang setelah perubahan lokal; review visual lintas perangkat tetap menjadi gate eksternal/opsional.
 - [x] Website publik mengonsumsi baseline Playground `09ac1cb` melalui workflow yang dipin dan sudah ter-deploy.
-- [ ] Endpoint publik `/sitemap.xml` belum dapat dibaca langsung oleh browser harness karena download XML diblokir `ERR_BLOCKED_BY_CLIENT`; Pages artifact assertion lokal tetap lulus.
+- [x] Endpoint publik `/sitemap.xml`, `favicon.svg`, dan `apple-touch-icon.png` diverifikasi oleh smoke-test job workflow run #18; browser harness tetap tidak dapat menampilkan XML secara langsung karena `ERR_BLOCKED_BY_CLIENT`.
 
 ## 4. Peta alur pengguna
 
@@ -371,7 +371,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Playground implementation baseline `09ac1cb` sudah di-commit dan di-push ke `relgeo/playground`.
 - [x] Pin workflow Pages sudah dipush ke website pada commit `5d103b2`, tetap merujuk commit Playground `09ac1cb`; website `build`, `astro check`, built-output assertions, dan Pages artifact assertions lulus setelah artifact Playground dimasukkan.
 - [x] Dokumentasi Getting Started website EN/ID tidak lagi mengklaim Playground belum memiliki URL publik; keduanya kini menaut ke `/playground/` dan build/output assertions tetap lulus.
-- [x] Commit/push workflow selesai; Pages run #18 sukses dan smoke publik pascadeploy lulus pada route HTML utama. Verifikasi independen `/sitemap.xml` masih terbuka karena keterbatasan browser harness.
+- [x] Commit/push workflow selesai; Pages run #18 sukses dan smoke publik pascadeploy lulus untuk route HTML utama serta asset/sitemap yang diuji oleh `scripts/smoke-public-site.mjs`.
 - [x] Warning workflow dirapikan: action resmi dipindah ke runtime Node 24 dan input checkout `sparse-checkout-cone-mode` digunakan; run #18 tidak lagi memiliki annotation warning.
 
 ## 8. Acceptance criteria terukur
@@ -550,7 +550,7 @@ Item berikut tidak dapat dibuktikan hanya melalui unit test atau browser emulati
 - [x] **Persiapan deployment website:** workflow lokal `relgeo.github.io` sudah mem-pin Playground ke `09ac1cb`; build website dan Pages artifact assertions lulus.
 - [x] **Konsistensi dokumentasi publik:** Getting Started EN/ID sudah menunjuk ke hosted Playground `/playground/`.
 - [x] **Deployment website:** website commit `5d103b2` sudah dipush; workflow run #18 sukses dan hosted route HTML utama sudah di-smoke-test setelah deploy.
-- [ ] **Sitemap publik:** `/sitemap.xml` belum diverifikasi langsung oleh browser harness karena `ERR_BLOCKED_BY_CLIENT`; artifact assertion lokal sudah memverifikasi file sitemap pada hasil build.
+- [x] **Sitemap publik:** `/sitemap.xml` lulus pada smoke-test workflow run #18 bersama `favicon.svg` dan `apple-touch-icon.png`; browser harness hanya tidak dapat merender/download XML secara langsung.
 
 Semua item lain pada U01–U21 sudah memiliki implementasi lokal dan bukti browser/unit yang memadai untuk baseline ini. Review estetika lintas perangkat, pengujian font pada perangkat lain, dan zoom/minimap graph dicatat sebagai peningkatan opsional, bukan blocker release.
 
@@ -567,6 +567,6 @@ Semua item lain pada U01–U21 sudah memiliki implementasi lokal dan bukti brows
 
 - **Touch fisik:** catat model/OS/viewport, hasil pan satu jari, pinch-zoom, scroll di luar canvas, pembukaan drawer, target sentuh, dan tidak adanya halaman yang terjebak pada `touch-action: none`.
 - **Screen reader:** catat platform/reader, urutan landmark, pengumuman status READY/error, operasi drawer dan dialog, selected state tab/graph, serta jalur kembali ke source.
-- **Deployment:** website `5d103b2`, run [#18](https://github.com/relgeo/relgeo.github.io/actions/runs/34931665545), Playground checkout `09ac1cb`, URL Pages `https://relgeo.github.io/`, serta smoke lulus untuk `/`, `/en/`, `/id/`, `/docs/`, `/docs/language-spec/`, dan `/playground/`. `/sitemap.xml` ter-cover oleh artifact assertion lokal, tetapi belum dapat dibaca langsung oleh browser harness karena `ERR_BLOCKED_BY_CLIENT`.
+- **Deployment:** website `5d103b2`, run [#18](https://github.com/relgeo/relgeo.github.io/actions/runs/34931665545), Playground checkout `09ac1cb`, URL Pages `https://relgeo.github.io/`, serta smoke lulus untuk `/`, `/en/`, `/id/`, `/docs/`, `/docs/language-spec/`, `/playground/`, `/sitemap.xml`, `/favicon.svg`, dan `/apple-touch-icon.png`. Browser harness tidak dapat menampilkan XML secara langsung karena `ERR_BLOCKED_BY_CLIENT`, tetapi fetch workflow lulus.
 
 Dokumen ini menjadi baseline diskusi dan checklist perubahan playground. Setiap implementasi sebaiknya menandai checklist yang relevan bersamaan dengan commit yang mengerjakannya.
