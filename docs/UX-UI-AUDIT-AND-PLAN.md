@@ -11,7 +11,7 @@ Playground memiliki fondasi teknis yang sehat dan kemampuan yang cukup lengkap: 
 
 > pilih contoh → baca/edit source → resolve → lihat preview → inspeksi hasil → share/export
 
-Audit awal menemukan bahwa masalah utamanya bukan kekurangan fitur, melainkan kepadatan dan prioritas. Banyak kemampuan ditempatkan sekaligus dalam satu workbench, sementara tugas utama pengguna belum cukup dominan. Sebagian besar temuan tersebut kini sudah ditangani pada baseline `09ac1cb` melalui pemisahan toolbar, camera-fit, responsive surface switch, semantic controls, inspector/graph navigation, feedback state, dan CSS token/layer cleanup. Dampak yang masih relevan terutama berasal dari validasi yang membutuhkan perangkat atau deployment eksternal.
+Audit awal menemukan bahwa masalah utamanya bukan kekurangan fitur, melainkan kepadatan dan prioritas. Banyak kemampuan ditempatkan sekaligus dalam satu workbench, sementara tugas utama pengguna belum cukup dominan. Sebagian besar temuan tersebut kini sudah ditangani pada baseline `09ac1cb` melalui pemisahan toolbar, camera-fit, responsive surface switch, semantic controls, inspector/graph navigation, feedback state, dan CSS token/layer cleanup. Dampak yang masih relevan terutama berasal dari validasi perangkat fisik dan assistive technology eksternal.
 
 Temuan baseline yang menjadi alasan pekerjaan ini:
 
@@ -274,7 +274,7 @@ Bagian temuan di atas mempertahankan observasi audit awal agar keputusan desain 
 | U20 | [x] Selesai pada persistence/share contract | Strategi hash sangat panjang masih dapat dikembangkan jika kebutuhan meningkat |
 | U21 | [x] Selesai untuk scope filter/focus/legend | Zoom/minimap belum menjadi kebutuhan release saat ini |
 
-Dengan demikian, tidak ada lagi temuan U01–U21 yang menunggu implementasi lokal wajib. Sisa pekerjaan berada pada validasi eksternal dan deployment website.
+Dengan demikian, tidak ada lagi temuan U01–U21 yang menunggu implementasi lokal wajib. Sisa pekerjaan hanya validasi eksternal pada perangkat fisik dan assistive technology; deployment website sudah ditutup oleh workflow Pages dan smoke test publik.
 
 ## 6. Arah UX target
 
@@ -507,7 +507,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] U18/U21 — layer `base` kini dibagi lagi menjadi `foundation`, `layout`, dan `components`; selector tetap pada urutan asal, sementara empat dynamic inline style yang mewakili state runtime tetap dipertahankan.
 - [x] U01/U08 — smoke browser lokal pada origin bersih kembali memverifikasi pemilihan contoh, resolving ke READY, preview kompleks, serta keberadaan inspector dan objek; state ini dibersihkan setelah pengujian.
 - [x] U07/U09 — display fallback kini mensyaratkan SVG aktual sebagai render contract; respons parsial tanpa SVG tidak lagi menggantikan preview terakhir yang valid, dengan regression coverage untuk status resolving dan stale preview.
-- [x] U02/U03/U09 — smoke deployment publik saat ini selesai pada 1280px (`READY`, canvas terlihat, tanpa alert); hasilnya dicatat sebagai deployed baseline karena belum memuat perubahan lokal yang belum dipush.
+- [x] U02/U03/U09 — smoke deployment publik pascadeploy run #18 selesai pada 1280px (`READY`, canvas terlihat, tanpa alert); baseline publik dan baseline lokal sudah selaras untuk scope release ini.
 - [x] U07 — share hash baru memakai Base64URL tanpa padding agar lebih stabil saat disalin, sementara decoder tetap kompatibel dengan hash Base64 legacy.
 - [x] U03/U11 — smoke browser tambahan pada viewport 1440×900 dan 768×1024 menunjukkan editor serta preview tetap terlihat, lebar dokumen sama dengan viewport, dan tidak ada horizontal overflow.
 - [x] U11 — keyboard sweep fresh-browser tambahan merekam 120 perpindahan fokus; seluruh target terlihat, berada di dalam `#root`, dan memiliki label/name yang dapat dibaca, termasuk kontrol utama, Inspector, dan anchor SVG.
