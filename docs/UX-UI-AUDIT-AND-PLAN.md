@@ -1,7 +1,7 @@
 # RelGeo Playground — UX/UI Audit & Improvement Plan
 
-**Status:** implementasi lokal, browser verification, workflow Pages, dan smoke URL publik selesai; gate perangkat eksternal masih terbuka
-**Tanggal audit terakhir:** 2026-09-15
+**Status:** implementasi lokal, browser verification termasuk mobile-device emulation, workflow Pages, dan smoke URL publik selesai; gate perangkat eksternal masih terbuka
+**Tanggal audit terakhir:** 2026-09-16
 **Implementation baseline:** `09ac1cb` (`main`)
 **Ruang lingkup:** browser IDE playground: editor, resolver, preview, inspector, graph, sidebar, responsive behavior, accessibility, share, dan export.
 
@@ -366,6 +366,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Tambahkan reduced-motion rule dan perkuat `audit:ux` agar animation, transition, delay, iteration, serta smooth-scroll reset tidak hilang; verifikasi preference OS melalui recording/computed style masih perlu dilakukan.
 - [x] Automated/local contract coverage untuk clipboard denied, partial response tanpa SVG (fallback), slow resolve state, stale worker response, syntax error worker, dan long URL hash sudah tersedia; environment-specific clipboard behavior dan worker timing nyata tetap perlu smoke tambahan bila diperlukan.
 - [x] Uji browser responsive pada viewport matrix 1024/940/840/480; tidak ada horizontal overflow dan mode surface/drawer tablet berhasil.
+- [x] Dedicated Playwright mobile-device emulation memakai profil iPhone 13 pada Chromium dengan touch capability, viewport 390px, dan `touchscreen.tap` untuk perpindahan Source/Preview; ini memperkuat automation evidence, tetapi bukan pengganti uji handset fisik.
 - [ ] Uji handset fisik dan VoiceOver/TalkBack.
 - [x] Smoke test URL deployment publik saat ini pada 1280px: halaman mencapai `READY`, canvas terlihat ter-render, dan tidak ada alert.
 - [x] Playground implementation baseline `09ac1cb` sudah di-commit dan di-push ke `relgeo/playground`.
@@ -521,7 +522,8 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 ### Sebagian diterapkan, masih perlu verifikasi atau penyempurnaan
 
 - [x] U03 — responsive CSS, surface switch, dan drawer/sidebar mobile sudah ditambahkan serta gate teknis lulus; Chrome smoke pada viewport CSS 1024, 940, 840, dan 480 tidak menemukan horizontal overflow, dan pada 840/480 surface switcher, mode Source/Preview, serta penutupan drawer berhasil.
-- [x] U12 — preview stage memakai `touch-action: none` dan implementasi Pointer Events untuk pan/pinch touch/stylus; browser/unit contract sudah lulus, sedangkan perangkat touch nyata belum tersedia.
+- [x] U03/U05 — suite E2E mobile memakai profil iPhone 13 pada Chromium dan touchscreen tap; touch capability, viewport 390px, serta perpindahan surface Source/Preview terverifikasi otomatis. Uji target sentuh pada handset fisik tetap terbuka.
+- [x] U12 — preview stage memakai `touch-action: none` dan implementasi Pointer Events untuk pan/pinch touch/stylus; browser/unit contract dan mobile-device emulation sudah lulus, sedangkan gesture pada perangkat touch nyata belum tersedia.
 
 ### Rekap verifikasi lokal dan sisa terbuka
 
@@ -530,6 +532,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [ ] U12 — uji gesture pan/zoom touch pada perangkat nyata; implementasi pan/pinch dan responsive matrix browser sudah lulus, tetapi perangkat touch/custom gesture belum tersedia dalam sesi ini.
 - [x] U09 — sweep local seluruh clickable affordance dan diagnostics selesai: target source/path/dependency tersedia bila ada, sedangkan diagnostics global tanpa target diberi penjelasan; verifikasi screen reader tetap masuk U11.
 - [x] U11 — AX tree lokal lintas state sudah diverifikasi; validasi screen reader nyata dipisahkan sebagai item terbuka.
+- [x] E2E mobile — `e2e/mobile-playground.spec.ts` lulus bersama suite desktop (`pnpm run test:e2e`: **2/2**); browser emulation memverifikasi tap surface switcher, bukan validasi handset/assistive technology nyata.
 - [x] U13 — radius/control language sudah konsisten di stylesheet; validasi visual lintas viewport dan keputusan estetika final tetap memerlukan review manusia pada screenshot.
 - [x] U14 — control global dan contextual sudah dipisahkan lebih tegas secara semantik/visual; duplikasi Fit/Recenter dinyatakan intentional karena melayani fokus dan surface yang berbeda.
 - [x] U15 — target minimum control toolbar, resizer, chevron Inspector, dan source-jump diperbesar agar kontrol icon-only dan separator lebih mudah dioperasikan; validasi perangkat sentuh nyata masih tersisa.

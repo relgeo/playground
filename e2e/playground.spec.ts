@@ -40,19 +40,3 @@ test('resolves source, keeps preview visible, and exposes runtime diagnostics', 
   await expect(page.getByRole('tab', { name: 'Errors' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByText('Points are not aligned. Distance: 14.1421', { exact: true })).toBeVisible();
 });
-
-test('mobile surface switcher can move between source and preview', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await openPlayground(page);
-
-  const mobileSurfaces = page.getByRole('group', { name: 'Mobile workspace surface' });
-  await expect(mobileSurfaces).toBeVisible();
-
-  await mobileSurfaces.getByRole('button', { name: 'Source' }).click();
-  await expect(page.getByRole('textbox', { name: 'RelGeo DSL source editor' })).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Model Preview canvas' })).toBeHidden();
-
-  await mobileSurfaces.getByRole('button', { name: 'Preview' }).click();
-  await expect(page.getByRole('region', { name: 'Model Preview canvas' })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: 'RelGeo DSL source editor' })).toBeHidden();
-});
