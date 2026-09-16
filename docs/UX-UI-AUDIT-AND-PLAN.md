@@ -2,7 +2,7 @@
 
 **Status:** implementasi lokal, browser verification termasuk mobile-device emulation, workflow Pages, dan smoke URL publik selesai; gate perangkat eksternal masih terbuka
 **Tanggal audit terakhir:** 2026-09-16
-**Implementation baseline:** `09ac1cb` (`main`)
+**Implementation baseline:** `e070cd9` (`main`)
 **Ruang lingkup:** browser IDE playground: editor, resolver, preview, inspector, graph, sidebar, responsive behavior, accessibility, share, dan export.
 
 ## 1. Ringkasan eksekutif
@@ -11,7 +11,7 @@ Playground memiliki fondasi teknis yang sehat dan kemampuan yang cukup lengkap: 
 
 > pilih contoh → baca/edit source → resolve → lihat preview → inspeksi hasil → share/export
 
-Audit awal menemukan bahwa masalah utamanya bukan kekurangan fitur, melainkan kepadatan dan prioritas. Banyak kemampuan ditempatkan sekaligus dalam satu workbench, sementara tugas utama pengguna belum cukup dominan. Sebagian besar temuan tersebut kini sudah ditangani pada baseline `09ac1cb` melalui pemisahan toolbar, camera-fit, responsive surface switch, semantic controls, inspector/graph navigation, feedback state, dan CSS token/layer cleanup. Dampak yang masih relevan terutama berasal dari validasi perangkat fisik dan assistive technology eksternal.
+Audit awal menemukan bahwa masalah utamanya bukan kekurangan fitur, melainkan kepadatan dan prioritas. Banyak kemampuan ditempatkan sekaligus dalam satu workbench, sementara tugas utama pengguna belum cukup dominan. Sebagian besar temuan tersebut kini sudah ditangani pada baseline `e070cd9` melalui pemisahan toolbar, camera-fit, responsive surface switch, semantic controls, inspector/graph navigation, feedback state, CSS token/layer cleanup, dan mobile-device emulation. Dampak yang masih relevan terutama berasal dari validasi perangkat fisik dan assistive technology eksternal.
 
 Temuan baseline yang menjadi alasan pekerjaan ini:
 
@@ -248,7 +248,7 @@ Graph memiliki overflow tetapi belum memiliki legend, search, zoom/minimap, atau
 
 ## 5a. Status temuan pada implementation baseline
 
-Bagian temuan di atas mempertahankan observasi audit awal agar keputusan desain tetap dapat ditelusuri. Status aktualnya pada `09ac1cb` adalah:
+Bagian temuan di atas mempertahankan observasi audit awal agar keputusan desain tetap dapat ditelusuri. Status aktualnya pada `e070cd9` adalah:
 
 | ID | Status lokal | Sisa atau batasan |
 | --- | --- | --- |
@@ -369,7 +369,7 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Dedicated Playwright mobile-device emulation memakai profil iPhone 13 pada Chromium dengan touch capability, viewport 390px, dan `touchscreen.tap` untuk perpindahan Source/Preview; ini memperkuat automation evidence, tetapi bukan pengganti uji handset fisik.
 - [ ] Uji handset fisik dan VoiceOver/TalkBack.
 - [x] Smoke test URL deployment publik saat ini pada 1280px: halaman mencapai `READY`, canvas terlihat ter-render, dan tidak ada alert.
-- [x] Playground implementation baseline `09ac1cb` sudah di-commit dan di-push ke `relgeo/playground`.
+- [x] Playground implementation baseline `e070cd9` sudah di-commit dan di-push ke `relgeo/playground`.
 - [x] Pin workflow Pages sudah dipush ke website pada commit `5d103b2`, tetap merujuk commit Playground `09ac1cb`; website `build`, `astro check`, built-output assertions, dan Pages artifact assertions lulus setelah artifact Playground dimasukkan.
 - [x] Dokumentasi Getting Started website EN/ID tidak lagi mengklaim Playground belum memiliki URL publik; keduanya kini menaut ke `/playground/` dan build/output assertions tetap lulus.
 - [x] Commit/push workflow selesai; Pages run #19 sukses dan smoke publik pascadeploy lulus untuk route HTML utama serta asset/sitemap yang diuji oleh `scripts/smoke-public-site.mjs`.
@@ -561,7 +561,7 @@ Semua item lain pada U01–U21 sudah memiliki implementasi lokal dan bukti brows
 
 `push --dry-run` lulus untuk ketiga repository. Push aktual sudah dilakukan berurutan agar pointer submodule dan checkout Pages merujuk commit yang tersedia:
 
-1. [x] Push `relgeo/playground` pada commit `0860145` yang memuat audit handoff.
+1. [x] Push `relgeo/playground` pada commit `e070cd9` yang memuat mobile-device emulation dan audit handoff terbaru.
 2. [x] Push `relgeo/relgeo.github.io` pada commit `c998bb9`, lalu workflow cleanup pada `5d103b2`; keduanya mem-pin baseline fungsional Playground `09ac1cb`.
 3. [x] Push `relgeo/workspace` pada commit `dcdcd2d`, lalu sinkronisasi workflow terbaru pada `2c05f16`.
 4. [x] Workflow Pages run #19 selesai sukses dan smoke URL publik pascadeploy lulus untuk route HTML utama.
