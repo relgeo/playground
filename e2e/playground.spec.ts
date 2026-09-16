@@ -21,7 +21,7 @@ constraints:
 `;
 
 async function openPlayground(page: Page) {
-  await page.goto('/');
+  await page.goto('./');
   await expect(page.getByRole('textbox', { name: 'RelGeo DSL source editor' })).toBeVisible();
   await expect(page.getByRole('status', { name: /^READY/ })).toBeVisible();
 }

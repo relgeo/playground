@@ -36,6 +36,14 @@ pnpm test:e2e
 
 The smoke covers the source-to-preview diagnostic flow and the mobile `Both`, `Source`, and `Preview` surface switcher. The workspace integration gate installs Chromium automatically when it runs this check in CI.
 
+To run the same browser smoke against a deployed Playground instead of starting a local preview server:
+
+```bash
+PLAYWRIGHT_BASE_URL=https://relgeo.github.io/playground/ pnpm test:e2e
+```
+
+When `PLAYWRIGHT_BASE_URL` is set, Playwright does not start the local `webServer`; this is intended for read-only verification of a deployment.
+
 Pada repo aktif saat ini, Playground ini ditujukan untuk mengedit dan memeriksa dokumen `RelGeo DSL v0.5`.
 
 Status packaging saat ini:
