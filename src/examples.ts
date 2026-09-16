@@ -3,19 +3,19 @@ import ellipseBasicsCode from './assets/examples/basics/02_ellipse_basics.yaml?r
 import pathJoinCode from './assets/examples/basics/03_path_join.yaml?raw';
 import splitCode from './assets/examples/basics/04_split.yaml?raw';
 import booleanCsgCode from './assets/examples/basics/v04_boolean_csg.yaml?raw';
-import architecturalPlanCode from './assets/examples/architecture/v04_architectural_plan.yaml?raw';
-import electronicFaceplateCode from './assets/examples/mechanical/v04_electronic_faceplate.yaml?raw';
-import sheetsCode from './assets/examples/mechanical/v04_technical_drawing_sheets.yaml?raw';
+import architecturalPlanCode from './assets/examples/architecture/v05_architectural_plan.yaml?raw';
+import electronicFaceplateCode from './assets/examples/mechanical/v05_electronic_faceplate.yaml?raw';
+import sheetsCode from './assets/examples/mechanical/v05_technical_drawing_sheets.yaml?raw';
 import bodiceBlockCode from './assets/examples/fashion/bodice_block.yaml?raw';
 
 import v02ShowcaseCode from './assets/examples/showcases/v02_showcase.yaml?raw';
 import v03ShowcaseCode from './assets/examples/showcases/v03_showcase.yaml?raw';
 import v03HolesCode from './assets/examples/showcases/v03_holes.yaml?raw';
-import v04ShowcaseCode from './assets/examples/showcases/v04_showcase.yaml?raw';
+import v05ShowcaseCode from './assets/examples/showcases/v05_showcase.yaml?raw';
 
-import v04FlangeCode from './assets/examples/mechanical/v04_flange.yaml?raw';
-import v04RepeatAlongPathCode from './assets/examples/mechanical/v04_repeat_along_path.yaml?raw';
-import v04FullAssemblyCode from './assets/examples/mechanical/v04_full_assembly.yaml?raw';
+import v05FlangeCode from './assets/examples/mechanical/v05_flange.yaml?raw';
+import v05RepeatAlongPathCode from './assets/examples/mechanical/v05_repeat_along_path.yaml?raw';
+import v05FullAssemblyCode from './assets/examples/mechanical/v05_full_assembly.yaml?raw';
 import v05JoinedBracketDetailCode from './assets/examples/mechanical/v05_joined_bracket_detail.yaml?raw';
 
 export const DEFAULT_EXAMPLE_KEY = 'architectural_plan';
@@ -83,19 +83,20 @@ export const EXAMPLES: Record<
     name: 'Mechanical Flange (Polar Repeat)',
     category: 'Mechanical',
     summary: 'Flange mekanikal dengan lubang baut polar repeat, dimensi radius/diameter.',
-    code: v04FlangeCode,
+    // Keep the key stable for existing localStorage selections and shared app state.
+    code: v05FlangeCode,
   },
   v04_repeat_along_path: {
     name: 'Repeat Along Path (Oriented Patterns)',
     category: 'Mechanical',
     summary: 'Oriented placement sejajar kurva kuadratik (quadratic) dan kubik (cubic).',
-    code: v04RepeatAlongPathCode,
+    code: v05RepeatAlongPathCode,
   },
   v04_full_assembly: {
     name: 'Full Assembly',
     category: 'Mechanical',
     summary: 'Flagship example untuk surface aktif: Reusable Component (parametrik), Divide, dan Layout Sheet.',
-    code: v04FullAssemblyCode,
+    code: v05FullAssemblyCode,
   },
   v05_joined_bracket_detail: {
     name: 'Joined Bracket Detail',
@@ -126,6 +127,7 @@ export const EXAMPLES: Record<
     name: 'Current Feature Showcase',
     category: 'Showcases',
     summary: 'Ringkasan fitur aktif: Polygon, polymorphic holes, path polyline shorthand, repeat, divide, dan metadata presets.',
-    code: v04ShowcaseCode,
+    // Keep the key stable; the bundled source now uses the truthful v05 filename.
+    code: v05ShowcaseCode,
   },
 };
