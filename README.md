@@ -27,6 +27,15 @@ pnpm dev --host 127.0.0.1 --port 4335
 
 Then open [`http://127.0.0.1:4335/playground/`](http://127.0.0.1:4335/playground/). Stop the server with `Ctrl+C`.
 
+Run the automated browser smoke locally after installing the Chromium runtime once:
+
+```bash
+pnpm exec playwright install chromium
+pnpm test:e2e
+```
+
+The smoke covers the source-to-preview diagnostic flow and the mobile `Both`, `Source`, and `Preview` surface switcher. The workspace integration gate installs Chromium automatically when it runs this check in CI.
+
 Pada repo aktif saat ini, Playground ini ditujukan untuk mengedit dan memeriksa dokumen `RelGeo DSL v0.5`.
 
 Status packaging saat ini:
