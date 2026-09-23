@@ -36,6 +36,15 @@ pnpm test:e2e
 
 The smoke covers the source-to-preview diagnostic flow and the mobile `Both`, `Source`, and `Preview` surface switcher. The workspace integration gate installs Chromium automatically when it runs this check in CI.
 
+If the Playwright-managed browser cannot be downloaded locally, point the suite
+at an already installed Chromium-compatible browser instead:
+
+```bash
+PLAYWRIGHT_EXECUTABLE_PATH="/path/to/your/chromium-or-chrome" pnpm test:e2e
+```
+
+This fallback is local-only; CI continues to use the pinned Playwright browser.
+
 To run the same browser smoke against a deployed Playground instead of starting a local preview server:
 
 ```bash

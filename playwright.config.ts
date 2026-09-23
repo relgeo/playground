@@ -1,6 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:4173';
+const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH;
 
 export default defineConfig({
   testDir: './e2e',
@@ -16,6 +17,9 @@ export default defineConfig({
     baseURL,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    ...(executablePath
+      ? { launchOptions: { executablePath } }
+      : {}),
   },
   ...(process.env.PLAYWRIGHT_BASE_URL
     ? {}
