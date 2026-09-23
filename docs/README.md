@@ -136,3 +136,13 @@ Halaman website docs untuk `Playground` sebaiknya dibaca sebagai:
 3. pengarah ke surface browser IDE yang tepat
 
 Sedangkan dokumen ini adalah rumah yang lebih dekat ke package playground itu sendiri.
+
+## 10. Rencana Pengembangan
+
+Rencana peningkatan Playground menjadi editor dengan file lokal tersimpan di workspace:
+
+- [Playground Local File Workspace](./LOCAL-FILE-WORKSPACE-PLAN.md)
+
+Rencana tersebut mencakup My Files, examples read-only, new/rename/delete, autosave,
+import/download, share semantics, dan backup workspace. Implementasi dan rencana
+detailnya sama-sama berada di repository `playground`.
