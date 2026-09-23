@@ -366,7 +366,8 @@ Setiap zona sebaiknya memiliki paling banyak satu baris kontrol utama pada kondi
 - [x] Tambahkan reduced-motion rule dan perkuat `audit:ux` agar animation, transition, delay, iteration, serta smooth-scroll reset tidak hilang; verifikasi preference OS melalui recording/computed style masih perlu dilakukan.
 - [x] Automated/local contract coverage untuk clipboard denied, partial response tanpa SVG (fallback), slow resolve state, stale worker response, syntax error worker, dan long URL hash sudah tersedia; environment-specific clipboard behavior dan worker timing nyata tetap perlu smoke tambahan bila diperlukan.
 - [x] Uji browser responsive pada viewport matrix 1024/940/840/480; tidak ada horizontal overflow dan mode surface/drawer tablet berhasil.
-- [x] Dedicated Playwright mobile-device emulation memakai profil iPhone 13 pada Chromium dengan touch capability, viewport 390px, dan `touchscreen.tap` untuk perpindahan Source/Preview; ini memperkuat automation evidence, tetapi bukan pengganti uji handset fisik.
+- [x] Dedicated Playwright mobile-device emulation memakai profil iPhone 13 pada Chromium dengan touch capability, viewport 390px, dan `touchscreen.tap` untuk perpindahan Source/Preview; E2E lokal terbaru lulus `2/2` pada child commit `3969d47`; ini memperkuat automation evidence, tetapi bukan pengganti uji handset fisik.
+- [x] E2E lokal memiliki fallback `PLAYWRIGHT_EXECUTABLE_PATH` untuk memakai browser Chromium-compatible yang sudah terpasang ketika cache Playwright tidak dapat diunduh; CI tetap menggunakan browser pinned.
 - [ ] Uji handset fisik dan VoiceOver/TalkBack.
 - [x] Smoke test URL deployment publik saat ini pada 1280px: halaman mencapai `READY`, canvas terlihat ter-render, dan tidak ada alert.
 - [x] Playground implementation baseline `e070cd9` sudah di-commit dan di-push ke `relgeo/playground`.
