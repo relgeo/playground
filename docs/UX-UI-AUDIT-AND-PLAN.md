@@ -1,8 +1,8 @@
 # RelGeo Playground — UX/UI Audit & Improvement Plan
 
 **Status:** implementasi lokal, browser verification termasuk mobile-device emulation, workflow Pages, dan smoke URL publik selesai; gate perangkat eksternal masih terbuka
-**Tanggal audit terakhir:** 2026-09-16
-**Implementation baseline:** `e070cd9` (`main`)
+**Tanggal audit terakhir:** 2026-09-25
+**Implementation baseline:** current `main` after the final IndexedDB fresh-start audit
 **Ruang lingkup:** browser IDE playground: editor, resolver, preview, inspector, graph, sidebar, responsive behavior, accessibility, share, dan export.
 
 ## 1. Ringkasan eksekutif
@@ -11,7 +11,7 @@ Playground memiliki fondasi teknis yang sehat dan kemampuan yang cukup lengkap: 
 
 > pilih contoh → baca/edit source → resolve → lihat preview → inspeksi hasil → share/export
 
-Audit awal menemukan bahwa masalah utamanya bukan kekurangan fitur, melainkan kepadatan dan prioritas. Banyak kemampuan ditempatkan sekaligus dalam satu workbench, sementara tugas utama pengguna belum cukup dominan. Sebagian besar temuan tersebut kini sudah ditangani pada baseline `e070cd9` melalui pemisahan toolbar, camera-fit, responsive surface switch, semantic controls, inspector/graph navigation, feedback state, CSS token/layer cleanup, dan mobile-device emulation. Dampak yang masih relevan terutama berasal dari validasi perangkat fisik dan assistive technology eksternal.
+Audit awal menemukan bahwa masalah utamanya bukan kekurangan fitur, melainkan kepadatan dan prioritas. Banyak kemampuan ditempatkan sekaligus dalam satu workbench, sementara tugas utama pengguna belum cukup dominan. Sebagian besar temuan tersebut kini sudah ditangani melalui pemisahan toolbar, camera-fit, responsive surface switch, semantic controls, inspector/graph navigation, feedback state, CSS token/layer cleanup, dan mobile-device emulation. Dampak yang masih relevan terutama berasal dari validasi perangkat fisik dan assistive technology eksternal.
 
 Temuan baseline yang menjadi alasan pekerjaan ini:
 
@@ -60,7 +60,7 @@ Validasi baseline:
 
 - TypeScript check: **lulus**.
 - Vite production build: **lulus**.
-- Vitest: **85/85 test lulus** pada validasi terbaru (baseline audit awal: 48/48).
+- Vitest: **93/93 test lulus** pada validasi final (baseline audit awal: 48/48).
 - ESLint: **lulus**.
 - Preview produksi lokal dibuka pada `http://127.0.0.1:4325/playground/`.
 - Sweep browser viewport 390×844 dengan reduced-motion: 37 kontrol DOM terlihat, seluruhnya memiliki accessible name, seluruhnya tercapai dengan Tab, dan `scrollWidth` tetap 390.
@@ -240,7 +240,7 @@ Metadata paket dan `LICENSE` memakai MIT, tetapi README masih menyebut ISC. Sela
 
 #### U20 — Persistence draft tidak terlihat
 
-Code disimpan ke localStorage dan URL hash setelah jeda, tetapi UI tidak membedakan default example, local draft, dan custom hash source. Tampilkan `Saved locally`/`Unsaved changes`, jelaskan bahwa share link memuat source, dan tetapkan strategi untuk hash panjang.
+Persistence workspace kini memakai IndexedDB, bukan localStorage. UI membedakan default example, local file, dan custom hash source; status `Saving locally`/`Saved locally`/`Could not save locally` tersedia, dan share link tetap diperlakukan sebagai source transient sampai disimpan ke My Files.
 
 #### U21 — Graph fixed-layout cepat menjadi tidak terbaca
 
@@ -248,7 +248,7 @@ Graph memiliki overflow tetapi belum memiliki legend, search, zoom/minimap, atau
 
 ## 5a. Status temuan pada implementation baseline
 
-Bagian temuan di atas mempertahankan observasi audit awal agar keputusan desain tetap dapat ditelusuri. Status aktualnya pada `e070cd9` adalah:
+Bagian temuan di atas mempertahankan observasi audit awal agar keputusan desain tetap dapat ditelusuri. Status aktualnya pada baseline final `main` adalah:
 
 | ID | Status lokal | Sisa atau batasan |
 | --- | --- | --- |
