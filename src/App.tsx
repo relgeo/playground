@@ -4,6 +4,7 @@ import { DEFAULT_EXAMPLE_KEY, EXAMPLES } from './examples';
 
 // Components
 import { Navbar } from './components/Navbar';
+import type { FileSourceValue } from './components/FileWorkspacePicker';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import {
   getEffectiveSheetId,
@@ -13,10 +14,21 @@ import {
 import { buildShareUrl, decodeCodeFromHash, encodeCodeToHash } from './share-code';
 import { copyText } from './clipboard';
 import {
-  DRAFT_STORAGE_KEY,
-  SELECTED_EXAMPLE_STORAGE_KEY,
+  createEmptyWorkspace,
+  createLocalDocument,
+  findExampleKeyByCode,
+  getUniqueDocumentName,
+  parseWorkspaceBackup,
   resolveInitialPlaygroundState,
+  serializeWorkspaceBackup,
+  getWorkspaceStorageStats,
+  type LocalWorkspace,
 } from './persistence';
+import {
+  createWorkspaceRepository,
+  WorkspacePersistenceError,
+  type WorkspaceRepository,
+} from './indexeddb-persistence';
 import {
   isUsingFallbackRender,
   resolveDisplayRenderState,
@@ -88,42 +100,49 @@ function findSourceLineForErrorPath(code: string, path: string): number {
   });
 }
 
+function readHashCode(): string | null {
+  if (typeof window === 'undefined') return null;
+  const hash = window.location.hash.slice(1);
+  if (!hash) return null;
+  try {
+    return decodeCodeFromHash(hash);
+  } catch (error) {
+    console.error('Failed to decode code from URL', error);
+    return null;
+  }
+}
+
 function App() {
   const [initialPlaygroundState] = useState(() => {
-    let hashCode: string | null = null;
-    let draftCode: string | null = null;
-    let storedExampleKey: string | null = null;
-
-    // Try to load from URL hash first
-    const hash = window.location.hash.slice(1);
-    if (hash) {
-      try {
-        hashCode = decodeCodeFromHash(hash);
-      } catch (e) {
-        console.error('Failed to decode code from URL', e);
-      }
-    }
-
-    // Try to load from localStorage draft
-    try {
-      draftCode = localStorage.getItem(DRAFT_STORAGE_KEY);
-      storedExampleKey = localStorage.getItem(SELECTED_EXAMPLE_STORAGE_KEY);
-    } catch (e) {
-      console.error('Failed to load playground persistence from localStorage', e);
-    }
-
-    return resolveInitialPlaygroundState({
+    const hashCode = readHashCode();
+    const workspace = createEmptyWorkspace();
+    const initialState = resolveInitialPlaygroundState({
       defaultExampleKey: DEFAULT_EXAMPLE_KEY,
       examples: EXAMPLES,
       hashCode,
-      draftCode,
-      storedExampleKey,
     });
+
+    return {
+      ...initialState,
+      localWorkspace: workspace,
+      activeDocumentId: null,
+      isSharedDraft: Boolean(
+        hashCode
+        && !findExampleKeyByCode(hashCode, EXAMPLES),
+      ),
+    };
   });
   const [selectedExample, setSelectedExample] = useState(
     initialPlaygroundState.selectedExample
   );
   const [code, setCode] = useState(initialPlaygroundState.code);
+  const [localWorkspace, setLocalWorkspace] = useState<LocalWorkspace>(
+    initialPlaygroundState.localWorkspace,
+  );
+  const [activeDocumentId, setActiveDocumentId] = useState<string | null>(
+    initialPlaygroundState.activeDocumentId,
+  );
+  const [isSharedDraft, setIsSharedDraft] = useState(initialPlaygroundState.isSharedDraft);
   const [error, setError] = useState<string | null>(null);
   const [errorPath, setErrorPath] = useState<string | null>(null);
   const [fullError, setFullError] = useState<RelGeoError | null>(null);
@@ -168,8 +187,12 @@ function App() {
   const [isResizingSplit, setIsResizingSplit] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
   const [actionFeedback, setActionFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
+  const [persistenceStatus, setPersistenceStatus] = useState<'saved' | 'saving' | 'error'>('saved');
+  const [storageEstimate, setStorageEstimate] = useState<{ usageBytes: number; quotaBytes: number } | null>(null);
   const [confirmationRequest, setConfirmationRequest] = useState<ConfirmationRequest | null>(null);
   const sidebarReturnFocusRef = useRef<HTMLElement | null>(null);
+  const userChangedBeforeBootstrapRef = useRef(false);
+  const [workspaceRepository] = useState<WorkspaceRepository>(() => createWorkspaceRepository());
 
   const openSidebar = useCallback(() => {
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
@@ -219,6 +242,126 @@ function App() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
   const deferredCode = useDeferredValue(code);
+  const activeLocalDocument = useMemo(
+    () => activeDocumentId
+      ? localWorkspace.documents.find((document) => document.id === activeDocumentId) ?? null
+      : null,
+    [activeDocumentId, localWorkspace.documents],
+  );
+  const activeSource: FileSourceValue = activeLocalDocument
+    ? `local:${activeLocalDocument.id}`
+    : isSharedDraft
+      ? 'shared:hash'
+    : `example:${selectedExample}`;
+  const activeSourceName = activeLocalDocument?.name
+    ?? (isSharedDraft ? 'Shared draft' : null)
+    ?? EXAMPLES[selectedExample as keyof typeof EXAMPLES]?.name
+    ?? selectedExample;
+  const isDirty = activeLocalDocument
+    ? activeLocalDocument.content !== code
+    : code !== EXAMPLES[selectedExample].code;
+  const workspaceStats = useMemo(
+    () => getWorkspaceStorageStats(localWorkspace),
+    [localWorkspace],
+  );
+
+  const queueWorkspaceSave = useCallback((
+    workspace: LocalWorkspace,
+    successMessage?: string | null,
+    errorMessage = 'Could not save the local workspace. Export a backup before continuing.',
+  ) => {
+    const repository = workspaceRepository;
+    userChangedBeforeBootstrapRef.current = true;
+    setPersistenceStatus('saving');
+    void repository.save(workspace).then(() => {
+      setPersistenceStatus('saved');
+      if (successMessage !== undefined) {
+        setActionFeedback(successMessage === null ? null : { tone: 'success', message: successMessage });
+      }
+    }).catch((error: unknown) => {
+      const persistenceError = error instanceof WorkspacePersistenceError ? error : null;
+      const suffix = persistenceError?.code === 'blocked'
+        ? ' Close other playground tabs and retry.'
+        : persistenceError?.code === 'quota'
+          ? ' Export a backup and remove unused files.'
+          : '';
+      setPersistenceStatus('error');
+      setActionFeedback({ tone: 'error', message: `${errorMessage}${suffix}` });
+    });
+  }, [workspaceRepository]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const bootstrapWorkspace = async () => {
+      const repository = workspaceRepository;
+
+      try {
+        const storedWorkspace = await repository.load();
+        if (cancelled) return;
+
+        if (storedWorkspace && !userChangedBeforeBootstrapRef.current) {
+          const activeDocument = storedWorkspace.activeDocumentId
+            ? storedWorkspace.documents.find((document) => document.id === storedWorkspace.activeDocumentId) ?? null
+            : null;
+          const hashCode = readHashCode();
+          const hashMatchesActiveDocument = Boolean(
+            hashCode && activeDocument && activeDocument.content === hashCode,
+          );
+          const restoredCode = activeDocument
+            ? (hashMatchesActiveDocument ? hashCode : activeDocument.content)
+            : hashCode ?? EXAMPLES[DEFAULT_EXAMPLE_KEY].code;
+          const restoredExampleKey = findExampleKeyByCode(restoredCode, EXAMPLES);
+
+          setLocalWorkspace(storedWorkspace);
+          setActiveDocumentId(activeDocument?.id ?? null);
+          setIsSharedDraft(Boolean(
+            hashCode
+            && !activeDocument
+            && !findExampleKeyByCode(hashCode, EXAMPLES),
+          ));
+          setCode(restoredCode);
+          if (restoredExampleKey) setSelectedExample(restoredExampleKey);
+        } else if (!userChangedBeforeBootstrapRef.current) {
+          // A new installation starts with an empty IndexedDB workspace.
+          await repository.save(initialPlaygroundState.localWorkspace);
+        }
+        setPersistenceStatus('saved');
+      } catch (error: unknown) {
+        if (!cancelled) {
+          setPersistenceStatus('error');
+          setActionFeedback({
+            tone: 'error',
+            message: error instanceof WorkspacePersistenceError && error.code === 'unavailable'
+              ? 'Browser file storage is unavailable; use Backup to protect your work.'
+              : 'Could not open browser file storage; use Backup to protect your work.',
+          });
+        }
+      }
+    };
+
+    void bootstrapWorkspace();
+    return () => {
+      cancelled = true;
+    };
+  }, [initialPlaygroundState, workspaceRepository]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const estimateStorage = async () => {
+      try {
+        const estimate = await navigator.storage?.estimate();
+        if (!cancelled && estimate?.usage !== undefined && estimate.quota !== undefined) {
+          setStorageEstimate({ usageBytes: estimate.usage, quotaBytes: estimate.quota });
+        }
+      } catch (error) {
+        console.warn('Browser storage estimate unavailable', error);
+      }
+    };
+    void estimateStorage();
+    return () => {
+      cancelled = true;
+    };
+  }, [localWorkspace]);
 
   const handleJumpToLine = (lineNum: number) => {
     if (editorRef.current?.view) {
@@ -273,39 +416,47 @@ function App() {
     return () => window.removeEventListener('keydown', handleEscape);
   }, [closeSidebar, selectedObjectId, sidebarVisible]);
 
-  // Sync code to URL hash and localStorage draft
+  // Sync code to URL hash. Durable source changes are handled by the
+  // IndexedDB is the only durable workspace store; localStorage is intentionally ignored.
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
         const hash = encodeCodeToHash(code);
         const shareUrl = buildShareUrl(`${window.location.origin}${window.location.pathname}`, code);
         // Only update if it's different to avoid history bloat. Oversized source
-        // stays in localStorage and is intentionally not written into the URL.
+        // stays in the editor/workspace and is intentionally not written into the URL.
         if (shareUrl && window.location.hash.slice(1) !== hash) {
           window.history.replaceState(null, '', `#${hash}`);
         }
         if (!shareUrl) {
-          setActionFeedback({ tone: 'error', message: 'Draft is too large for a share link; it remains saved locally.' });
+          setActionFeedback({ tone: 'error', message: 'Draft is too large for a share link; save it as a local file for durable storage.' });
         }
       } catch (e) {
         console.error('Failed to encode code into URL hash', e);
-      }
-      try {
-        localStorage.setItem(DRAFT_STORAGE_KEY, code);
-      } catch (e) {
-        console.error('Failed to save draft to localStorage', e);
       }
     }, 1000); // Debounce URL and local draft updates
     return () => clearTimeout(timer);
   }, [code]);
 
+  // IndexedDB is the only durable workspace store. Share links remain
+  // transient until the user explicitly saves them as a local file.
   useEffect(() => {
-    try {
-      localStorage.setItem(SELECTED_EXAMPLE_STORAGE_KEY, selectedExample);
-    } catch (e) {
-      console.error('Failed to save selected example to localStorage', e);
-    }
-  }, [selectedExample]);
+    if (!activeDocumentId || !activeLocalDocument || activeLocalDocument.content === code) return;
+
+    const timer = setTimeout(() => {
+      setPersistenceStatus('saving');
+      const nextWorkspace: LocalWorkspace = {
+        ...localWorkspace,
+        documents: localWorkspace.documents.map((document) => document.id === activeDocumentId
+          ? { ...document, content: code, updatedAt: Date.now() }
+          : document),
+      };
+      setLocalWorkspace(nextWorkspace);
+      queueWorkspaceSave(nextWorkspace, undefined, 'Could not save the local file. Export a backup before continuing.');
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [activeDocumentId, activeLocalDocument, code, localWorkspace, queueWorkspaceSave]);
 
   // Resize logic
   // Sidebar Resize
@@ -502,7 +653,14 @@ function App() {
 
   const applyExampleChange = (key: string) => {
     startTransition(() => {
+      const nextWorkspace: LocalWorkspace = {
+        ...localWorkspace,
+        activeDocumentId: null,
+      };
       setSelectedExample(key);
+      setActiveDocumentId(null);
+      setIsSharedDraft(false);
+      setLocalWorkspace(nextWorkspace);
       setCode(EXAMPLES[key].code);
       setParamOverrides({});
       setSelectedProfile(null);
@@ -513,21 +671,358 @@ function App() {
       setFullError(null);
       setInspectorTab('resolved');
       setActionFeedback(null);
+      queueWorkspaceSave(
+        nextWorkspace,
+        null,
+        'Example opened, but the active file state could not be saved.',
+      );
       requestFitAll();
     });
   };
 
-  const handleExampleChange = (key: string) => {
-    if (code !== EXAMPLES[selectedExample].code) {
+  const applyLocalDocumentChange = (documentId: string) => {
+    const document = localWorkspace.documents.find((item) => item.id === documentId);
+    if (!document) {
+      setActionFeedback({ tone: 'error', message: 'That local file is no longer available.' });
+      return;
+    }
+
+    const nextWorkspace: LocalWorkspace = {
+      ...localWorkspace,
+      activeDocumentId: document.id,
+    };
+    startTransition(() => {
+      setActiveDocumentId(document.id);
+      setIsSharedDraft(false);
+      setLocalWorkspace(nextWorkspace);
+      setCode(document.content);
+      setParamOverrides({});
+      setSelectedProfile(null);
+      setSelectedSheetId(null);
+      setIsPrintMode(false);
+      setError(null);
+      setErrorPath(null);
+      setFullError(null);
+      setInspectorTab('resolved');
+      setActionFeedback({ tone: 'success', message: `Opened ${document.name}.` });
+      queueWorkspaceSave(
+        nextWorkspace,
+        `Opened ${document.name}.`,
+        `Opened ${document.name}, but active-file state could not be saved.`,
+      );
+      requestFitAll();
+    });
+  };
+
+  const handleSourceChange = (source: FileSourceValue) => {
+    const nextChange = () => {
+      if (source.startsWith('local:')) {
+        applyLocalDocumentChange(source.slice('local:'.length));
+      } else if (source.startsWith('example:')) {
+        applyExampleChange(source.slice('example:'.length));
+      }
+    };
+
+    if (isDirty) {
       setConfirmationRequest({
         title: 'Replace the current draft?',
-        message: 'The selected example will replace the source currently open in the editor.',
-        confirmLabel: 'Use example',
-        onConfirm: () => applyExampleChange(key),
+        message: 'The source currently open in the editor will be replaced by the selected file.',
+        confirmLabel: 'Open file',
+        onConfirm: nextChange,
       });
       return;
     }
-    applyExampleChange(key);
+    nextChange();
+  };
+
+  const applyNewFile = () => {
+    const name = getUniqueDocumentName('Untitled', localWorkspace.documents);
+    const document = createLocalDocument({
+      name,
+      content: EXAMPLES[DEFAULT_EXAMPLE_KEY].code,
+      source: 'new',
+    });
+    const nextWorkspace: LocalWorkspace = {
+      ...localWorkspace,
+      activeDocumentId: document.id,
+      documents: [...localWorkspace.documents, document],
+    };
+    startTransition(() => {
+      setLocalWorkspace(nextWorkspace);
+      setActiveDocumentId(document.id);
+      setIsSharedDraft(false);
+      setSelectedExample(DEFAULT_EXAMPLE_KEY);
+      setCode(document.content);
+      setParamOverrides({});
+      setSelectedProfile(null);
+      setSelectedSheetId(null);
+      setIsPrintMode(false);
+      setError(null);
+      setErrorPath(null);
+      setFullError(null);
+      setInspectorTab('resolved');
+      setActionFeedback({ tone: 'success', message: `Created ${document.name}.` });
+      queueWorkspaceSave(
+        nextWorkspace,
+        `Created ${document.name}.`,
+        `Created ${document.name}, but it could not be saved locally.`,
+      );
+      requestFitAll();
+    });
+  };
+
+  const handleNewFile = () => {
+    if (isDirty) {
+      setConfirmationRequest({
+        title: 'Create a new local file?',
+        message: 'The current source has unsaved editor changes and will be replaced.',
+        confirmLabel: 'Create file',
+        onConfirm: applyNewFile,
+      });
+      return;
+    }
+    applyNewFile();
+  };
+
+  const handleSaveAsFile = () => {
+    const requestedName = activeLocalDocument
+      ? `${activeLocalDocument.name} copy`
+      : activeSourceName;
+    const document = createLocalDocument({
+      name: getUniqueDocumentName(requestedName, localWorkspace.documents),
+      content: code,
+      source: activeLocalDocument || isSharedDraft ? 'new' : 'example-copy',
+      originExampleKey: activeLocalDocument || isSharedDraft ? undefined : selectedExample,
+    });
+    const nextWorkspace: LocalWorkspace = {
+      ...localWorkspace,
+      activeDocumentId: document.id,
+      documents: [...localWorkspace.documents, document],
+    };
+    setLocalWorkspace(nextWorkspace);
+    setActiveDocumentId(document.id);
+    setIsSharedDraft(false);
+    setActionFeedback({ tone: 'success', message: `Saved as ${document.name}.` });
+    queueWorkspaceSave(
+      nextWorkspace,
+      `Saved as ${document.name}.`,
+      `Saved ${document.name} in memory, but browser file storage failed.`,
+    );
+  };
+
+  const handleRenameFile = () => {
+    if (!activeLocalDocument) return;
+
+    const requestedName = window.prompt('Rename local file', activeLocalDocument.name);
+    if (requestedName === null) return;
+    if (!requestedName.trim()) {
+      setActionFeedback({ tone: 'error', message: 'A local file name cannot be empty.' });
+      return;
+    }
+
+    const nextName = getUniqueDocumentName(
+      requestedName,
+      localWorkspace.documents,
+      activeLocalDocument.id,
+    );
+    const nextWorkspace: LocalWorkspace = {
+      ...localWorkspace,
+      documents: localWorkspace.documents.map((document) => document.id === activeLocalDocument.id
+        ? { ...document, name: nextName, updatedAt: Date.now() }
+        : document),
+    };
+    setLocalWorkspace(nextWorkspace);
+    setActionFeedback({ tone: 'success', message: `Renamed to ${nextName}.` });
+    queueWorkspaceSave(
+      nextWorkspace,
+      `Renamed to ${nextName}.`,
+      `Renamed to ${nextName}, but browser file storage failed.`,
+    );
+  };
+
+  const applyDeleteFile = () => {
+    if (!activeLocalDocument) return;
+
+    const remainingDocuments = localWorkspace.documents.filter(
+      (document) => document.id !== activeLocalDocument.id,
+    );
+    const nextDocument = [...remainingDocuments].sort((a, b) => b.updatedAt - a.updatedAt)[0] ?? null;
+    const nextWorkspace: LocalWorkspace = {
+      ...localWorkspace,
+      activeDocumentId: nextDocument?.id ?? null,
+      documents: remainingDocuments,
+    };
+    setLocalWorkspace(nextWorkspace);
+    setActiveDocumentId(nextDocument?.id ?? null);
+    setIsSharedDraft(false);
+    if (nextDocument) {
+      setCode(nextDocument.content);
+    } else {
+      setSelectedExample(DEFAULT_EXAMPLE_KEY);
+      setCode(EXAMPLES[DEFAULT_EXAMPLE_KEY].code);
+    }
+    setParamOverrides({});
+    setSelectedProfile(null);
+    setSelectedSheetId(null);
+    setIsPrintMode(false);
+    setError(null);
+    setErrorPath(null);
+    setFullError(null);
+    setActionFeedback({ tone: 'success', message: `Deleted ${activeLocalDocument.name}.` });
+    queueWorkspaceSave(
+      nextWorkspace,
+      `Deleted ${activeLocalDocument.name}.`,
+      `Deleted ${activeLocalDocument.name} in memory, but browser file storage failed.`,
+    );
+    requestFitAll();
+  };
+
+  const handleDeleteFile = () => {
+    if (!activeLocalDocument) return;
+    setConfirmationRequest({
+      title: `Delete ${activeLocalDocument.name}?`,
+      message: 'This removes the local file from this browser. Download a backup first if you may need it later.',
+      confirmLabel: 'Delete file',
+      onConfirm: applyDeleteFile,
+    });
+  };
+
+  const applyRestoreWorkspace = (workspace: LocalWorkspace) => {
+    const restoredDocument = workspace.activeDocumentId
+      ? workspace.documents.find((document) => document.id === workspace.activeDocumentId) ?? null
+      : null;
+    const restoredExampleKey = restoredDocument
+      ? findExampleKeyByCode(restoredDocument.content, EXAMPLES) ?? DEFAULT_EXAMPLE_KEY
+      : DEFAULT_EXAMPLE_KEY;
+    setLocalWorkspace(workspace);
+    setActiveDocumentId(restoredDocument?.id ?? null);
+    setIsSharedDraft(false);
+    setSelectedExample(restoredExampleKey);
+    setCode(restoredDocument?.content ?? EXAMPLES[restoredExampleKey].code);
+    setParamOverrides({});
+    setSelectedProfile(null);
+    setSelectedSheetId(null);
+    setIsPrintMode(false);
+    setError(null);
+    setErrorPath(null);
+    setFullError(null);
+    setInspectorTab('resolved');
+    const successMessage = `Restored ${workspace.documents.length} local file${workspace.documents.length === 1 ? '' : 's'}.`;
+    setActionFeedback({ tone: 'success', message: successMessage });
+    queueWorkspaceSave(
+      workspace,
+      successMessage,
+      'Workspace restored in memory, but could not be saved to browser storage.',
+    );
+    requestFitAll();
+  };
+
+  const handleBackupWorkspace = () => {
+    try {
+      const blob = new Blob([serializeWorkspaceBackup(localWorkspace)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `relgeo-playground-workspace-${new Date().toISOString().slice(0, 10)}.json`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setActionFeedback({ tone: 'success', message: 'Workspace backup downloaded.' });
+    } catch (error) {
+      console.error('Failed to download workspace backup', error);
+      setActionFeedback({ tone: 'error', message: 'Workspace backup failed. Try again.' });
+    }
+  };
+
+  const handleRestoreWorkspace = async (file: File) => {
+    if (!/\.json$/i.test(file.name)) {
+      setActionFeedback({ tone: 'error', message: 'Restore accepts a .json workspace backup.' });
+      return;
+    }
+    if (file.size > 5_000_000) {
+      setActionFeedback({ tone: 'error', message: 'This workspace backup is larger than the 5 MB limit.' });
+      return;
+    }
+
+    try {
+      const workspace = parseWorkspaceBackup(await file.text());
+      if (!workspace) {
+        setActionFeedback({ tone: 'error', message: 'That workspace backup is invalid or unsupported.' });
+        return;
+      }
+      setConfirmationRequest({
+        title: 'Restore this workspace?',
+        message: `This will replace the current My Files list with ${workspace.documents.length} file${workspace.documents.length === 1 ? '' : 's'} from the backup.`,
+        confirmLabel: 'Restore workspace',
+        onConfirm: () => applyRestoreWorkspace(workspace),
+      });
+    } catch (error) {
+      console.error('Failed to read workspace backup', error);
+      setActionFeedback({ tone: 'error', message: 'Could not read that workspace backup.' });
+    }
+  };
+
+  const handleImportFile = async (file: File) => {
+    if (!/\.ya?ml$/i.test(file.name)) {
+      setActionFeedback({ tone: 'error', message: 'Import accepts .yaml or .yml files.' });
+      return;
+    }
+    if (file.size > 1_000_000) {
+      setActionFeedback({ tone: 'error', message: 'This file is larger than the 1 MB local-file limit.' });
+      return;
+    }
+
+    try {
+      const content = await file.text();
+      const document = createLocalDocument({
+        name: getUniqueDocumentName(file.name, localWorkspace.documents),
+        content,
+        source: 'imported',
+      });
+      const nextWorkspace: LocalWorkspace = {
+        ...localWorkspace,
+        activeDocumentId: document.id,
+        documents: [...localWorkspace.documents, document],
+      };
+      setLocalWorkspace(nextWorkspace);
+      setActiveDocumentId(document.id);
+      setIsSharedDraft(false);
+      setCode(content);
+      setSelectedExample(findExampleKeyByCode(content, EXAMPLES) ?? DEFAULT_EXAMPLE_KEY);
+      setParamOverrides({});
+      setSelectedProfile(null);
+      setSelectedSheetId(null);
+      setIsPrintMode(false);
+      setError(null);
+      setErrorPath(null);
+      setFullError(null);
+      setInspectorTab('resolved');
+      setActionFeedback({ tone: 'success', message: `Imported ${document.name}.` });
+      queueWorkspaceSave(
+        nextWorkspace,
+        `Imported ${document.name}.`,
+        `Opened ${document.name}, but browser file storage failed.`,
+      );
+      requestFitAll();
+    } catch (error) {
+      console.error('Failed to import source file', error);
+      setActionFeedback({ tone: 'error', message: 'Could not read that YAML file.' });
+    }
+  };
+
+  const handleDownloadFile = () => {
+    try {
+      const blob = new Blob([code], { type: 'application/yaml' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `${activeSourceName.replace(/[^a-z0-9._-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'untitled'}.yaml`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setActionFeedback({ tone: 'success', message: 'Source downloaded as YAML.' });
+    } catch (error) {
+      console.error('Failed to download source', error);
+      setActionFeedback({ tone: 'error', message: 'Source download failed. Try again.' });
+    }
   };
 
   const handleParamChange = (key: string, value: number) => {
@@ -608,7 +1103,7 @@ function App() {
 
   const applyReset = () => {
     startTransition(() => {
-      setCode(EXAMPLES[selectedExample].code);
+      setCode(activeLocalDocument?.content ?? EXAMPLES[selectedExample].code);
       setParamOverrides({});
       setSelectedProfile(null);
       setSelectedSheetId(null);
@@ -617,19 +1112,17 @@ function App() {
       setZoom(100);
       setPan({ x: 0, y: 0 });
       setInspectorTab('resolved');
-      setActionFeedback({ tone: 'success', message: 'Draft reset to the selected example.' });
-      // Reset localStorage draft too
-      try {
-        localStorage.removeItem(DRAFT_STORAGE_KEY);
-        localStorage.setItem(SELECTED_EXAMPLE_STORAGE_KEY, selectedExample);
-      } catch (e) {
-        console.error(e);
-      }
+      setActionFeedback({
+        tone: 'success',
+        message: activeLocalDocument
+          ? `Draft reset to the last saved version of ${activeLocalDocument.name}.`
+          : 'Draft reset to the selected example.',
+      });
     });
   };
 
   const handleReset = () => {
-    if (code !== EXAMPLES[selectedExample].code) {
+    if (isDirty) {
       setConfirmationRequest({
         title: 'Reset the current draft?',
         message: 'Your current source will be replaced with the selected example.',
@@ -640,6 +1133,11 @@ function App() {
     }
     applyReset();
   };
+
+  const handleEditorChange = useCallback((nextCode: string) => {
+    userChangedBeforeBootstrapRef.current = true;
+    setCode(nextCode);
+  }, []);
 
   const toggleSidebarPanel = (panel: keyof SidebarPanels) => {
     setSidebarPanels(prev => ({ ...prev, [panel]: !prev[panel] }));
@@ -655,8 +1153,18 @@ function App() {
         <a className="skip-link" href="#relgeo-preview">Skip to preview</a>
       )}
         <Navbar
-        selectedExample={selectedExample}
-        onExampleChange={handleExampleChange}
+        activeSource={activeSource}
+        localDocuments={localWorkspace.documents}
+        onSourceChange={handleSourceChange}
+        onNewFile={handleNewFile}
+        onSaveAsFile={handleSaveAsFile}
+        onRenameFile={handleRenameFile}
+        onDeleteFile={handleDeleteFile}
+        onBackupWorkspace={handleBackupWorkspace}
+        onRestoreWorkspace={handleRestoreWorkspace}
+        onImportFile={handleImportFile}
+        onDownloadFile={handleDownloadFile}
+        activeSourceName={activeSourceName}
         viewMode={viewMode}
         setViewMode={setViewMode}
         sidebarVisible={sidebarVisible}
@@ -688,7 +1196,10 @@ function App() {
           setIsPrintMode(val);
           requestFitAll();
         }}
-        isDirty={code !== EXAMPLES[selectedExample].code}
+        isDirty={isDirty}
+        persistenceStatus={persistenceStatus}
+        workspaceStats={workspaceStats}
+        storageEstimate={storageEstimate}
       />
 
       <main className={`main-area ${sidebarPosition === 'right' ? 'sidebar-right' : ''}`}>
@@ -745,7 +1256,7 @@ function App() {
                 doc={displayDoc}
                 code={code}
                 fullError={fullError}
-                exampleName={EXAMPLES[selectedExample as keyof typeof EXAMPLES]?.name || selectedExample}
+                exampleName={activeSourceName}
                 objectCount={resolvedObjectCount}
                 valueCount={resolvedValueCount}
                 unit={displayDoc?.scene?.unit || 'mm'}
@@ -778,7 +1289,7 @@ function App() {
               style={viewMode === 'editor-only' ? undefined : { flex: `0 0 ${splitRatio}%` }}
             >
               <Suspense fallback={<div className="editor-loading" role="status">Loading editor…</div>}>
-                <Editor code={code} onChange={setCode} editorRef={editorRef} />
+                <Editor code={code} onChange={handleEditorChange} editorRef={editorRef} />
               </Suspense>
             </div>
           )}
@@ -830,7 +1341,7 @@ function App() {
                 pan={pan}
                 setPan={setPan}
                 onExport={handleExport}
-                exampleName={EXAMPLES[selectedExample as keyof typeof EXAMPLES]?.name || selectedExample}
+                exampleName={activeSourceName}
                 objectCount={resolvedObjectCount}
                 valueCount={resolvedValueCount}
                 unit={displayDoc?.scene?.unit || 'mm'}

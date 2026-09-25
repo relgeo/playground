@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { ICONS } from './Icons';
 import type { ViewMode, SidebarPosition } from '../types';
-import { EXAMPLES } from '../examples';
 import { getSheetPreviewEntryLabel, getSheetPreviewEntryTarget } from '../view-state';
+import { FileWorkspacePicker, type FileSourceValue } from './FileWorkspacePicker';
+import type { LocalDocument } from '../persistence';
+import type { WorkspaceStorageStats } from '../persistence';
 
 import type { RelGeoDocument } from '@relgeo/core';
 
@@ -13,9 +15,25 @@ function formatZoomLabel(zoom: number): string {
   return `${zoom.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}%`;
 }
 
+function formatStorageBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round((bytes / 1024) * 10) / 10} KB`;
+  return `${Math.round((bytes / (1024 * 1024)) * 10) / 10} MB`;
+}
+
 interface NavbarProps {
-  selectedExample: string;
-  onExampleChange: (key: string) => void;
+  activeSource: FileSourceValue;
+  localDocuments: LocalDocument[];
+  onSourceChange: (source: FileSourceValue) => void;
+  onNewFile: () => void;
+  onSaveAsFile: () => void;
+  onRenameFile: () => void;
+  onDeleteFile: () => void;
+  onBackupWorkspace: () => void;
+  onRestoreWorkspace: (file: File) => void | Promise<void>;
+  onImportFile: (file: File) => void | Promise<void>;
+  onDownloadFile: () => void;
+  activeSourceName: string;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
   sidebarVisible: boolean;
@@ -44,11 +62,24 @@ interface NavbarProps {
   setIsPrintMode: (val: boolean) => void;
   actionFeedback?: { tone: 'success' | 'error'; message: string } | null;
   isDirty: boolean;
+  persistenceStatus: 'saved' | 'saving' | 'error';
+  workspaceStats: WorkspaceStorageStats;
+  storageEstimate: { usageBytes: number; quotaBytes: number } | null;
 }
 
 export function Navbar({
-  selectedExample,
-  onExampleChange,
+  activeSource,
+  localDocuments,
+  onSourceChange,
+  onNewFile,
+  onSaveAsFile,
+  onRenameFile,
+  onDeleteFile,
+  onBackupWorkspace,
+  onRestoreWorkspace,
+  onImportFile,
+  onDownloadFile,
+  activeSourceName,
   viewMode,
   setViewMode,
   sidebarVisible,
@@ -74,11 +105,13 @@ export function Navbar({
   setIsPrintMode,
   actionFeedback,
   isDirty,
+  persistenceStatus,
+  workspaceStats,
+  storageEstimate,
 }: NavbarProps) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const hasSheets = !!doc?.sheets && Object.keys(doc.sheets).length > 0;
-  const selectedExampleName = EXAMPLES[selectedExample as keyof typeof EXAMPLES]?.name || selectedExample;
   const sheetIds = doc?.sheets ? Object.keys(doc.sheets) : [];
   const sheetPreviewEntryTarget = getSheetPreviewEntryTarget(
     sheetIds,
@@ -115,19 +148,19 @@ export function Navbar({
           <span className="navbar-brand-accent">Rel</span><span>Geo</span>
         </div>
         <div className="navbar-divider" />
-        <select
-          className="example-select"
-          aria-label="Choose example"
-          title={`Current example: ${selectedExampleName}. Open to choose another example.`}
-          value={selectedExample}
-          onChange={(e) => onExampleChange(e.target.value)}
-        >
-          {Object.entries(EXAMPLES).map(([key, ex]) => (
-            <option key={key} value={key}>
-              {ex.name}
-            </option>
-          ))}
-        </select>
+        <FileWorkspacePicker
+          activeSource={activeSource}
+          localDocuments={localDocuments}
+          onSourceChange={onSourceChange}
+          onNewFile={onNewFile}
+          onSaveAsFile={onSaveAsFile}
+          onRenameFile={onRenameFile}
+          onDeleteFile={onDeleteFile}
+          onBackupWorkspace={onBackupWorkspace}
+          onRestoreWorkspace={onRestoreWorkspace}
+          onImportFile={onImportFile}
+          onDownloadFile={onDownloadFile}
+        />
 
         {hasSheets && (
           <>
@@ -225,10 +258,26 @@ export function Navbar({
             <div className="navbar-menu-section">
               <span className="navbar-menu-label">Draft state</span>
               <div className="navbar-persistence-note" role="status" aria-live="polite">
-                <strong>{isDirty ? 'Modified draft' : 'Selected example'}</strong>
+                <strong>
+                  {persistenceStatus === 'saving'
+                    ? 'Saving locally…'
+                    : persistenceStatus === 'error'
+                      ? 'Could not save locally'
+                      : isDirty
+                        ? 'Modified draft'
+                        : `Saved locally: ${activeSourceName}`}
+                </strong>
                 <span>
                   Drafts are saved only in this browser. Share links include the source in the URL hash.
                 </span>
+                <span>
+                  {workspaceStats.documentCount} local file{workspaceStats.documentCount === 1 ? '' : 's'} · {workspaceStats.serializedKilobytes} KB workspace
+                </span>
+                {storageEstimate && (
+                  <span>
+                    Browser storage estimate: {formatStorageBytes(storageEstimate.usageBytes)} / {formatStorageBytes(storageEstimate.quotaBytes)}
+                  </span>
+                )}
               </div>
             </div>
             {viewMode !== 'preview-only' && (

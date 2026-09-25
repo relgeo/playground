@@ -83,7 +83,7 @@ export const EXAMPLES: Record<
     name: 'Mechanical Flange (Polar Repeat)',
     category: 'Mechanical',
     summary: 'Flange mekanikal dengan lubang baut polar repeat, dimensi radius/diameter.',
-    // Keep the key stable for existing localStorage selections and shared app state.
+    // Keep the key stable for shared links and example selection state.
     code: v05FlangeCode,
   },
   v04_repeat_along_path: {
