@@ -1,7 +1,7 @@
 # RelGeo Playground — UX/UI Audit & Improvement Plan
 
-**Status:** implementasi lokal, browser verification termasuk mobile-device emulation, workflow Pages, dan smoke URL publik selesai; gate perangkat eksternal masih terbuka
-**Tanggal audit terakhir:** 2026-09-25
+**Status:** implementasi lokal, browser contract verification, mobile-device emulation, workflow Pages, dan historical public smoke tersedia; fresh browser runtime serta gate perangkat eksternal memiliki limitation yang terdokumentasi
+**Tanggal audit terakhir:** 2026-10-08
 **Implementation baseline:** current `main` after the final IndexedDB fresh-start audit
 **Ruang lingkup:** browser IDE playground: editor, resolver, preview, inspector, graph, sidebar, responsive behavior, accessibility, share, dan export.
 
@@ -69,12 +69,26 @@ Validasi baseline:
 - Workflow `Deploy RelGeo website` run #19 pada commit website `dc3f772` sukses: build, Pages artifact, deploy, dan smoke-test job semuanya hijau.
 - Smoke browser publik setelah deploy baru lulus untuk `/`, `/en/`, `/id/`, `/docs/`, `/docs/language-spec/`, dan `/playground/`; semua route terbaca tanpa alert dan Playground memiliki judul `RelGeo Playground`.
 
+### Evidence checkpoint — 2026-10-08
+
+| Provenance | Nilai |
+| --- | --- |
+| Workspace / submodule | workspace `d3ec2b0430f12bd95f2be312fa7438b6d97757d6`; Playground `ecc1407a8ba0da3929042137ff43b8e69f50b556`; website `5c4576ec83ff7d4beebcbc1553c716711b91db68`; Flutter `edc9488952db7edc74dd2caa7fc2064f03ff62f9` |
+| Toolchain | Node `22.23.2` (repo meminta `>=24`, sehingga hasil ini diagnostik); pnpm `10.33.3`; Playwright `1.63.0`; Vite `8.3.0` |
+| Host | macOS `14.5` (`23F79`), arm64; tanggal `2026-10-08` |
+| Static/runtime contract | production build lulus; ESLint lulus; Vitest `93/93` lulus; `audit:ux` lulus (`13` component files, `4` approved dynamic inline styles) |
+| Fresh local E2E | Tidak mencapai page: Playwright webServer gagal bind `127.0.0.1:4173` dengan `EPERM` dari sandbox. Ini limitation harness, bukan assertion aplikasi. |
+| Fresh public E2E | 12 test dicoba dengan public base URL; browser headless Chrome/Chromium berhenti sebelum page creation (`SIGABRT`/`SIGTRAP`). `curl` juga tidak dapat resolve `relgeo.github.io` pada host ini. Historical CI/public smoke tetap menjadi evidence deployment yang sah. |
+| Accessibility conclusion | DOM/AX names, roles, states, keyboard contract, reduced-motion, dan mobile emulation tetap covered oleh audit/CI historis; VoiceOver nyata, keyboard fisik, dan screen-reader announcement belum terbukti. |
+
+Kesimpulan checkpoint: browser accessibility memiliki evidence automation dan limitation runtime yang dapat diaudit. Jangan mengubah limitation harness menjadi klaim regression aplikasi, dan jangan menyebut VoiceOver/TalkBack atau handset fisik telah lulus.
+
 Validasi itu membuktikan baseline lokal tidak sedang rusak secara teknis. Itu belum membuktikan alur nyaman, jelas, dan optimal pada perangkat fisik atau screen reader nyata.
 
 ### Keterbatasan
 
 - [ ] Belum ada uji handset fisik untuk pan/pinch, target sentuh, dan performa layout.
-- [ ] Belum ada traversal penuh dengan VoiceOver, TalkBack, atau screen reader nyata.
+- [ ] Belum ada traversal penuh dengan VoiceOver, TalkBack, atau screen reader nyata; fresh browser runtime 2026-10-08 juga tidak dapat start karena limitation host di atas.
 - [x] Screenshot lokal adalah spot check yang sudah dipersistenkan, bukan usability study.
 - [x] Camera dan responsive layout sudah diuji ulang setelah perubahan lokal; review visual lintas perangkat tetap menjadi gate eksternal/opsional.
 - [x] Website publik mengonsumsi baseline Playground `09ac1cb` melalui workflow yang dipin dan sudah ter-deploy.
