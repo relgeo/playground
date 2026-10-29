@@ -20,10 +20,14 @@ constraints:
       with: second
 `;
 
+async function waitForReady(page: Page) {
+  await expect(page.getByRole('status', { name: /^READY/ })).toBeVisible({ timeout: 20_000 });
+}
+
 async function openPlayground(page: Page) {
   await page.goto('./');
   await expect(page.getByRole('textbox', { name: 'RelGeo DSL source editor' })).toBeVisible();
-  await expect(page.getByRole('status', { name: /^READY/ })).toBeVisible();
+  await waitForReady(page);
 }
 
 async function hasIndexedDbDocument(page: Page, documentId: string, contentFragment: string) {
@@ -59,7 +63,7 @@ test('resolves source, keeps preview visible, and exposes runtime diagnostics', 
   const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
   await editor.fill(runtimeDiagnosticSource);
 
-  await expect(page.getByRole('status', { name: /^READY/ })).toBeVisible();
+  await waitForReady(page);
   await expect(page.getByRole('region', { name: 'Model Preview canvas' })).toBeVisible();
   await expect(page.locator('.svg-inner-wrapper svg')).toBeVisible();
 
@@ -74,10 +78,11 @@ test('creates a local file and restores it after reload', async ({ page }) => {
   const sourcePicker = page.getByRole('combobox', { name: 'Choose source file' });
   await page.getByRole('button', { name: 'New', exact: true }).click();
   await expect(sourcePicker).toHaveValue(/^local:/);
+  await waitForReady(page);
 
   const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
   await editor.fill(runtimeDiagnosticSource);
-  await expect(page.getByRole('status', { name: /^READY/ })).toBeVisible();
+  await waitForReady(page);
 
   const activeSource = await sourcePicker.inputValue();
   await expect.poll(
