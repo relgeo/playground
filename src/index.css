@@ -586,12 +586,6 @@ button:disabled {
   opacity: 0.5;
 }
 
-.status-detail {
-  margin-left: 0.45rem;
-  color: var(--muted);
-  font-size: 0.65rem;
-}
-
 .preview-mode-label {
   color: var(--muted);
   font-size: 0.68rem;
@@ -984,11 +978,16 @@ button:disabled {
 }
 
 .status-indicator {
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  flex: 0 0 1rem;
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  border-radius: var(--radius-round);
+  background: transparent;
+  cursor: help;
 }
 
 
@@ -1009,27 +1008,22 @@ button:disabled {
 }
 
 .status-ready {
-  background: var(--ready-soft);
   color: var(--ready);
 }
 
 .status-error {
-  background: var(--error-soft);
   color: var(--error);
 }
 
 .status-idle {
-  background: rgba(39, 45, 58, 0.08);
   color: var(--muted);
 }
 
 .status-resolving {
-  background: var(--brand-soft);
   color: var(--brand);
 }
 
 .status-loading {
-  background: var(--brand-soft);
   color: var(--brand);
 }
 
@@ -2656,15 +2650,6 @@ input[type='range'] {
 
   .navbar-center {
     flex: 1 1 auto;
-  }
-
-  .navbar-center .status-indicator {
-    min-width: 0;
-    max-width: 8rem;
-  }
-
-  .navbar-center .status-indicator span:last-child {
-    display: none;
   }
 
   .navbar-center > .control-group {

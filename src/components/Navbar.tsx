@@ -133,6 +133,7 @@ export function Navbar({
   const currentPreviewLabel = isPrintMode && selectedSheetId
     ? `Physical Preview: ${selectedSheetId}`
     : 'Model Preview';
+  const statusHint = statusDetail ? `${statusLabel} — ${statusDetail}` : statusLabel;
 
   const handleCopyCode = async () => {
     const copied = await onCopy();
@@ -193,15 +194,10 @@ export function Navbar({
           className={`status-indicator status-${status}`}
           role="status"
           aria-live="polite"
-          aria-label={`${statusLabel}${statusDetail ? `: ${statusDetail}` : ''}`}
+          aria-label={statusHint}
+          title={statusHint}
         >
-          <div className="status-dot" />
-          <span>{statusLabel}</span>
-          {statusDetail && (
-            <span className="status-detail">
-              {statusDetail}
-            </span>
-          )}
+          <div className="status-dot" aria-hidden="true" />
         </div>
 
         {/* Preview Toolbar (Visible if Preview is not collapsed) */}
