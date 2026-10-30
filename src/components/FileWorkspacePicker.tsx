@@ -1,4 +1,4 @@
-import { useRef, type ChangeEvent } from 'react';
+import { useEffect, useRef, type ChangeEvent } from 'react';
 import type { LocalDocument } from '../persistence';
 import { EXAMPLES } from '../examples';
 
@@ -33,7 +33,34 @@ export function FileWorkspacePicker({
 }: FileWorkspacePickerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const backupInputRef = useRef<HTMLInputElement>(null);
+  const actionsMenuRef = useRef<HTMLDetailsElement>(null);
   const sortedDocuments = [...localDocuments].sort((a, b) => b.updatedAt - a.updatedAt);
+
+  useEffect(() => {
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!actionsMenuRef.current?.contains(event.target as Node)) {
+        if (actionsMenuRef.current) actionsMenuRef.current.open = false;
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      const menu = actionsMenuRef.current;
+      if (event.key !== 'Escape' || !menu?.open) return;
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    };
+
+    document.addEventListener('pointerdown', closeOnOutsidePointer);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointer);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, []);
+
+  const runFileAction = (action: () => void) => {
+    if (actionsMenuRef.current) actionsMenuRef.current.open = false;
+    action();
+  };
 
   const handleImportChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -82,36 +109,39 @@ export function FileWorkspacePicker({
         </optgroup>
       </select>
 
-      <div className="file-workspace-actions" role="group" aria-label="File actions">
-        <button type="button" onClick={onNewFile} title="Create a new local file" aria-keyshortcuts="Control+Alt+N Meta+Alt+N">
-          New
-        </button>
-        <button type="button" onClick={() => fileInputRef.current?.click()} title="Import a YAML file" aria-keyshortcuts="Control+Alt+I Meta+Alt+I">
-          Import
-        </button>
-        <button type="button" onClick={onSaveAsFile} title="Save the current source as a local file" aria-keyshortcuts="Control+Alt+Shift+S Meta+Alt+Shift+S">
-          Save as
-        </button>
-        {activeSource.startsWith('local:') && (
-          <>
-            <button type="button" onClick={onRenameFile} title="Rename the active local file">
-              Rename
-            </button>
-            <button type="button" onClick={onDeleteFile} title="Delete the active local file">
-              Delete
-            </button>
-          </>
-        )}
-        <button type="button" onClick={onDownloadFile} title="Download the current source as YAML">
-          Download
-        </button>
-        <button type="button" onClick={onBackupWorkspace} title="Download all local files as a workspace backup">
-          Backup
-        </button>
-        <button type="button" onClick={() => backupInputRef.current?.click()} title="Restore local files from a workspace backup">
-          Restore
-        </button>
-      </div>
+      <details className="file-actions-menu" ref={actionsMenuRef}>
+        <summary aria-label="Open file actions">Menu</summary>
+        <div className="file-actions-popup" role="group" aria-label="File actions">
+          <button type="button" onClick={() => runFileAction(onNewFile)} title="Create a new local file" aria-keyshortcuts="Control+Alt+N Meta+Alt+N">
+            New
+          </button>
+          <button type="button" onClick={() => runFileAction(() => fileInputRef.current?.click())} title="Import a YAML file" aria-keyshortcuts="Control+Alt+I Meta+Alt+I">
+            Import
+          </button>
+          <button type="button" onClick={() => runFileAction(onSaveAsFile)} title="Save the current source as a local file" aria-keyshortcuts="Control+Alt+Shift+S Meta+Alt+Shift+S">
+            Save as
+          </button>
+          {activeSource.startsWith('local:') && (
+            <>
+              <button type="button" onClick={() => runFileAction(onRenameFile)} title="Rename the active local file">
+                Rename
+              </button>
+              <button type="button" onClick={() => runFileAction(onDeleteFile)} title="Delete the active local file">
+                Delete
+              </button>
+            </>
+          )}
+          <button type="button" onClick={() => runFileAction(onDownloadFile)} title="Download the current source as YAML">
+            Download
+          </button>
+          <button type="button" onClick={() => runFileAction(onBackupWorkspace)} title="Download all local files as a workspace backup">
+            Backup
+          </button>
+          <button type="button" onClick={() => runFileAction(() => backupInputRef.current?.click())} title="Restore local files from a workspace backup">
+            Restore
+          </button>
+        </div>
+      </details>
       <input
         ref={fileInputRef}
         className="visually-hidden"
