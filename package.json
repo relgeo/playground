@@ -42,7 +42,7 @@
     "@codemirror/lint": "^6.9.6",
     "@codemirror/state": "^6.6.0",
     "@codemirror/view": "^6.42.1",
-    "@relgeo/core": "^0.5.0",
+    "@relgeo/core": "^0.5.2",
     "@relgeo/language-service": "^0.5.0",
     "@relgeo/renderer-svg": "^0.5.0",
     "@uiw/react-codemirror": "^4.25.9",
