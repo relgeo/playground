@@ -2689,21 +2689,17 @@ input[type='range'] {
 
 @media (max-width: 1280px) and (min-width: 941px) {
   .playground-shell {
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: var(--navbar-height) minmax(0, 1fr);
   }
 
   .navbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "left right"
-      "center center";
+    display: flex;
     align-items: center;
-    justify-content: stretch;
-    gap: 0.35rem 0.75rem;
-    height: auto;
+    justify-content: space-between;
+    gap: 0.45rem;
+    height: var(--navbar-height);
     min-height: var(--navbar-height);
-    padding: 0.4rem 0.75rem;
+    padding: 0 0.75rem;
   }
 
   .navbar-left,
@@ -2714,8 +2710,7 @@ input[type='range'] {
   }
 
   .navbar-left {
-    grid-area: left;
-    flex: initial;
+    flex: 0 1 auto;
   }
 
   .navbar-left .example-select,
@@ -2725,8 +2720,7 @@ input[type='range'] {
   }
 
   .navbar-center {
-    grid-area: center;
-    flex: initial;
+    flex: 1 1 auto;
     justify-content: flex-start;
     overflow-x: auto;
     scrollbar-width: thin;
@@ -2739,9 +2733,7 @@ input[type='range'] {
   }
 
   .navbar-right {
-    grid-area: right;
-    flex: initial;
-    justify-self: end;
+    flex: 0 0 auto;
   }
 
   .sidebar,
