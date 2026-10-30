@@ -5,6 +5,23 @@ import {
 } from '../playground-status';
 
 describe('playground status helpers', () => {
+  it('reports explicit bootstrap loading before workspace state is ready', () => {
+    expect(
+      getPlaygroundStatusMeta({
+        hasError: false,
+        hasRenderablePreview: false,
+        isResolving: false,
+        isShowingFallback: false,
+        isBootstrapping: true,
+        bootstrapDetail: 'Restoring local files',
+      })
+    ).toEqual({
+      tone: 'loading',
+      label: 'LOADING',
+      detail: 'Restoring local files',
+    });
+  });
+
   it('reports fallback preview while resolving', () => {
     expect(
       getPlaygroundStatusMeta({

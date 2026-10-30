@@ -5,6 +5,20 @@ export function getEffectiveSheetId(
   return isPrintMode ? selectedSheetId : null;
 }
 
+export const DEFAULT_VIEWPORT_ZOOM = 100;
+
+export interface ViewportResetState {
+  zoom: number;
+  pan: { x: number; y: number };
+}
+
+export function getViewportResetState(): ViewportResetState {
+  return {
+    zoom: DEFAULT_VIEWPORT_ZOOM,
+    pan: { x: 0, y: 0 },
+  };
+}
+
 export function shouldEnterPrintModeForSheetSelection(
   sheetId: string | null
 ): boolean {

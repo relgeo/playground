@@ -83,13 +83,13 @@ export function FileWorkspacePicker({
       </select>
 
       <div className="file-workspace-actions" role="group" aria-label="File actions">
-        <button type="button" onClick={onNewFile} title="Create a new local file">
+        <button type="button" onClick={onNewFile} title="Create a new local file" aria-keyshortcuts="Control+Alt+N Meta+Alt+N">
           New
         </button>
-        <button type="button" onClick={() => fileInputRef.current?.click()} title="Import a YAML file">
+        <button type="button" onClick={() => fileInputRef.current?.click()} title="Import a YAML file" aria-keyshortcuts="Control+Alt+I Meta+Alt+I">
           Import
         </button>
-        <button type="button" onClick={onSaveAsFile} title="Save the current source as a local file">
+        <button type="button" onClick={onSaveAsFile} title="Save the current source as a local file" aria-keyshortcuts="Control+Alt+Shift+S Meta+Alt+Shift+S">
           Save as
         </button>
         {activeSource.startsWith('local:') && (

@@ -28,6 +28,7 @@ async function openPlayground(page: Page) {
   await page.goto('./');
   await expect(page.getByRole('textbox', { name: 'RelGeo DSL source editor' })).toBeVisible();
   await waitForReady(page);
+  await expect(page.locator('main[data-bootstrap-state="ready"]')).toHaveAttribute('aria-busy', 'false');
 }
 
 async function hasIndexedDbDocument(page: Page, documentId: string, contentFragment: string) {
@@ -56,6 +57,52 @@ async function hasIndexedDbDocument(page: Page, documentId: string, contentFragm
     });
   }, { documentId, contentFragment });
 }
+
+test('exposes the keyboard command surface and camera-only viewport reset', async ({ page }) => {
+  await openPlayground(page);
+
+  const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
+  const sourceBeforeReset = await editor.textContent();
+
+  await page.keyboard.press('Control+Alt+0');
+  await expect(page.locator('.action-feedback')).toContainText('Viewport reset without changing the source.');
+  await expect(editor).toHaveText(sourceBeforeReset ?? '');
+  await expect(page.getByRole('button', { name: 'Reset viewport' })).toHaveAttribute(
+    'aria-keyshortcuts',
+    'Control+Alt+0 Meta+Alt+0',
+  );
+
+  await page.keyboard.press('Control+Alt+D');
+  await expect(page.getByRole('tab', { name: 'Errors' })).toHaveAttribute('aria-selected', 'true');
+
+  await page.keyboard.press('Control+Alt+2');
+  await expect(page.locator('.editor-side')).toBeVisible();
+  await expect(page.locator('.preview-side')).toHaveCount(0);
+});
+
+test('follows system theme by default and persists explicit light/dark overrides', async ({ page }) => {
+  await page.addInitScript(() => localStorage.removeItem('relgeo_playground_theme'));
+  await openPlayground(page);
+
+  await page.getByText('More', { exact: true }).click();
+  const theme = page.getByRole('combobox', { name: 'Theme' });
+  await expect(theme).toHaveValue('system');
+
+  await theme.selectOption('dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('relgeo_playground_theme')))
+    .toBe('dark');
+
+  await page.reload();
+  await page.getByText('More', { exact: true }).click();
+  await expect(theme).toHaveValue('dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+
+  await theme.selectOption('light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('relgeo_playground_theme')))
+    .toBe('light');
+});
 
 test('resolves source, keeps preview visible, and exposes runtime diagnostics', async ({ page }) => {
   await openPlayground(page);

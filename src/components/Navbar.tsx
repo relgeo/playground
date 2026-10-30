@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ICONS } from './Icons';
 import type { ViewMode, SidebarPosition } from '../types';
+import type { ThemeMode } from '../theme';
 import { getSheetPreviewEntryLabel, getSheetPreviewEntryTarget } from '../view-state';
 import { FileWorkspacePicker, type FileSourceValue } from './FileWorkspacePicker';
 import type { LocalDocument } from '../persistence';
@@ -37,11 +38,13 @@ interface NavbarProps {
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
   sidebarVisible: boolean;
+  themeMode: ThemeMode;
+  setThemeMode: (mode: ThemeMode) => void;
   onOpenSidebar: () => void;
   onCloseSidebar: () => void;
   sidebarPosition: SidebarPosition;
   setSidebarPosition: (pos: SidebarPosition) => void;
-  status: 'error' | 'ready' | 'idle' | 'resolving';
+  status: 'error' | 'ready' | 'idle' | 'resolving' | 'loading';
   statusLabel: string;
   statusDetail?: string | null;
   // Editor actions
@@ -53,6 +56,7 @@ interface NavbarProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onRecenter: () => void;
+  onResetViewport: () => void;
   onExport: () => void;
   // Sheet actions
   doc: RelGeoDocument | null;
@@ -83,6 +87,8 @@ export function Navbar({
   viewMode,
   setViewMode,
   sidebarVisible,
+  themeMode,
+  setThemeMode,
   onOpenSidebar,
   onCloseSidebar,
   sidebarPosition,
@@ -97,6 +103,7 @@ export function Navbar({
   onZoomIn,
   onZoomOut,
   onRecenter,
+  onResetViewport,
   onExport,
   doc,
   selectedSheetId,
@@ -243,8 +250,9 @@ export function Navbar({
               <button type="button" onClick={onZoomOut} title="Zoom Out" aria-label="Zoom out">{ICONS.ZoomOut}</button>
               <span className="zoom-readout" aria-live="polite" aria-label={`Zoom ${formatZoomLabel(zoom)}`}>{formatZoomLabel(zoom)}</span>
               <button type="button" onClick={onZoomIn} title="Zoom In" aria-label="Zoom in">{ICONS.ZoomIn}</button>
-              <button type="button" onClick={onRecenter} title="Fit and recenter active preview" aria-label="Fit and recenter active preview">{ICONS.Recenter}</button>
-              <button type="button" onClick={onExport} title="Export SVG" aria-label="Export SVG">{ICONS.Export}</button>
+              <button type="button" onClick={onRecenter} title="Fit and recenter active preview" aria-label="Fit and recenter active preview" aria-keyshortcuts="Control+Alt+F Meta+Alt+F">{ICONS.Recenter}</button>
+              <button type="button" onClick={onResetViewport} title="Reset viewport camera" aria-label="Reset viewport" aria-keyshortcuts="Control+Alt+0 Meta+Alt+0">{ICONS.Reset}</button>
+              <button type="button" onClick={onExport} title="Export SVG" aria-label="Export SVG" aria-keyshortcuts="Control+Alt+E Meta+Alt+E">{ICONS.Export}</button>
             </div>
           </>
         )}
@@ -296,6 +304,23 @@ export function Navbar({
                 </div>
               </div>
             )}
+
+            <div className="navbar-menu-section">
+              <span className="navbar-menu-label">Theme</span>
+              <label className="theme-control">
+                <span>Color mode</span>
+                <select
+                  aria-label="Theme"
+                  value={themeMode}
+                  onChange={(event) => setThemeMode(event.target.value as ThemeMode)}
+                >
+                  <option value="system">System</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </label>
+              <span className="navbar-menu-help">System follows your browser or OS preference.</span>
+            </div>
 
             <div className="navbar-menu-section">
               <span className="navbar-menu-label">Sidebar placement</span>

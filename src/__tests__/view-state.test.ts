@@ -3,6 +3,7 @@ import {
   getExportFileName,
   getEffectiveSheetId,
   getNextPrintModeForSheetSelection,
+  getViewportResetState,
   getSheetPreviewEntryLabel,
   getSheetPreviewEntryTarget,
   shouldEnterPrintModeForSheetSelection,
@@ -23,6 +24,10 @@ describe('playground view state helpers', () => {
   it('keeps print mode aligned with explicit sheet selection changes', () => {
     expect(getNextPrintModeForSheetSelection('drawing1')).toBe(true);
     expect(getNextPrintModeForSheetSelection(null)).toBe(false);
+  });
+
+  it('defines a camera-only viewport reset baseline', () => {
+    expect(getViewportResetState()).toEqual({ zoom: 100, pan: { x: 0, y: 0 } });
   });
 
   it('uses a sheet-specific export name only for active print sheets', () => {

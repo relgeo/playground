@@ -10,7 +10,10 @@ import {
   getEffectiveSheetId,
   getExportFileName,
   getNextPrintModeForSheetSelection,
+  getViewportResetState,
 } from './view-state';
+import { getPlaygroundKeyboardCommand } from './keyboard-commands';
+import { applyThemeMode, getInitialThemeMode, persistThemeMode, type ThemeMode } from './theme';
 import { buildShareUrl, decodeCodeFromHash, encodeCodeToHash } from './share-code';
 import { copyText } from './clipboard';
 import {
@@ -169,6 +172,7 @@ function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('split-h');
   const [sidebarPosition, setSidebarPosition] = useState<SidebarPosition>('right');
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => getInitialThemeMode());
   const [sidebarPanels, setSidebarPanels] = useState<SidebarPanels>({
     parameters: true,
     profiles: false,
@@ -186,6 +190,7 @@ function App() {
   const [isResizingSidebar, setIsResizingSidebar] = useState(false);
   const [isResizingSplit, setIsResizingSplit] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
+  const [bootstrapPhase, setBootstrapPhase] = useState<'opening' | 'restoring' | 'ready' | 'error'>('opening');
   const [actionFeedback, setActionFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
   const [persistenceStatus, setPersistenceStatus] = useState<'saved' | 'saving' | 'error'>('saved');
   const [storageEstimate, setStorageEstimate] = useState<{ usageBytes: number; quotaBytes: number } | null>(null);
@@ -193,6 +198,11 @@ function App() {
   const sidebarReturnFocusRef = useRef<HTMLElement | null>(null);
   const userChangedBeforeBootstrapRef = useRef(false);
   const [workspaceRepository] = useState<WorkspaceRepository>(() => createWorkspaceRepository());
+
+  useEffect(() => {
+    applyThemeMode(themeMode);
+    persistThemeMode(themeMode);
+  }, [themeMode]);
 
   const openSidebar = useCallback(() => {
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
@@ -224,7 +234,7 @@ function App() {
     return () => window.cancelAnimationFrame(frame);
   }, [sidebarVisible]);
 
-  const requestFitAll = () => setFitAllTrigger((trigger) => trigger + 1);
+  const requestFitAll = useCallback(() => setFitAllTrigger((trigger) => trigger + 1), []);
 
   const cancelConfirmation = useCallback(() => {
     setConfirmationRequest(null);
@@ -294,6 +304,7 @@ function App() {
     let cancelled = false;
     const bootstrapWorkspace = async () => {
       const repository = workspaceRepository;
+      setBootstrapPhase('restoring');
 
       try {
         const storedWorkspace = await repository.load();
@@ -326,8 +337,10 @@ function App() {
           await repository.save(initialPlaygroundState.localWorkspace);
         }
         setPersistenceStatus('saved');
+        setBootstrapPhase('ready');
       } catch (error: unknown) {
         if (!cancelled) {
+          setBootstrapPhase('error');
           setPersistenceStatus('error');
           setActionFeedback({
             tone: 'error',
@@ -395,26 +408,6 @@ function App() {
       handleJumpToObject(objectId);
     }
   };
-
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      const target = event.target as HTMLElement | null;
-      if (target?.closest('input, textarea, [contenteditable="true"]')) return;
-
-      if (window.matchMedia('(max-width: 840px)').matches && sidebarVisible) {
-        closeSidebar();
-        return;
-      }
-
-      if (selectedObjectId) {
-        setSelectedObjectId(null);
-      }
-    };
-
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [closeSidebar, selectedObjectId, sidebarVisible]);
 
   // Sync code to URL hash. Durable source changes are handled by the
   // IndexedDB is the only durable workspace store; localStorage is intentionally ignored.
@@ -532,6 +525,10 @@ function App() {
     hasRenderablePreview: displaySvgContent !== '',
     isResolving,
     isShowingFallback,
+    isBootstrapping: bootstrapPhase === 'opening' || bootstrapPhase === 'restoring',
+    bootstrapDetail: bootstrapPhase === 'opening'
+      ? 'Opening the browser workspace'
+      : 'Restoring local files and shared source',
   });
   const previewErrorHint = getPreviewRecoveryHint({
     hasError: error !== null,
@@ -807,6 +804,31 @@ function App() {
       nextWorkspace,
       `Saved as ${document.name}.`,
       `Saved ${document.name} in memory, but browser file storage failed.`,
+    );
+  };
+
+  const handleSaveCurrentFile = () => {
+    if (!activeLocalDocument) {
+      handleSaveAsFile();
+      return;
+    }
+
+    if (activeLocalDocument.content === code) {
+      setActionFeedback({ tone: 'success', message: `${activeLocalDocument.name} is already saved locally.` });
+      return;
+    }
+
+    const nextWorkspace: LocalWorkspace = {
+      ...localWorkspace,
+      documents: localWorkspace.documents.map((document) => document.id === activeLocalDocument.id
+        ? { ...document, content: code, updatedAt: Date.now() }
+        : document),
+    };
+    setLocalWorkspace(nextWorkspace);
+    queueWorkspaceSave(
+      nextWorkspace,
+      `Saved ${activeLocalDocument.name}.`,
+      `Saved ${activeLocalDocument.name} in memory, but browser file storage failed.`,
     );
   };
 
@@ -1134,6 +1156,14 @@ function App() {
     applyReset();
   };
 
+  const handleResetViewport = () => {
+    const resetState = getViewportResetState();
+    setZoom(resetState.zoom);
+    setPan(resetState.pan);
+    requestFitAll();
+    setActionFeedback({ tone: 'success', message: 'Viewport reset without changing the source.' });
+  };
+
   const handleEditorChange = useCallback((nextCode: string) => {
     userChangedBeforeBootstrapRef.current = true;
     setCode(nextCode);
@@ -1142,6 +1172,105 @@ function App() {
   const toggleSidebarPanel = (panel: keyof SidebarPanels) => {
     setSidebarPanels(prev => ({ ...prev, [panel]: !prev[panel] }));
   };
+
+  const keyboardActionsRef = useRef({
+    newFile: handleNewFile,
+    saveFile: handleSaveCurrentFile,
+    saveAsFile: handleSaveAsFile,
+    downloadFile: handleDownloadFile,
+    resetViewport: handleResetViewport,
+  });
+  // Keep the global listener stable while routing to the latest render's actions.
+  useEffect(() => {
+    keyboardActionsRef.current = {
+      newFile: handleNewFile,
+      saveFile: handleSaveCurrentFile,
+      saveAsFile: handleSaveAsFile,
+      downloadFile: handleDownloadFile,
+      resetViewport: handleResetViewport,
+    };
+  });
+
+  useEffect(() => {
+    const handleKeyboardCommand = (event: KeyboardEvent) => {
+      const command = getPlaygroundKeyboardCommand(event);
+      if (!command) return;
+
+      const target = event.target as HTMLElement | null;
+      if (command === 'cancel' && target?.closest('input, textarea, [contenteditable="true"]')) return;
+
+      if (command === 'cancel') {
+        if (confirmationRequest) {
+          event.preventDefault();
+          cancelConfirmation();
+          return;
+        }
+
+        if (window.matchMedia('(max-width: 840px)').matches && sidebarVisible) {
+          event.preventDefault();
+          closeSidebar();
+          return;
+        }
+
+        if (selectedObjectId) {
+          event.preventDefault();
+          setSelectedObjectId(null);
+        }
+        return;
+      }
+
+      event.preventDefault();
+      switch (command) {
+        case 'new-file':
+          keyboardActionsRef.current.newFile();
+          break;
+        case 'open-file-picker':
+          document.querySelector<HTMLSelectElement>('.file-source-select')?.focus();
+          break;
+        case 'save-file':
+          keyboardActionsRef.current.saveFile();
+          break;
+        case 'save-as-file':
+          keyboardActionsRef.current.saveAsFile();
+          break;
+        case 'import-file':
+          document.querySelector<HTMLInputElement>('input[aria-label="Import YAML file"]')?.click();
+          break;
+        case 'export-file':
+          keyboardActionsRef.current.downloadFile();
+          break;
+        case 'fit-preview':
+          requestFitAll();
+          setActionFeedback({ tone: 'success', message: 'Preview fitted and recentered.' });
+          break;
+        case 'reset-viewport':
+          keyboardActionsRef.current.resetViewport();
+          break;
+        case 'show-diagnostics':
+          setInspectorTab('errors');
+          if (!sidebarVisible) openSidebar();
+          break;
+        case 'toggle-sidebar':
+          if (sidebarVisible) closeSidebar();
+          else openSidebar();
+          break;
+        case 'show-both':
+          setViewMode('split-h');
+          break;
+        case 'show-editor':
+          setViewMode('editor-only');
+          break;
+        case 'show-preview':
+          setViewMode('preview-only');
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyboardCommand);
+    return () => window.removeEventListener('keydown', handleKeyboardCommand);
+  }, [cancelConfirmation, closeSidebar, confirmationRequest, openSidebar, requestFitAll, selectedObjectId, sidebarVisible]);
 
   return (
     <>
@@ -1168,6 +1297,8 @@ function App() {
         viewMode={viewMode}
         setViewMode={setViewMode}
         sidebarVisible={sidebarVisible}
+        themeMode={themeMode}
+        setThemeMode={setThemeMode}
         onOpenSidebar={openSidebar}
         onCloseSidebar={closeSidebar}
         sidebarPosition={sidebarPosition}
@@ -1183,6 +1314,7 @@ function App() {
         onZoomIn={() => setZoom(z => clampPreviewZoom(z * 1.25))}
         onZoomOut={() => setZoom(z => clampPreviewZoom(z / 1.25))}
         onRecenter={requestFitAll}
+        onResetViewport={handleResetViewport}
         onExport={handleExport}
         doc={displayDoc}
         selectedSheetId={visibleSelectedSheetId}
@@ -1202,7 +1334,10 @@ function App() {
         storageEstimate={storageEstimate}
       />
 
-      <main className={`main-area ${sidebarPosition === 'right' ? 'sidebar-right' : ''}`}>
+      <main className={`main-area ${sidebarPosition === 'right' ? 'sidebar-right' : ''}`}
+        aria-busy={bootstrapPhase === 'opening' || bootstrapPhase === 'restoring'}
+        data-bootstrap-state={bootstrapPhase}
+      >
         <Suspense fallback={<aside className="sidebar component-loading" role="status">Loading sidebar…</aside>}>
         <Sidebar
           visible={sidebarVisible}

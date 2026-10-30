@@ -77,6 +77,21 @@ for (const target of [
 for (const target of ['id="relgeo-editor"', 'id="relgeo-preview"']) {
   if (!appSource.includes(target)) fail(`missing keyboard navigation anchor: ${target}`);
 }
+for (const target of [
+  'getPlaygroundKeyboardCommand',
+  'data-bootstrap-state={bootstrapPhase}',
+  'aria-busy={bootstrapPhase === \'opening\' || bootstrapPhase === \'restoring\'}',
+]) {
+  if (!appSource.includes(target)) fail(`missing application command/bootstrap contract: ${target}`);
+}
+
+for (const target of [
+  'getInitialThemeMode',
+  'applyThemeMode',
+  'persistThemeMode',
+]) {
+  if (!appSource.includes(target)) fail(`missing application theme contract: ${target}`);
+}
 for (const target of ['tabIndex={-1}', 'aria-label="RelGeo source editor"', 'aria-label="RelGeo preview"']) {
   if (!appSource.includes(target)) fail(`missing focusable landmark contract: ${target}`);
 }
@@ -112,11 +127,22 @@ for (const target of [
   'aria-label="Copy source code"',
   'aria-label="Copy share link"',
   'aria-label="Reset source code"',
+  'aria-label="Reset viewport"',
+  'aria-keyshortcuts="Control+Alt+0 Meta+Alt+0"',
   'aria-label="Show sidebar on left"',
   'aria-label="Show sidebar on right"',
   'aria-label="Hide sidebar"',
 ]) {
   if (!navbarSource.includes(target)) fail(`missing global preview control contract: ${target}`);
+}
+
+for (const target of [
+  'aria-label="Theme"',
+  'option value="system"',
+  'option value="light"',
+  'option value="dark"',
+]) {
+  if (!navbarSource.includes(target)) fail(`missing theme control contract: ${target}`);
 }
 
 const sidebarSource = await readFile(resolve(root, 'src/components/Sidebar.tsx'), 'utf8');
@@ -222,11 +248,20 @@ for (const [label, contract] of requiredCssContracts) {
 }
 
 for (const [label, contract] of [
+  ['explicit dark theme tokens', ":root[data-theme='dark']"],
+  ['system dark theme media tokens', ":root[data-theme='system']"],
+  ['system dark theme media query', '@media (prefers-color-scheme: dark)'],
+]) {
+  if (!tokens.includes(contract) && !css.includes(contract)) fail(`missing theme CSS contract: ${label}`);
+}
+
+for (const [label, contract] of [
   ['reduced-motion animation clamp', 'animation-duration: 0.001ms !important'],
   ['reduced-motion iteration clamp', 'animation-iteration-count: 1 !important'],
   ['reduced-motion scroll reset', 'scroll-behavior: auto !important'],
   ['reduced-motion transition clamp', 'transition-duration: 0.001ms !important'],
   ['reduced-motion delay reset', 'transition-delay: 0s !important'],
+  ['forced-colors focus fallback', '@media (forced-colors: active)'],
 ]) {
   if (!css.includes(contract)) fail(`missing reduced-motion declaration: ${label}`);
 }

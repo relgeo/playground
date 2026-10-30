@@ -3,10 +3,12 @@ interface PlaygroundStatusInput {
   hasRenderablePreview: boolean;
   isResolving: boolean;
   isShowingFallback: boolean;
+  isBootstrapping?: boolean;
+  bootstrapDetail?: string | null;
 }
 
 export interface PlaygroundStatusMeta {
-  tone: 'error' | 'ready' | 'idle' | 'resolving';
+  tone: 'error' | 'ready' | 'idle' | 'resolving' | 'loading';
   label: string;
   detail: string | null;
 }
@@ -16,7 +18,17 @@ export function getPlaygroundStatusMeta({
   hasRenderablePreview,
   isResolving,
   isShowingFallback,
+  isBootstrapping = false,
+  bootstrapDetail = null,
 }: PlaygroundStatusInput): PlaygroundStatusMeta {
+  if (isBootstrapping) {
+    return {
+      tone: 'loading',
+      label: 'LOADING',
+      detail: bootstrapDetail ?? 'Opening the local workspace',
+    };
+  }
+
   if (isResolving && isShowingFallback) {
     return {
       tone: 'resolving',
