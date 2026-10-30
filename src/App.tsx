@@ -77,6 +77,12 @@ function clampPreviewZoom(value: number): number {
   return Math.min(MAX_PREVIEW_ZOOM, Math.max(MIN_PREVIEW_ZOOM, Math.round(value * 100) / 100));
 }
 
+function getSidebarMaxWidth(viewportWidth = typeof window === 'undefined' ? 1280 : window.innerWidth): number {
+  return viewportWidth <= 1280
+    ? Math.max(240, Math.min(320, viewportWidth * 0.3))
+    : 600;
+}
+
 function findSourceLineForObject(code: string, objectId: string): number {
   const candidates = Array.from(new Set([
     objectId,
@@ -456,9 +462,10 @@ function App() {
   useEffect(() => {
     if (!isResizingSidebar) return;
     const handlePointerMove = (e: PointerEvent) => {
+      const maxWidth = getSidebarMaxWidth();
       const newWidth = sidebarPosition === 'left' 
-        ? Math.max(240, Math.min(600, e.clientX))
-        : Math.max(240, Math.min(600, window.innerWidth - e.clientX));
+        ? Math.max(240, Math.min(maxWidth, e.clientX))
+        : Math.max(240, Math.min(maxWidth, window.innerWidth - e.clientX));
       setSidebarWidth(newWidth);
     };
     const handlePointerUp = () => setIsResizingSidebar(false);
@@ -1348,9 +1355,10 @@ function App() {
           hasParameters={hasParameters}
           hasMetaPresets={hasMetaPresets}
           width={sidebarWidth}
+          maxWidth={getSidebarMaxWidth()}
           isResizing={isResizingSidebar}
           onResizeStart={() => setIsResizingSidebar(true)}
-          onResizeKeyboard={(delta) => setSidebarWidth((width) => Math.max(240, Math.min(600, width + delta)))}
+          onResizeKeyboard={(delta) => setSidebarWidth((width) => Math.max(240, Math.min(getSidebarMaxWidth(), width + delta)))}
           onClose={closeSidebar}
         >
           {{

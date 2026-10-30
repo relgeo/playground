@@ -12,6 +12,7 @@ interface SidebarProps {
   hasParameters: boolean;
   hasMetaPresets: boolean;
   width: number;
+  maxWidth?: number;
   isResizing?: boolean;
   onResizeStart?: () => void;
   onResizeKeyboard?: (delta: number) => void;
@@ -34,6 +35,7 @@ export function Sidebar({
   hasParameters,
   hasMetaPresets,
   width,
+  maxWidth = 600,
   isResizing,
   onResizeStart,
   onResizeKeyboard,
@@ -161,7 +163,7 @@ export function Sidebar({
           tabIndex={0}
           aria-orientation="vertical"
           aria-valuemin={240}
-          aria-valuemax={600}
+          aria-valuemax={maxWidth}
           aria-valuenow={width}
           aria-valuetext={`${width}px sidebar width`}
           aria-label={`Resize ${position === 'left' ? 'left' : 'right'} sidebar width`}
@@ -178,7 +180,7 @@ export function Sidebar({
               onResizeKeyboard(240 - width);
             } else if (event.key === 'End') {
               event.preventDefault();
-              onResizeKeyboard(600 - width);
+              onResizeKeyboard(maxWidth - width);
             }
           }}
         />
