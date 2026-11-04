@@ -2,9 +2,18 @@ import { describe, expect, it } from 'vitest';
 import {
   getPlaygroundStatusMeta,
   getPreviewRecoveryHint,
+  isBootstrapInteractionBlocked,
 } from '../playground-status';
 
 describe('playground status helpers', () => {
+  it('blocks interaction only during opening and restore bootstrap phases', () => {
+    expect(isBootstrapInteractionBlocked('opening')).toBe(true);
+    expect(isBootstrapInteractionBlocked('restoring')).toBe(true);
+    expect(isBootstrapInteractionBlocked('empty')).toBe(false);
+    expect(isBootstrapInteractionBlocked('ready')).toBe(false);
+    expect(isBootstrapInteractionBlocked('error')).toBe(false);
+  });
+
   it('reports explicit bootstrap loading before workspace state is ready', () => {
     expect(
       getPlaygroundStatusMeta({
@@ -64,6 +73,22 @@ describe('playground status helpers', () => {
       tone: 'ready',
       label: 'READY',
       detail: null,
+    });
+  });
+
+  it('reports an explicit empty workspace state after bootstrap has no local files', () => {
+    expect(
+      getPlaygroundStatusMeta({
+        hasError: false,
+        hasRenderablePreview: false,
+        isResolving: true,
+        isShowingFallback: false,
+        isEmpty: true,
+      })
+    ).toEqual({
+      tone: 'empty',
+      label: 'EMPTY',
+      detail: 'No local files yet; starting from the default example',
     });
   });
 

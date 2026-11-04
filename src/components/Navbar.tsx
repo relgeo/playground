@@ -44,7 +44,7 @@ interface NavbarProps {
   onCloseSidebar: () => void;
   sidebarPosition: SidebarPosition;
   setSidebarPosition: (pos: SidebarPosition) => void;
-  status: 'error' | 'ready' | 'idle' | 'resolving' | 'loading';
+  status: 'error' | 'ready' | 'empty' | 'resolving' | 'loading';
   statusLabel: string;
   statusDetail?: string | null;
   // Editor actions
@@ -69,6 +69,7 @@ interface NavbarProps {
   persistenceStatus: 'saved' | 'saving' | 'error';
   workspaceStats: WorkspaceStorageStats;
   storageEstimate: { usageBytes: number; quotaBytes: number } | null;
+  interactionsBlocked?: boolean;
 }
 
 export function Navbar({
@@ -115,6 +116,7 @@ export function Navbar({
   persistenceStatus,
   workspaceStats,
   storageEstimate,
+  interactionsBlocked = false,
 }: NavbarProps) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -150,7 +152,14 @@ export function Navbar({
   };
 
   return (
-    <nav className="navbar">
+    <nav
+      className="navbar"
+      aria-label="Playground navigation"
+      aria-busy={interactionsBlocked}
+      aria-disabled={interactionsBlocked || undefined}
+      data-interaction-state={interactionsBlocked ? 'blocked' : 'ready'}
+      inert={interactionsBlocked ? '' : undefined}
+    >
       <div className="navbar-left">
         <div className="navbar-brand">
           <span className="navbar-brand-accent">Rel</span><span>Geo</span>

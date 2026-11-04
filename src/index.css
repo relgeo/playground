@@ -1015,6 +1015,7 @@ button:disabled {
   color: var(--error);
 }
 
+.status-empty,
 .status-idle {
   color: var(--muted);
 }

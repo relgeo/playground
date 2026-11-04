@@ -40,6 +40,8 @@ import {
 import {
   getPlaygroundStatusMeta,
   getPreviewRecoveryHint,
+  isBootstrapInteractionBlocked,
+  type BootstrapPhase,
 } from './playground-status';
 import { getRelatedObjectIds, type InspectorDependencyGraphEntry } from './inspector-helpers';
 import {
@@ -196,13 +198,14 @@ function App() {
   const [isResizingSidebar, setIsResizingSidebar] = useState(false);
   const [isResizingSplit, setIsResizingSplit] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
-  const [bootstrapPhase, setBootstrapPhase] = useState<'opening' | 'restoring' | 'ready' | 'error'>('opening');
+  const [bootstrapPhase, setBootstrapPhase] = useState<BootstrapPhase>('opening');
   const [actionFeedback, setActionFeedback] = useState<{ tone: 'success' | 'error'; message: string } | null>(null);
   const [persistenceStatus, setPersistenceStatus] = useState<'saved' | 'saving' | 'error'>('saved');
   const [storageEstimate, setStorageEstimate] = useState<{ usageBytes: number; quotaBytes: number } | null>(null);
   const [confirmationRequest, setConfirmationRequest] = useState<ConfirmationRequest | null>(null);
   const sidebarReturnFocusRef = useRef<HTMLElement | null>(null);
   const userChangedBeforeBootstrapRef = useRef(false);
+  const initialResolveSucceededRef = useRef(false);
   const [workspaceRepository] = useState<WorkspaceRepository>(() => createWorkspaceRepository());
 
   useEffect(() => {
@@ -316,7 +319,9 @@ function App() {
         const storedWorkspace = await repository.load();
         if (cancelled) return;
 
+        let restoredWorkspaceHasDocuments = false;
         if (storedWorkspace && !userChangedBeforeBootstrapRef.current) {
+          restoredWorkspaceHasDocuments = storedWorkspace.documents.length > 0;
           const activeDocument = storedWorkspace.activeDocumentId
             ? storedWorkspace.documents.find((document) => document.id === storedWorkspace.activeDocumentId) ?? null
             : null;
@@ -343,7 +348,7 @@ function App() {
           await repository.save(initialPlaygroundState.localWorkspace);
         }
         setPersistenceStatus('saved');
-        setBootstrapPhase('ready');
+        setBootstrapPhase(restoredWorkspaceHasDocuments || initialResolveSucceededRef.current ? 'ready' : 'empty');
       } catch (error: unknown) {
         if (!cancelled) {
           setBootstrapPhase('error');
@@ -533,6 +538,7 @@ function App() {
     isResolving,
     isShowingFallback,
     isBootstrapping: bootstrapPhase === 'opening' || bootstrapPhase === 'restoring',
+    isEmpty: bootstrapPhase === 'empty',
     bootstrapDetail: bootstrapPhase === 'opening'
       ? 'Opening the browser workspace'
       : 'Restoring local files and shared source',
@@ -544,6 +550,7 @@ function App() {
   });
 
   const status = statusMeta.tone;
+  const interactionsBlocked = isBootstrapInteractionBlocked(bootstrapPhase);
   const hasProfiles = !!(displayDoc?.profiles && Object.keys(displayDoc.profiles).length > 0);
   const hasParameters = !!(
     displayDoc?.parameters && Object.keys(displayDoc.parameters).length > 0
@@ -592,6 +599,8 @@ function App() {
         return;
       }
       if (res.type === 'SUCCESS') {
+        initialResolveSucceededRef.current = true;
+        setBootstrapPhase((phase) => phase === 'empty' ? 'ready' : phase);
         setDoc(res.data.doc);
         setResolvedData(res.data.resolvedData);
         setSvgContent(res.data.svgContent);
@@ -1203,6 +1212,11 @@ function App() {
       const command = getPlaygroundKeyboardCommand(event);
       if (!command) return;
 
+      if (interactionsBlocked) {
+        event.preventDefault();
+        return;
+      }
+
       const target = event.target as HTMLElement | null;
       if (command === 'cancel' && target?.closest('input, textarea, [contenteditable="true"]')) return;
 
@@ -1277,7 +1291,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyboardCommand);
     return () => window.removeEventListener('keydown', handleKeyboardCommand);
-  }, [cancelConfirmation, closeSidebar, confirmationRequest, openSidebar, requestFitAll, selectedObjectId, sidebarVisible]);
+  }, [cancelConfirmation, closeSidebar, confirmationRequest, interactionsBlocked, openSidebar, requestFitAll, selectedObjectId, sidebarVisible]);
 
   return (
     <>
@@ -1339,10 +1353,14 @@ function App() {
         persistenceStatus={persistenceStatus}
         workspaceStats={workspaceStats}
         storageEstimate={storageEstimate}
+        interactionsBlocked={interactionsBlocked}
       />
 
       <main className={`main-area ${sidebarPosition === 'right' ? 'sidebar-right' : ''}`}
-        aria-busy={bootstrapPhase === 'opening' || bootstrapPhase === 'restoring'}
+        aria-label="Playground workspace"
+        aria-busy={interactionsBlocked}
+        aria-disabled={interactionsBlocked || undefined}
+        inert={interactionsBlocked ? '' : undefined}
         data-bootstrap-state={bootstrapPhase}
       >
         <Suspense fallback={<aside className="sidebar component-loading" role="status">Loading sidebar…</aside>}>
@@ -1432,7 +1450,7 @@ function App() {
               style={viewMode === 'editor-only' ? undefined : { flex: `0 0 ${splitRatio}%` }}
             >
               <Suspense fallback={<div className="editor-loading" role="status">Loading editor…</div>}>
-                <Editor code={code} onChange={handleEditorChange} editorRef={editorRef} />
+                <Editor code={code} onChange={handleEditorChange} editorRef={editorRef} readOnly={interactionsBlocked} />
               </Suspense>
             </div>
           )}

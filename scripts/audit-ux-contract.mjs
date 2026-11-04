@@ -55,6 +55,7 @@ for (const relativePath of componentFiles) {
 
 const appSource = await readFile(resolve(root, 'src/App.tsx'), 'utf8');
 if (!appSource.includes('<main ')) fail('App is missing the main landmark');
+if (!appSource.includes('aria-label="Playground workspace"')) fail('main landmark is missing an accessible name');
 for (const target of ['#relgeo-editor', '#relgeo-preview']) {
   if (!appSource.includes(`href="${target}"`)) fail(`missing skip link target: ${target}`);
 }
@@ -79,8 +80,12 @@ for (const target of ['id="relgeo-editor"', 'id="relgeo-preview"']) {
 }
 for (const target of [
   'getPlaygroundKeyboardCommand',
+  'isBootstrapInteractionBlocked',
   'data-bootstrap-state={bootstrapPhase}',
-  'aria-busy={bootstrapPhase === \'opening\' || bootstrapPhase === \'restoring\'}',
+  'setBootstrapPhase((phase) => phase === \'empty\' ? \'ready\' : phase)',
+  'aria-busy={interactionsBlocked}',
+  "inert={interactionsBlocked ? '' : undefined}",
+  'isEmpty: bootstrapPhase === \'empty\'',
 ]) {
   if (!appSource.includes(target)) fail(`missing application command/bootstrap contract: ${target}`);
 }
@@ -119,6 +124,7 @@ for (const target of [
 }
 
 const navbarSource = await readFile(resolve(root, 'src/components/Navbar.tsx'), 'utf8');
+if (!navbarSource.includes('aria-label="Playground navigation"')) fail('navigation landmark is missing an accessible name');
 for (const target of [
   'preview-global-controls',
   'Global preview controls for ${currentPreviewLabel}',
@@ -143,6 +149,15 @@ for (const target of [
   'option value="dark"',
 ]) {
   if (!navbarSource.includes(target)) fail(`missing theme control contract: ${target}`);
+}
+
+const editorSource = await readFile(resolve(root, 'src/components/Editor.tsx'), 'utf8');
+for (const target of [
+  'aria-label="RelGeo DSL source editor"',
+  'aria-multiline',
+  'aria-readonly={readOnly}',
+]) {
+  if (!editorSource.includes(target)) fail(`missing editor accessibility contract: ${target}`);
 }
 
 const sidebarSource = await readFile(resolve(root, 'src/components/Sidebar.tsx'), 'utf8');

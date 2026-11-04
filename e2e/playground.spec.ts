@@ -104,6 +104,22 @@ test('follows system theme by default and persists explicit light/dark overrides
     .toBe('light');
 });
 
+test('applies the browser system preference while system mode is selected', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.addInitScript(() => localStorage.removeItem('relgeo_playground_theme'));
+  await openPlayground(page);
+
+  await page.getByText('More', { exact: true }).click();
+  await expect(page.getByRole('combobox', { name: 'Theme' })).toHaveValue('system');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'system');
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement)
+    .getPropertyValue('--bg').trim())).toBe('#101820');
+
+  await page.emulateMedia({ colorScheme: 'light' });
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement)
+    .getPropertyValue('--bg').trim())).toBe('#efe8d8');
+});
+
 test('resolves source, keeps preview visible, and exposes runtime diagnostics', async ({ page }) => {
   await openPlayground(page);
 
@@ -117,6 +133,38 @@ test('resolves source, keeps preview visible, and exposes runtime diagnostics', 
   await page.getByRole('tab', { name: 'Errors' }).click();
   await expect(page.getByRole('tab', { name: 'Errors' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByText('Points are not aligned. Distance: 14.1421', { exact: true })).toBeVisible();
+});
+
+test('exposes named landmarks, state semantics, and source-preview keyboard navigation', async ({ page }) => {
+  await openPlayground(page);
+
+  await expect(page.getByRole('navigation', { name: 'Playground navigation' })).toBeVisible();
+  await expect(page.getByRole('main', { name: 'Playground workspace' }))
+    .toHaveAttribute('aria-busy', 'false');
+
+  const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
+  await expect(editor).toHaveAttribute('aria-multiline', 'true');
+  await expect(editor).toHaveAttribute('aria-readonly', 'false');
+
+  const tablist = page.getByRole('tablist', { name: 'Inspector views' });
+  await expect(tablist).toBeVisible();
+  await expect(tablist.getByRole('tab')).toHaveCount(5);
+  const objectsTab = page.getByRole('tab', { name: 'Objects' });
+  await objectsTab.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByRole('tab', { name: 'Values' })).toBeFocused();
+  await page.keyboard.press('End');
+  await expect(page.getByRole('tab', { name: 'BOM' })).toBeFocused();
+  await expect(page.getByRole('tab', { name: 'BOM' })).toHaveAttribute('aria-selected', 'true');
+
+  const skipPreview = page.getByRole('link', { name: 'Skip to preview' });
+  await skipPreview.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#relgeo-preview')).toBeFocused();
+  const skipEditor = page.getByRole('link', { name: 'Skip to editor' });
+  await skipEditor.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#relgeo-editor')).toBeFocused();
 });
 
 test('creates a local file and restores it after reload', async ({ page }) => {
@@ -408,4 +456,5 @@ test('keeps file actions keyboard reachable and traps delete confirmation focus'
   await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(dialog).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Delete', exact: true })).toBeFocused();
 });

@@ -4,11 +4,18 @@ interface PlaygroundStatusInput {
   isResolving: boolean;
   isShowingFallback: boolean;
   isBootstrapping?: boolean;
+  isEmpty?: boolean;
   bootstrapDetail?: string | null;
 }
 
+export type BootstrapPhase = 'opening' | 'restoring' | 'empty' | 'ready' | 'error';
+
+export function isBootstrapInteractionBlocked(phase: BootstrapPhase): boolean {
+  return phase === 'opening' || phase === 'restoring';
+}
+
 export interface PlaygroundStatusMeta {
-  tone: 'error' | 'ready' | 'idle' | 'resolving' | 'loading';
+  tone: 'error' | 'ready' | 'empty' | 'resolving' | 'loading';
   label: string;
   detail: string | null;
 }
@@ -19,6 +26,7 @@ export function getPlaygroundStatusMeta({
   isResolving,
   isShowingFallback,
   isBootstrapping = false,
+  isEmpty = false,
   bootstrapDetail = null,
 }: PlaygroundStatusInput): PlaygroundStatusMeta {
   if (isBootstrapping) {
@@ -26,6 +34,14 @@ export function getPlaygroundStatusMeta({
       tone: 'loading',
       label: 'LOADING',
       detail: bootstrapDetail ?? 'Opening the local workspace',
+    };
+  }
+
+  if (isEmpty) {
+    return {
+      tone: 'empty',
+      label: 'EMPTY',
+      detail: 'No local files yet; starting from the default example',
     };
   }
 
@@ -70,8 +86,8 @@ export function getPlaygroundStatusMeta({
   }
 
   return {
-    tone: 'idle',
-    label: 'IDLE',
+    tone: 'empty',
+    label: 'EMPTY',
     detail: null,
   };
 }

@@ -7,10 +7,52 @@ import { EditorView, hoverTooltip } from '@codemirror/view';
 import React from 'react';
 
 const langService = new RelGeoLanguageService();
+type EditorRequest = {
+  documentId: string;
+  version: number;
+  requestId: string;
+  code: string;
+};
+type ProtocolService = {
+  analyzeDiagnostics?: (request: EditorRequest) => { diagnostics: ReturnType<RelGeoLanguageService['getDiagnostics']> };
+  analyzeCompletion?: (request: EditorRequest, position: { line: number; character: number }) => { items: ReturnType<RelGeoLanguageService['getCompletions']> };
+  analyzeHover?: (request: EditorRequest, position: { line: number; character: number }) => { hover: ReturnType<RelGeoLanguageService['getHover']> };
+};
+const protocolService = langService as unknown as RelGeoLanguageService & ProtocolService;
+let lastEditorSource = '';
+let editorDocumentVersion = 0;
+
+function editorRequest(code: string) {
+  if (code !== lastEditorSource) {
+    editorDocumentVersion += 1;
+    lastEditorSource = code;
+  }
+  return {
+    documentId: 'playground-editor',
+    version: editorDocumentVersion,
+    requestId: `playground-editor-${editorDocumentVersion}`,
+    code,
+  };
+}
+
+function analyzeDiagnostics(code: string) {
+  const request = editorRequest(code);
+  return protocolService.analyzeDiagnostics?.(request).diagnostics ?? langService.getDiagnostics(code);
+}
+
+function analyzeCompletion(code: string, position: { line: number; character: number }) {
+  const request = editorRequest(code);
+  return protocolService.analyzeCompletion?.(request, position).items ?? langService.getCompletions(code, position);
+}
+
+function analyzeHover(code: string, position: { line: number; character: number }) {
+  const request = editorRequest(code);
+  return protocolService.analyzeHover?.(request, position).hover ?? langService.getHover(code, position);
+}
 
 const relgeoLinter = linter((view) => {
   const code = view.state.doc.toString();
-  const diagnostics = langService.getDiagnostics(code);
+  const diagnostics = analyzeDiagnostics(code);
   return diagnostics.map((d) => {
     try {
       const startLineNum = Math.max(1, Math.min(view.state.doc.lines, d.range.start.line + 1));
@@ -45,7 +87,7 @@ const relgeoAutocompletion = autocompletion({
 
       const code = context.state.doc.toString();
       const line = context.state.doc.lineAt(context.pos);
-      const completions = langService.getCompletions(code, {
+      const completions = analyzeCompletion(code, {
         line: line.number - 1,
         character: context.pos - line.from,
       });
@@ -65,7 +107,7 @@ const relgeoAutocompletion = autocompletion({
 const relgeoHover = hoverTooltip((view, pos) => {
   const code = view.state.doc.toString();
   const line = view.state.doc.lineAt(pos);
-  const hover = langService.getHover(code, {
+  const hover = analyzeHover(code, {
     line: line.number - 1,
     character: pos - line.from,
   });
@@ -93,9 +135,10 @@ interface EditorProps {
   code: string;
   onChange: (code: string) => void;
   editorRef?: React.RefObject<EditorView | null>;
+  readOnly?: boolean;
 }
 
-export function Editor({ code, onChange, editorRef }: EditorProps) {
+export function Editor({ code, onChange, editorRef, readOnly = false }: EditorProps) {
   return (
     <section className="editor-panel">
       <div className="panel-head compact">
@@ -107,7 +150,9 @@ export function Editor({ code, onChange, editorRef }: EditorProps) {
         <CodeMirror
           ref={editorRef}
           value={code}
+          readOnly={readOnly}
           aria-label="RelGeo DSL source editor"
+          aria-readonly={readOnly}
           height="100%"
           indentWithTab={false}
           theme="none" // We use our own CSS for styling
