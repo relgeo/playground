@@ -64,8 +64,11 @@ test('exposes the keyboard command surface and camera-only viewport reset', asyn
   const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
   const sourceBeforeReset = await editor.textContent();
 
+  await page.getByRole('button', { name: 'Zoom in' }).click();
+  await expect(page.locator('.zoom-readout')).not.toHaveAttribute('aria-label', 'Zoom 100%');
   await page.keyboard.press('Control+Alt+0');
   await expect(page.locator('.action-feedback')).toContainText('Viewport reset without changing the source.');
+  await expect(page.locator('.zoom-readout')).toHaveAttribute('aria-label', 'Zoom 100%');
   await expect(editor).toHaveText(sourceBeforeReset ?? '');
   await expect(page.getByRole('button', { name: 'Reset viewport' })).toHaveAttribute(
     'aria-keyshortcuts',

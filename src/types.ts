@@ -21,6 +21,9 @@ export interface OverlayConfig {
   showSegments: boolean;
 }
 
+export type WorkerReadiness = 'invalid' | 'partial' | 'structurally-valid' | 'semantically-valid' | 'resolve-ready';
+export type WorkerRecoveryState = 'invalid' | 'partial' | 'recovered' | 'stable';
+
 export interface WorkerRequest {
   requestId: number;
   code: string;
@@ -34,12 +37,16 @@ export interface WorkerRequest {
   showLabels?: boolean;
   hiddenRoles?: string[];
   nonScalingStroke?: boolean;
+  /** Previous response state lets the worker distinguish a recovery from a stable render. */
+  previousRecoveryState?: WorkerRecoveryState;
 }
 
 export type WorkerResponse =
   | {
       requestId: number;
       type: 'SUCCESS';
+      readiness: 'resolve-ready';
+      recoveryState: WorkerRecoveryState;
       data: {
         doc: RelGeoDocument;
         resolvedData: ResolvedScene;
@@ -50,6 +57,8 @@ export type WorkerResponse =
   | {
       requestId: number;
       type: 'ERROR';
+      readiness: WorkerReadiness;
+      recoveryState: WorkerRecoveryState;
       error: string;
       code?: string | null;
       path?: string | null;

@@ -137,6 +137,8 @@ describe('playground worker contract', () => {
 
     expect(result.type).toBe('SUCCESS');
     if (result.type === 'SUCCESS') {
+      expect(result.readiness).toBe('resolve-ready');
+      expect(result.recoveryState).toBe('stable');
       expect(result.data.doc.objects.panel).toBeDefined();
       expect(result.data.resolvedData.objects.panel).toBeDefined();
       expect(result.data.svgContent).toContain('<svg');
@@ -172,7 +174,38 @@ describe('playground worker contract', () => {
 
     expect(result.type).toBe('ERROR');
     if (result.type === 'ERROR') {
+      expect(result.readiness).toBe('invalid');
+      expect(result.recoveryState).toBe('invalid');
       expect(result.error.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('returns partial readiness for an empty document', () => {
+    const result = processWorkerRequest({
+      code: '',
+      overrides: {},
+      hiddenRoles: [],
+    });
+
+    expect(result.type).toBe('ERROR');
+    if (result.type === 'ERROR') {
+      expect(result.readiness).toBe('partial');
+      expect(result.recoveryState).toBe('partial');
+    }
+  });
+
+  it('marks a successful render as recovered after an invalid or partial response', () => {
+    const result = processWorkerRequest({
+      code: validDoc,
+      overrides: {},
+      hiddenRoles: [],
+      previousRecoveryState: 'partial',
+    });
+
+    expect(result.type).toBe('SUCCESS');
+    if (result.type === 'SUCCESS') {
+      expect(result.readiness).toBe('resolve-ready');
+      expect(result.recoveryState).toBe('recovered');
     }
   });
 

@@ -1,6 +1,6 @@
 import { getDependencyGraph, parseRelGeo, resolveGeometry } from '@relgeo/core';
 import { renderToSVG } from '@relgeo/renderer-svg';
-import type { WorkerRequest, WorkerResponse } from './types';
+import type { WorkerReadiness, WorkerRecoveryState, WorkerRequest, WorkerResponse } from './types';
 
 const offscreenCanvas = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(0, 0) : null;
 const offscreenCtx = offscreenCanvas ? offscreenCanvas.getContext('2d') : null;
@@ -64,6 +64,7 @@ export function processWorkerRequest({
   showLabels,
   hiddenRoles = ['construction'],
   nonScalingStroke,
+  previousRecoveryState,
 }: WorkerRequest): WorkerResponse {
   try {
     // 1. Parse & Validate Document (Strict mode for better playground feedback)
@@ -101,6 +102,8 @@ export function processWorkerRequest({
     return {
       requestId,
       type: 'SUCCESS',
+      readiness: 'resolve-ready',
+      recoveryState: getRecoveryStateAfterSuccess(previousRecoveryState),
       data: {
         doc,
         resolvedData: scene,
@@ -110,9 +113,12 @@ export function processWorkerRequest({
     };
   } catch (err: unknown) {
     const error = err as { message?: string; path?: string; objectId?: string; dependencyChain?: string[] };
+    const readiness: WorkerReadiness = code.trim().length === 0 ? 'partial' : 'invalid';
     return {
       requestId,
       type: 'ERROR',
+      readiness,
+      recoveryState: readiness === 'partial' ? 'partial' : 'invalid',
       error: error?.message ?? 'Unknown error',
       code: error?.code ?? null,
       path: error?.path ?? null,
@@ -120,6 +126,12 @@ export function processWorkerRequest({
       dependencyChain: error?.dependencyChain ?? null,
     };
   }
+}
+
+function getRecoveryStateAfterSuccess(previousRecoveryState?: WorkerRecoveryState): WorkerRecoveryState {
+  return previousRecoveryState === 'invalid' || previousRecoveryState === 'partial'
+    ? 'recovered'
+    : 'stable';
 }
 
 if (typeof self !== 'undefined') {

@@ -125,6 +125,7 @@ for (const target of [
 
 const navbarSource = await readFile(resolve(root, 'src/components/Navbar.tsx'), 'utf8');
 if (!navbarSource.includes('aria-label="Playground navigation"')) fail('navigation landmark is missing an accessible name');
+if (!navbarSource.includes('role="status"') || !navbarSource.includes('aria-atomic="true"')) fail('status announcements must be atomic');
 for (const target of [
   'preview-global-controls',
   'Global preview controls for ${currentPreviewLabel}',

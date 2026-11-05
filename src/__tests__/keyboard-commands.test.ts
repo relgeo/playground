@@ -56,4 +56,23 @@ describe('Playground keyboard command map', () => {
       shiftKey: false,
     })).toBeNull();
   });
+
+  it('does not steal IME composition or AltGraph text-entry chords', () => {
+    expect(getPlaygroundKeyboardCommand({
+      key: 'n',
+      altKey: true,
+      ctrlKey: true,
+      metaKey: false,
+      shiftKey: false,
+      isComposing: true,
+    })).toBeNull();
+    expect(getPlaygroundKeyboardCommand({
+      key: 's',
+      altKey: true,
+      ctrlKey: true,
+      metaKey: false,
+      shiftKey: false,
+      altGraphKey: true,
+    })).toBeNull();
+  });
 });

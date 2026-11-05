@@ -52,7 +52,7 @@ import {
 import type { RelGeoDocument, ResolvedScene, RelGeoError } from '@relgeo/core';
 
 // Types
-import type { InspectorTab, DragState, ViewMode, SidebarPosition, SidebarPanels, WorkerRequest, WorkerResponse, PreviewLineMode } from './types';
+import type { InspectorTab, DragState, ViewMode, SidebarPosition, SidebarPanels, WorkerRecoveryState, WorkerRequest, WorkerResponse, PreviewLineMode } from './types';
 
 const Editor = lazy(() => import('./components/Editor').then((module) => ({ default: module.Editor })));
 const Preview = lazy(() => import('./components/Preview').then((module) => ({ default: module.Preview })));
@@ -258,6 +258,7 @@ function App() {
   const workerRef = useRef<Worker | null>(null);
   const latestRequestIdRef = useRef(0);
   const requestCodeByIdRef = useRef(new Map<number, string>());
+  const workerRecoveryStateRef = useRef<WorkerRecoveryState | undefined>(undefined);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
   const deferredCode = useDeferredValue(code);
@@ -599,6 +600,7 @@ function App() {
         return;
       }
       if (res.type === 'SUCCESS') {
+        workerRecoveryStateRef.current = res.recoveryState;
         initialResolveSucceededRef.current = true;
         setBootstrapPhase((phase) => phase === 'empty' ? 'ready' : phase);
         setDoc(res.data.doc);
@@ -618,6 +620,7 @@ function App() {
         setErrorPath(null);
         setFullError(null);
       } else {
+        workerRecoveryStateRef.current = res.recoveryState;
         setError(res.error);
         setErrorPath(res.path ?? null);
         setFullError({
@@ -660,6 +663,7 @@ function App() {
       showLabels: isPrintMode ? showLabels : false,
       hiddenRoles: Array.from(hiddenRoles),
       nonScalingStroke: isPrintMode ? undefined : false,
+      previousRecoveryState: workerRecoveryStateRef.current,
     };
     workerRef.current.postMessage(reqPayload);
   }, [deferredCode, paramOverrides, selectedProfile, effectiveSheetId, isPrintMode, showDimensions, showAnnotations, showAnchors, showBoundingBox, showLabels, hiddenRoles]);
@@ -1176,7 +1180,6 @@ function App() {
     const resetState = getViewportResetState();
     setZoom(resetState.zoom);
     setPan(resetState.pan);
-    requestFitAll();
     setActionFeedback({ tone: 'success', message: 'Viewport reset without changing the source.' });
   };
 
@@ -1209,7 +1212,15 @@ function App() {
 
   useEffect(() => {
     const handleKeyboardCommand = (event: KeyboardEvent) => {
-      const command = getPlaygroundKeyboardCommand(event);
+      const command = getPlaygroundKeyboardCommand({
+        key: event.key,
+        altKey: event.altKey,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
+        isComposing: event.isComposing,
+        altGraphKey: event.getModifierState?.('AltGraph') ?? false,
+      });
       if (!command) return;
 
       if (interactionsBlocked) {

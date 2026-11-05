@@ -20,6 +20,8 @@ interface KeyboardCommandEvent {
   ctrlKey: boolean;
   metaKey: boolean;
   shiftKey: boolean;
+  isComposing?: boolean;
+  altGraphKey?: boolean;
 }
 
 /**
@@ -32,7 +34,13 @@ export function getPlaygroundKeyboardCommand({
   ctrlKey,
   metaKey,
   shiftKey,
+  isComposing = false,
+  altGraphKey = false,
 }: KeyboardCommandEvent): PlaygroundKeyboardCommand | null {
+  // IME composition and AltGraph are text-entry/browser keyboard paths. They
+  // must never be reinterpreted as a Playground command chord.
+  if (isComposing || altGraphKey) return null;
+
   if (key === 'Escape' && !altKey && !ctrlKey && !metaKey && !shiftKey) {
     return 'cancel';
   }

@@ -203,6 +203,7 @@ export function Navbar({
           className={`status-indicator status-${status}`}
           role="status"
           aria-live="polite"
+          aria-atomic="true"
           aria-label={statusHint}
           title={statusHint}
         >
