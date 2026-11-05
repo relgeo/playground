@@ -24,7 +24,7 @@ importers:
         specifier: ^6.42.1
         version: 6.43.11
       '@relgeo/core':
-        specifier: ^0.5.2
+        specifier: ^0.5.0
         version: 0.5.2
       '@relgeo/language-service':
         specifier: ^0.5.0
