@@ -31,6 +31,26 @@ export interface WorkspaceRepository {
   save(workspace: LocalWorkspace): Promise<void>;
 }
 
+interface PlaygroundTestHooks {
+  bootstrapDelayMs?: unknown;
+}
+
+function getBootstrapDelayMs(): number {
+  const hooks = (globalThis as typeof globalThis & {
+    __RELGeoPlaygroundTestHooks?: PlaygroundTestHooks;
+  }).__RELGeoPlaygroundTestHooks;
+  if (!hooks || typeof hooks.bootstrapDelayMs !== 'number' || !Number.isFinite(hooks.bootstrapDelayMs)) {
+    return 0;
+  }
+  return Math.max(0, Math.min(5_000, Math.floor(hooks.bootstrapDelayMs)));
+}
+
+async function delayBootstrapForTestHook(): Promise<void> {
+  const delayMs = getBootstrapDelayMs();
+  if (delayMs === 0) return;
+  await new Promise<void>((resolve) => globalThis.setTimeout(resolve, delayMs));
+}
+
 function getIndexedDbFactory(): IDBFactory | null {
   return typeof indexedDB === 'undefined' ? null : indexedDB;
 }
@@ -148,6 +168,7 @@ export class IndexedDbWorkspaceRepository implements WorkspaceRepository {
 
   load(): Promise<LocalWorkspace | null> {
     return this.enqueue(async () => {
+      await delayBootstrapForTestHook();
       const database = await this.open();
       try {
         return await readStoredWorkspace(database);

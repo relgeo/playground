@@ -128,6 +128,80 @@ objects:
 `;
 
 describe('playground worker contract', () => {
+  it('echoes document identity and serializes the language-service analysis envelope', () => {
+    const result = processWorkerRequest({
+      documentId: 'local:contract-proof',
+      version: 4,
+      requestId: 12,
+      code: invalidDoc,
+      sourceRevision: 'sha256:contract-proof',
+      provenance: [{ source: 'host', specVersion: '0.5', revision: 'playground-test' }],
+      overrides: {},
+      hiddenRoles: [],
+    });
+
+    expect(result).toMatchObject({
+      documentId: 'local:contract-proof',
+      version: 4,
+      requestId: 12,
+      type: 'ERROR',
+    });
+    expect(result.analysis).toMatchObject({
+      protocolVersion: '0.2',
+      resultKind: 'analysis',
+      specVersion: '0.5',
+      documentId: 'local:contract-proof',
+      version: 4,
+      requestId: '12',
+      positionEncoding: 'utf-16',
+      sourceRevision: 'sha256:contract-proof',
+      provenance: [{ source: 'host', specVersion: '0.5', revision: 'playground-test' }],
+      readiness: 'invalid',
+      recoveryState: 'invalid',
+      provenance: [{ source: 'host', specVersion: '0.5', revision: 'playground-test' }],
+    });
+    expect(result.analysis.diagnostics[0]?.range).toEqual(expect.objectContaining({
+      start: expect.objectContaining({ line: expect.any(Number), character: expect.any(Number) }),
+      end: expect.objectContaining({ line: expect.any(Number), character: expect.any(Number) }),
+    }));
+
+    const roundTrip = JSON.parse(JSON.stringify(result));
+    expect(roundTrip.analysis).toMatchObject({
+      documentId: 'local:contract-proof',
+      version: 4,
+      requestId: '12',
+      positionEncoding: 'utf-16',
+      sourceRevision: 'sha256:contract-proof',
+      provenance: [{ source: 'host', specVersion: '0.5', revision: 'playground-test' }],
+    });
+  });
+
+  it('propagates a same-document invalid-to-recovered analysis sequence', () => {
+    const invalid = processWorkerRequest({
+      documentId: 'local:recovery-proof',
+      version: 1,
+      requestId: 1,
+      code: invalidDoc,
+      overrides: {},
+      hiddenRoles: [],
+    });
+    const recovered = processWorkerRequest({
+      documentId: 'local:recovery-proof',
+      version: 2,
+      requestId: 2,
+      code: validDoc,
+      overrides: {},
+      hiddenRoles: [],
+      previousRecoveryState: invalid.recoveryState,
+      previousAnalysis: invalid.analysis,
+    });
+
+    expect(recovered.type).toBe('SUCCESS');
+    expect(recovered.analysis.readiness).toBe('structurally-valid');
+    expect(recovered.analysis.recoveryState).toBe('recovered');
+    expect(recovered.recoveryState).toBe('recovered');
+  });
+
   it('returns SUCCESS for valid input', () => {
     const result = processWorkerRequest({
       code: validDoc,

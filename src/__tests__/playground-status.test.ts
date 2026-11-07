@@ -92,6 +92,23 @@ describe('playground status helpers', () => {
     });
   });
 
+  it('reports bootstrap storage failure as ERROR instead of EMPTY or READY', () => {
+    expect(
+      getPlaygroundStatusMeta({
+        hasError: false,
+        hasRenderablePreview: true,
+        isResolving: false,
+        isShowingFallback: false,
+        isBootstrapError: true,
+        bootstrapErrorDetail: 'Browser storage is unavailable',
+      })
+    ).toEqual({
+      tone: 'error',
+      label: 'ERROR',
+      detail: 'Browser storage is unavailable',
+    });
+  });
+
   it('keeps resolving explicit when no fallback preview exists yet', () => {
     expect(
       getPlaygroundStatusMeta({

@@ -30,11 +30,18 @@ test('mobile surface switcher responds to touch taps', async ({ page }) => {
   const mobileSurfaces = page.getByRole('group', { name: 'Mobile workspace surface' });
   await expect(mobileSurfaces).toBeVisible();
 
-  await tapWithTouch(mobileSurfaces.getByRole('button', { name: 'Source' }));
+  const sourceButton = mobileSurfaces.getByRole('button', { name: 'Source' });
+  const previewButton = mobileSurfaces.getByRole('button', { name: 'Preview' });
+  await expect(sourceButton).toHaveAttribute('aria-pressed', 'false');
+  await expect(previewButton).toHaveAttribute('aria-pressed', 'false');
+
+  await tapWithTouch(sourceButton);
   await expect(page.getByRole('textbox', { name: 'RelGeo DSL source editor' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Model Preview canvas' })).toBeHidden();
+  await expect(sourceButton).toHaveAttribute('aria-pressed', 'true');
 
-  await tapWithTouch(mobileSurfaces.getByRole('button', { name: 'Preview' }));
+  await tapWithTouch(previewButton);
   await expect(page.getByRole('region', { name: 'Model Preview canvas' })).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'RelGeo DSL source editor' })).toBeHidden();
+  await expect(previewButton).toHaveAttribute('aria-pressed', 'true');
 });

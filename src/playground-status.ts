@@ -5,7 +5,9 @@ interface PlaygroundStatusInput {
   isShowingFallback: boolean;
   isBootstrapping?: boolean;
   isEmpty?: boolean;
+  isBootstrapError?: boolean;
   bootstrapDetail?: string | null;
+  bootstrapErrorDetail?: string | null;
 }
 
 export type BootstrapPhase = 'opening' | 'restoring' | 'empty' | 'ready' | 'error';
@@ -27,13 +29,23 @@ export function getPlaygroundStatusMeta({
   isShowingFallback,
   isBootstrapping = false,
   isEmpty = false,
+  isBootstrapError = false,
   bootstrapDetail = null,
+  bootstrapErrorDetail = null,
 }: PlaygroundStatusInput): PlaygroundStatusMeta {
   if (isBootstrapping) {
     return {
       tone: 'loading',
       label: 'LOADING',
       detail: bootstrapDetail ?? 'Opening the local workspace',
+    };
+  }
+
+  if (isBootstrapError) {
+    return {
+      tone: 'error',
+      label: 'ERROR',
+      detail: bootstrapErrorDetail ?? 'Browser workspace storage could not be opened',
     };
   }
 

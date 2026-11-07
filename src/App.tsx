@@ -52,7 +52,7 @@ import {
 import type { RelGeoDocument, ResolvedScene, RelGeoError } from '@relgeo/core';
 
 // Types
-import type { InspectorTab, DragState, ViewMode, SidebarPosition, SidebarPanels, WorkerRecoveryState, WorkerRequest, WorkerResponse, PreviewLineMode } from './types';
+import type { InspectorTab, DragState, ViewMode, SidebarPosition, SidebarPanels, WorkerDocumentIdentity, WorkerRecoveryState, WorkerRequest, WorkerResponse, PreviewLineMode } from './types';
 
 const Editor = lazy(() => import('./components/Editor').then((module) => ({ default: module.Editor })));
 const Preview = lazy(() => import('./components/Preview').then((module) => ({ default: module.Preview })));
@@ -257,8 +257,15 @@ function App() {
 
   const workerRef = useRef<Worker | null>(null);
   const latestRequestIdRef = useRef(0);
+  const latestWorkerIdentityRef = useRef<WorkerDocumentIdentity>({
+    documentId: '',
+    version: 0,
+    requestId: 0,
+  });
+  const workerDocumentRef = useRef<{ documentId: string; version: number; code: string } | null>(null);
   const requestCodeByIdRef = useRef(new Map<number, string>());
   const workerRecoveryStateRef = useRef<WorkerRecoveryState | undefined>(undefined);
+  const workerAnalysisRef = useRef<WorkerResponse['analysis'] | undefined>(undefined);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
   const deferredCode = useDeferredValue(code);
@@ -540,9 +547,13 @@ function App() {
     isShowingFallback,
     isBootstrapping: bootstrapPhase === 'opening' || bootstrapPhase === 'restoring',
     isEmpty: bootstrapPhase === 'empty',
+    isBootstrapError: bootstrapPhase === 'error',
     bootstrapDetail: bootstrapPhase === 'opening'
       ? 'Opening the browser workspace'
       : 'Restoring local files and shared source',
+    bootstrapErrorDetail: bootstrapPhase === 'error'
+      ? actionFeedback?.message ?? 'Browser workspace storage could not be opened'
+      : null,
   });
   const previewErrorHint = getPreviewRecoveryHint({
     hasError: error !== null,
@@ -596,9 +607,10 @@ function App() {
       const res = e.data;
       const requestCode = requestCodeByIdRef.current.get(res.requestId);
       requestCodeByIdRef.current.delete(res.requestId);
-      if (!shouldApplyWorkerResponse(res.requestId, latestRequestIdRef.current)) {
+      if (!shouldApplyWorkerResponse(res, latestWorkerIdentityRef.current)) {
         return;
       }
+      workerAnalysisRef.current = res.analysis;
       if (res.type === 'SUCCESS') {
         workerRecoveryStateRef.current = res.recoveryState;
         initialResolveSucceededRef.current = true;
@@ -647,10 +659,26 @@ function App() {
     if (!workerRef.current) return;
 
     setIsResolving(true);
+    const documentId = activeDocumentId
+      ? `local:${activeDocumentId}`
+      : isSharedDraft
+        ? 'shared:hash'
+        : `example:${selectedExample}`;
+    const previousDocument = workerDocumentRef.current;
+    const version = previousDocument?.documentId === documentId
+      ? previousDocument.code === deferredCode
+        ? previousDocument.version
+        : previousDocument.version + 1
+      : 1;
+    workerDocumentRef.current = { documentId, version, code: deferredCode };
+
     const requestId = getNextWorkerRequestId(latestRequestIdRef.current);
     latestRequestIdRef.current = requestId;
+    latestWorkerIdentityRef.current = { documentId, version, requestId };
     requestCodeByIdRef.current.set(requestId, deferredCode);
     const reqPayload: WorkerRequest = {
+      documentId,
+      version,
       requestId,
       code: deferredCode,
       profile: selectedProfile,
@@ -664,9 +692,12 @@ function App() {
       hiddenRoles: Array.from(hiddenRoles),
       nonScalingStroke: isPrintMode ? undefined : false,
       previousRecoveryState: workerRecoveryStateRef.current,
+      previousAnalysis: workerAnalysisRef.current?.documentId === documentId
+        ? workerAnalysisRef.current
+        : undefined,
     };
     workerRef.current.postMessage(reqPayload);
-  }, [deferredCode, paramOverrides, selectedProfile, effectiveSheetId, isPrintMode, showDimensions, showAnnotations, showAnchors, showBoundingBox, showLabels, hiddenRoles]);
+  }, [deferredCode, paramOverrides, selectedProfile, effectiveSheetId, isPrintMode, showDimensions, showAnnotations, showAnchors, showBoundingBox, showLabels, hiddenRoles, activeDocumentId, isSharedDraft, selectedExample]);
 
   const applyExampleChange = (key: string) => {
     startTransition(() => {

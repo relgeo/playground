@@ -139,6 +139,7 @@ for (const target of [
   'aria-label="Show sidebar on left"',
   'aria-label="Show sidebar on right"',
   'aria-label="Hide sidebar"',
+  'aria-pressed={',
 ]) {
   if (!navbarSource.includes(target)) fail(`missing global preview control contract: ${target}`);
 }
@@ -157,6 +158,7 @@ for (const target of [
   'aria-label="RelGeo DSL source editor"',
   'aria-multiline',
   'aria-readonly={readOnly}',
+  'acceptCurrentDocumentAnalysis',
 ]) {
   if (!editorSource.includes(target)) fail(`missing editor accessibility contract: ${target}`);
 }
@@ -166,6 +168,9 @@ for (const target of [
   'const backdropRef = useRef<HTMLButtonElement>(null);',
   'focusable.push(backdropRef.current);',
   'onKeyDown={handleDrawerKeyDown}',
+  'aria-expanded={isExpanded}',
+  'role="region"',
+  'aria-valuenow={width}',
 ]) {
   if (!sidebarSource.includes(target)) fail(`missing mobile drawer focus-trap contract: ${target}`);
 }
@@ -194,6 +199,9 @@ for (const target of [
   'getFirstDiagnosticTarget',
   'No source location is available for this diagnostic.',
   'No source target',
+  'aria-selected={tab ===',
+  'aria-controls="inspector-tabpanel"',
+  'aria-labelledby={`inspector-tab-${',
 ]) {
   if (!inspectorSource.includes(target)) fail(`missing diagnostics accessibility contract: ${target}`);
 }

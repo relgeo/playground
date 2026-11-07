@@ -1,5 +1,13 @@
 import { expect, test, type Page } from '@playwright/test';
 
+declare global {
+  interface Window {
+    __RELGeoPlaygroundTestHooks?: {
+      bootstrapDelayMs?: number;
+    };
+  }
+}
+
 const runtimeDiagnosticSource = `version: 0.5
 
 meta:
@@ -83,6 +91,37 @@ test('exposes the keyboard command surface and camera-only viewport reset', asyn
   await expect(page.locator('.preview-side')).toHaveCount(0);
 });
 
+test('gates the workspace while bootstrap is loading and releases it at the first interactive point', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__RELGeoPlaygroundTestHooks = { bootstrapDelayMs: 750 };
+  });
+
+  await page.goto('./');
+
+  const main = page.getByRole('main', { name: 'Playground workspace' });
+  const navigation = page.getByRole('navigation', { name: 'Playground navigation' });
+  const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
+
+  await expect(main).toHaveAttribute('data-bootstrap-state', /opening|restoring/);
+  await expect(main).toHaveAttribute('aria-busy', 'true');
+  await expect(main).toHaveAttribute('inert', '');
+  await expect(navigation).toHaveAttribute('aria-busy', 'true');
+  await expect(navigation).toHaveAttribute('inert', '');
+  await expect(page.getByRole('status', { name: /LOADING/ })).toBeVisible();
+  await expect(editor).toHaveAttribute('aria-readonly', 'true');
+
+  await page.keyboard.press('Control+Alt+3');
+  await expect(page.locator('.editor-side')).toHaveCount(1);
+  await expect(page.locator('.preview-side')).toHaveCount(1);
+
+  await expect(main).toHaveAttribute('data-bootstrap-state', /empty|ready/);
+  await expect(main).toHaveAttribute('aria-busy', 'false');
+  await expect(main).not.toHaveAttribute('inert');
+  await expect(navigation).not.toHaveAttribute('inert');
+  await expect(editor).toHaveAttribute('aria-readonly', 'false');
+  await expect(page.getByRole('status', { name: /^READY/ })).toBeVisible();
+});
+
 test('follows system theme by default and persists explicit light/dark overrides', async ({ page }) => {
   await page.addInitScript(() => localStorage.removeItem('relgeo_playground_theme'));
   await openPlayground(page);
@@ -136,6 +175,18 @@ test('resolves source, keeps preview visible, and exposes runtime diagnostics', 
   await page.getByRole('tab', { name: 'Errors' }).click();
   await expect(page.getByRole('tab', { name: 'Errors' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByText('Points are not aligned. Distance: 14.1421', { exact: true })).toBeVisible();
+
+  const diagnosticSummary = page.getByRole('status', { name: /diagnostic found/ });
+  await expect(diagnosticSummary).toHaveAttribute('aria-live', 'polite');
+  await expect(diagnosticSummary).toHaveAttribute('aria-atomic', 'true');
+  await expect(page.getByRole('button', { name: 'Jump to first error' })).toBeVisible();
+
+  await editor.fill('version: 0.5\nobjects:\n  broken:\n    type: rect\n    size: [missingWidth, 80mm]\n');
+  await expect(page.getByRole('status', { name: /^ERROR/ })).toBeVisible();
+  await expect(page.getByRole('alert')).toBeVisible();
+
+  await editor.fill(runtimeDiagnosticSource);
+  await expect(page.getByRole('status', { name: /^READY/ })).toBeVisible();
 });
 
 test('exposes named landmarks, state semantics, and source-preview keyboard navigation', async ({ page }) => {
@@ -148,6 +199,25 @@ test('exposes named landmarks, state semantics, and source-preview keyboard navi
   const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
   await expect(editor).toHaveAttribute('aria-multiline', 'true');
   await expect(editor).toHaveAttribute('aria-readonly', 'false');
+
+  const previewToggle = page.getByRole('button', { name: 'Switch to physical preview' });
+  await expect(previewToggle).toHaveAttribute('aria-pressed', 'false');
+  await previewToggle.click();
+  await expect(page.getByRole('button', { name: 'Switch to model preview' })).toHaveAttribute('aria-pressed', 'true');
+
+  const inspectorToggle = page.getByRole('button', { name: 'Inspector' });
+  const inspectorRegion = page.getByRole('region', { name: 'Inspector' });
+  await expect(inspectorToggle).toHaveAttribute('aria-expanded', 'true');
+  await inspectorToggle.click();
+  await expect(inspectorToggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(inspectorRegion).toBeHidden();
+  await inspectorToggle.click();
+  await expect(inspectorRegion).toBeVisible();
+
+  const splitResizer = page.getByRole('separator', { name: 'Resize editor and preview horizontally' });
+  await expect(splitResizer).toHaveAttribute('aria-valuemin', '10');
+  await expect(splitResizer).toHaveAttribute('aria-valuemax', '90');
+  await expect(splitResizer).toHaveAttribute('aria-valuenow', '50');
 
   const tablist = page.getByRole('tablist', { name: 'Inspector views' });
   await expect(tablist).toBeVisible();

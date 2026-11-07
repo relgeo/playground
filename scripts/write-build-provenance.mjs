@@ -47,6 +47,8 @@ function assetReferences(html) {
 const html = await readFile(entrypoint, 'utf8');
 const assets = assetReferences(html);
 if (assets.length === 0) throw new Error('Playground build has no local asset references');
+const title = html.match(/<title>([^<]+)<\/title>/)?.[1]?.trim();
+if (!title) throw new Error('Playground build has no document title');
 
 const assetDigests = {};
 for (const asset of assets) {
@@ -72,6 +74,9 @@ const output = {
   sourcePath: 'playground',
   sourceRevision: sourceRevision(),
   entrypoint: 'index.html',
+  basePath: '/playground/',
+  title,
+  assetManifest: assets,
   assetDigests,
   fileDigests,
   fileCount: allFiles.length,

@@ -2,21 +2,25 @@ import CodeMirror from '@uiw/react-codemirror';
 import { yaml } from '@codemirror/lang-yaml';
 import { linter } from '@codemirror/lint';
 import { autocompletion } from '@codemirror/autocomplete';
-import { RelGeoLanguageService } from '@relgeo/language-service';
+import {
+  acceptCurrentDocumentAnalysis,
+  RelGeoLanguageService,
+} from '@relgeo/language-service';
+import type {
+  CompletionResult,
+  DiagnosticsResult,
+  DocumentAnalysisRequest,
+  HoverResult,
+} from '@relgeo/language-service';
 import { EditorView, hoverTooltip } from '@codemirror/view';
 import React from 'react';
 
 const langService = new RelGeoLanguageService();
-type EditorRequest = {
-  documentId: string;
-  version: number;
-  requestId: string;
-  code: string;
-};
+type EditorRequest = DocumentAnalysisRequest;
 type ProtocolService = {
-  analyzeDiagnostics?: (request: EditorRequest) => { diagnostics: ReturnType<RelGeoLanguageService['getDiagnostics']> };
-  analyzeCompletion?: (request: EditorRequest, position: { line: number; character: number }) => { items: ReturnType<RelGeoLanguageService['getCompletions']> };
-  analyzeHover?: (request: EditorRequest, position: { line: number; character: number }) => { hover: ReturnType<RelGeoLanguageService['getHover']> };
+  analyzeDiagnostics?: (request: EditorRequest) => DiagnosticsResult;
+  analyzeCompletion?: (request: EditorRequest, position: { line: number; character: number }) => CompletionResult;
+  analyzeHover?: (request: EditorRequest, position: { line: number; character: number }) => HoverResult;
 };
 const protocolService = langService as unknown as RelGeoLanguageService & ProtocolService;
 let lastEditorSource = '';
@@ -37,17 +41,23 @@ function editorRequest(code: string) {
 
 function analyzeDiagnostics(code: string) {
   const request = editorRequest(code);
-  return protocolService.analyzeDiagnostics?.(request).diagnostics ?? langService.getDiagnostics(code);
+  const result = protocolService.analyzeDiagnostics?.(request);
+  if (!result) return langService.getDiagnostics(code);
+  return acceptCurrentDocumentAnalysis(result, request)?.diagnostics ?? [];
 }
 
 function analyzeCompletion(code: string, position: { line: number; character: number }) {
   const request = editorRequest(code);
-  return protocolService.analyzeCompletion?.(request, position).items ?? langService.getCompletions(code, position);
+  const result = protocolService.analyzeCompletion?.(request, position);
+  if (!result) return langService.getCompletions(code, position);
+  return acceptCurrentDocumentAnalysis(result, request)?.items ?? [];
 }
 
 function analyzeHover(code: string, position: { line: number; character: number }) {
   const request = editorRequest(code);
-  return protocolService.analyzeHover?.(request, position).hover ?? langService.getHover(code, position);
+  const result = protocolService.analyzeHover?.(request, position);
+  if (!result) return langService.getHover(code, position);
+  return acceptCurrentDocumentAnalysis(result, request)?.hover ?? null;
 }
 
 const relgeoLinter = linter((view) => {

@@ -1,9 +1,14 @@
 import { getDependencyGraph, parseRelGeo, resolveGeometry } from '@relgeo/core';
 import { renderToSVG } from '@relgeo/renderer-svg';
-import type { WorkerReadiness, WorkerRecoveryState, WorkerRequest, WorkerResponse } from './types';
+import { RelGeoLanguageService } from '@relgeo/language-service';
+import type { WorkerDocumentIdentity, WorkerReadiness, WorkerRecoveryState, WorkerRequest, WorkerResponse } from './types';
 
 const offscreenCanvas = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(0, 0) : null;
 const offscreenCtx = offscreenCanvas ? offscreenCanvas.getContext('2d') : null;
+const languageService = new RelGeoLanguageService();
+
+type WorkerRequestInput = Omit<WorkerRequest, keyof WorkerDocumentIdentity>
+  & Partial<WorkerDocumentIdentity>;
 
 const playgroundTextMetricsProvider = {
   measure({ content, fontSize, lineHeight }: { content: string; fontSize: number; lineHeight: number }) {
@@ -52,8 +57,12 @@ const playgroundTextMetricsProvider = {
 };
 
 export function processWorkerRequest({
-  requestId,
+  documentId = 'playground-document',
+  version = 0,
+  requestId = 0,
   code,
+  sourceRevision,
+  provenance,
   profile,
   overrides,
   selectedSheetId,
@@ -65,7 +74,19 @@ export function processWorkerRequest({
   hiddenRoles = ['construction'],
   nonScalingStroke,
   previousRecoveryState,
-}: WorkerRequest): WorkerResponse {
+  previousAnalysis,
+}: WorkerRequestInput): WorkerResponse {
+  const identity = { documentId, version, requestId } satisfies WorkerDocumentIdentity;
+  const analysis = languageService.analyzeDocument({
+    documentId,
+    version,
+    requestId: String(requestId),
+    code,
+    sourceRevision,
+    provenance,
+    previousAnalysis,
+  });
+
   try {
     // 1. Parse & Validate Document (Strict mode for better playground feedback)
     const doc = parseRelGeo(code, { mode: 'validate' });
@@ -100,10 +121,12 @@ export function processWorkerRequest({
 
     // Send back results in strict typed response format
     return {
+      ...identity,
       requestId,
       type: 'SUCCESS',
       readiness: 'resolve-ready',
       recoveryState: getRecoveryStateAfterSuccess(previousRecoveryState),
+      analysis,
       data: {
         doc,
         resolvedData: scene,
@@ -115,10 +138,12 @@ export function processWorkerRequest({
     const error = err as { message?: string; path?: string; objectId?: string; dependencyChain?: string[] };
     const readiness: WorkerReadiness = code.trim().length === 0 ? 'partial' : 'invalid';
     return {
+      ...identity,
       requestId,
       type: 'ERROR',
       readiness,
       recoveryState: readiness === 'partial' ? 'partial' : 'invalid',
+      analysis,
       error: error?.message ?? 'Unknown error',
       code: error?.code ?? null,
       path: error?.path ?? null,
