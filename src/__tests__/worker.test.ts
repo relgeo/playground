@@ -375,6 +375,57 @@ objects:
     }
   });
 
+  it('propagates nested metadata inheritance and the styles alias through worker resolution', () => {
+    const result = processWorkerRequest({
+      code: `version: 0.5
+styles:
+  baseGuide:
+    role: guide
+    stroke: "#334155"
+    strokeWidth: 1
+  dashedGuide:
+    inherit: baseGuide
+    dash: "4 2"
+metaPresets:
+  inspectionGuide:
+    inherit: dashedGuide
+    opacity: 0.7
+objects:
+  canonical:
+    type: line
+    from: [0, 0]
+    to: [40, 0]
+    metaPreset: inspectionGuide
+    meta:
+      strokeWidth: 2
+  alias:
+    type: line
+    from: [0, 10]
+    to: [40, 10]
+    style: dashedGuide
+`,
+      overrides: {},
+      hiddenRoles: [],
+    });
+
+    expect(result.type).toBe('SUCCESS');
+    if (result.type === 'SUCCESS') {
+      expect(result.data.resolvedData.objects.canonical.meta).toMatchObject({
+        role: 'guide',
+        stroke: '#334155',
+        strokeWidth: 2,
+        dash: '4 2',
+        opacity: 0.7,
+      });
+      expect(result.data.resolvedData.objects.alias.meta).toMatchObject({
+        role: 'guide',
+        stroke: '#334155',
+        strokeWidth: 1,
+        dash: '4 2',
+      });
+    }
+  });
+
   it('allows model preview worker output to disable non-scaling stroke for manual preview line handling', () => {
     const result = processWorkerRequest({
       code: previewStrokeDoc,
