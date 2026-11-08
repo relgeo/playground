@@ -128,6 +128,22 @@ objects:
 `;
 
 describe('playground worker contract', () => {
+  it('contains malformed host messages as typed errors instead of throwing', () => {
+    const result = processWorkerRequest({
+      documentId: null as unknown as string,
+      version: -1,
+      requestId: Number.NaN,
+      code: null as unknown as string,
+    });
+
+    expect(result).toMatchObject({
+      type: 'ERROR',
+      code: 'INVALID_WORKER_REQUEST',
+      readiness: 'invalid',
+      recoveryState: 'invalid',
+    });
+  });
+
   it('echoes document identity and serializes the language-service analysis envelope', () => {
     const result = processWorkerRequest({
       documentId: 'local:contract-proof',

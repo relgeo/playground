@@ -46,13 +46,13 @@ import {
 import { getRelatedObjectIds, type InspectorDependencyGraphEntry } from './inspector-helpers';
 import {
   getNextWorkerRequestId,
-  shouldApplyWorkerResponse,
 } from './worker-sequencing';
+import { WorkerLifecycle, type WorkerLifecycleFailure } from './worker-lifecycle';
 
 import type { RelGeoDocument, ResolvedScene, RelGeoError } from '@relgeo/core';
 
 // Types
-import type { InspectorTab, DragState, ViewMode, SidebarPosition, SidebarPanels, WorkerDocumentIdentity, WorkerRecoveryState, WorkerRequest, WorkerResponse, PreviewLineMode } from './types';
+import type { InspectorTab, DragState, ViewMode, SidebarPosition, SidebarPanels, WorkerRecoveryState, WorkerRequest, WorkerResponse, PreviewLineMode } from './types';
 
 const Editor = lazy(() => import('./components/Editor').then((module) => ({ default: module.Editor })));
 const Preview = lazy(() => import('./components/Preview').then((module) => ({ default: module.Preview })));
@@ -255,15 +255,9 @@ function App() {
     request?.onConfirm();
   }, [confirmationRequest]);
 
-  const workerRef = useRef<Worker | null>(null);
+  const workerLifecycleRef = useRef<WorkerLifecycle<WorkerRequest, WorkerResponse> | null>(null);
   const latestRequestIdRef = useRef(0);
-  const latestWorkerIdentityRef = useRef<WorkerDocumentIdentity>({
-    documentId: '',
-    version: 0,
-    requestId: 0,
-  });
   const workerDocumentRef = useRef<{ documentId: string; version: number; code: string } | null>(null);
-  const requestCodeByIdRef = useRef(new Map<number, string>());
   const workerRecoveryStateRef = useRef<WorkerRecoveryState | undefined>(undefined);
   const workerAnalysisRef = useRef<WorkerResponse['analysis'] | undefined>(undefined);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -597,19 +591,35 @@ function App() {
     );
   }, [displayDependencyGraph, displayDoc, displayResolvedData, relationDepth, visibleSelectedObjectId]);
 
-  // Initialize Worker
-  useEffect(() => {
-    const worker = new Worker(new URL('./worker.ts', import.meta.url), {
-      type: 'module',
+  const handleWorkerFailure = useCallback((failure: WorkerLifecycleFailure) => {
+    // Superseded/cancelled work is expected during fast editing and must not
+    // replace the state belonging to the current request.
+    if (failure.kind === 'superseded' || failure.kind === 'cancelled' || failure.kind === 'disposed') return;
+    setIsResolving(false);
+    setError(failure.message);
+    setErrorPath(null);
+    setFullError({
+      message: failure.message,
+      code: `WORKER_${failure.kind.toUpperCase().replaceAll('-', '_')}`,
+      path: null,
+      objectId: null,
+      dependencyChain: null,
     });
+    setDoc(null);
+    setResolvedData(null);
+    setSvgContent('');
+    setDependencyGraph([]);
+  }, []);
 
-    worker.onmessage = (e: MessageEvent<WorkerResponse>) => {
-      const res = e.data;
-      const requestCode = requestCodeByIdRef.current.get(res.requestId);
-      requestCodeByIdRef.current.delete(res.requestId);
-      if (!shouldApplyWorkerResponse(res, latestWorkerIdentityRef.current)) {
-        return;
-      }
+  // Initialize and own the worker lifecycle. Errors/timeouts replace the
+  // worker, while exact identity filtering happens before this callback.
+  useEffect(() => {
+    const lifecycle = new WorkerLifecycle<WorkerRequest, WorkerResponse>({
+      createWorker: () => new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' }),
+      timeoutMs: 15_000,
+      onFailure: handleWorkerFailure,
+      onResponse: (res, request) => {
+        const requestCode = request.code;
       workerAnalysisRef.current = res.analysis;
       if (res.type === 'SUCCESS') {
         workerRecoveryStateRef.current = res.recoveryState;
@@ -648,15 +658,18 @@ function App() {
         setDependencyGraph([]);
       }
       setIsResolving(false);
+      },
+    });
+    workerLifecycleRef.current = lifecycle;
+    return () => {
+      lifecycle.dispose();
+      workerLifecycleRef.current = null;
     };
-
-    workerRef.current = worker;
-    return () => worker.terminate();
-  }, []);
+  }, [handleWorkerFailure]);
 
   // Dispatch to Worker
   useEffect(() => {
-    if (!workerRef.current) return;
+    if (!workerLifecycleRef.current) return;
 
     setIsResolving(true);
     const documentId = activeDocumentId
@@ -674,8 +687,6 @@ function App() {
 
     const requestId = getNextWorkerRequestId(latestRequestIdRef.current);
     latestRequestIdRef.current = requestId;
-    latestWorkerIdentityRef.current = { documentId, version, requestId };
-    requestCodeByIdRef.current.set(requestId, deferredCode);
     const reqPayload: WorkerRequest = {
       documentId,
       version,
@@ -696,7 +707,10 @@ function App() {
         ? workerAnalysisRef.current
         : undefined,
     };
-    workerRef.current.postMessage(reqPayload);
+    void workerLifecycleRef.current.dispatch(reqPayload).catch(() => {
+      // Lifecycle callbacks own user-visible failures; the promise is kept
+      // rejected for callers/tests without creating an unhandled rejection.
+    });
   }, [deferredCode, paramOverrides, selectedProfile, effectiveSheetId, isPrintMode, showDimensions, showAnnotations, showAnchors, showBoundingBox, showLabels, hiddenRoles, activeDocumentId, isSharedDraft, selectedExample]);
 
   const applyExampleChange = (key: string) => {

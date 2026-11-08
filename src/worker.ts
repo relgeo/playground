@@ -76,20 +76,48 @@ export function processWorkerRequest({
   previousRecoveryState,
   previousAnalysis,
 }: WorkerRequestInput): WorkerResponse {
-  const identity = { documentId, version, requestId } satisfies WorkerDocumentIdentity;
+  const safeDocumentId = typeof documentId === 'string' && documentId.length > 0
+    ? documentId
+    : 'playground-document';
+  const safeVersion = Number.isInteger(version) && version >= 0 ? version : 0;
+  const safeRequestId = Number.isInteger(requestId) && requestId >= 0 ? requestId : 0;
+  const safeCode = typeof code === 'string' ? code : '';
+  const malformedRequest = typeof documentId !== 'string'
+    || documentId.length === 0
+    || !Number.isInteger(version)
+    || version < 0
+    || !Number.isInteger(requestId)
+    || requestId < 0
+    || typeof code !== 'string';
+  const identity = { documentId: safeDocumentId, version: safeVersion, requestId: safeRequestId } satisfies WorkerDocumentIdentity;
   const analysis = languageService.analyzeDocument({
-    documentId,
-    version,
-    requestId: String(requestId),
-    code,
+    documentId: safeDocumentId,
+    version: safeVersion,
+    requestId: String(safeRequestId),
+    code: safeCode,
     sourceRevision,
     provenance,
     previousAnalysis,
   });
 
+  if (malformedRequest) {
+    return {
+      ...identity,
+      type: 'ERROR',
+      readiness: 'invalid',
+      recoveryState: 'invalid',
+      analysis,
+      error: 'Malformed worker request.',
+      code: 'INVALID_WORKER_REQUEST',
+      path: null,
+      objectId: null,
+      dependencyChain: null,
+    };
+  }
+
   try {
     // 1. Parse & Validate Document (Strict mode for better playground feedback)
-    const doc = parseRelGeo(code, { mode: 'validate' });
+    const doc = parseRelGeo(safeCode, { mode: 'validate' });
 
     // 2. Resolve Geometry
     const scene = resolveGeometry(doc, {
@@ -122,7 +150,7 @@ export function processWorkerRequest({
     // Send back results in strict typed response format
     return {
       ...identity,
-      requestId,
+      requestId: safeRequestId,
       type: 'SUCCESS',
       readiness: 'resolve-ready',
       recoveryState: getRecoveryStateAfterSuccess(previousRecoveryState),
@@ -136,10 +164,10 @@ export function processWorkerRequest({
     };
   } catch (err: unknown) {
     const error = err as { message?: string; path?: string; objectId?: string; dependencyChain?: string[] };
-    const readiness: WorkerReadiness = code.trim().length === 0 ? 'partial' : 'invalid';
+    const readiness: WorkerReadiness = safeCode.trim().length === 0 ? 'partial' : 'invalid';
     return {
       ...identity,
-      requestId,
+      requestId: safeRequestId,
       type: 'ERROR',
       readiness,
       recoveryState: readiness === 'partial' ? 'partial' : 'invalid',
@@ -161,6 +189,19 @@ function getRecoveryStateAfterSuccess(previousRecoveryState?: WorkerRecoveryStat
 
 if (typeof self !== 'undefined') {
   self.onmessage = (e: MessageEvent<WorkerRequest>) => {
-    self.postMessage(processWorkerRequest(e.data));
+    try {
+      self.postMessage(processWorkerRequest(e.data));
+    } catch {
+      // Keep malformed host messages inside the typed worker boundary. The
+      // lifecycle controller can then surface this response without leaving
+      // the consumer in a perpetual resolving state.
+      const input = e.data as Partial<WorkerRequest> | null | undefined;
+      self.postMessage(processWorkerRequest({
+        documentId: typeof input?.documentId === 'string' ? input.documentId : 'playground-document',
+        version: Number.isInteger(input?.version) && (input?.version ?? -1) >= 0 ? input!.version! : 0,
+        requestId: Number.isInteger(input?.requestId) && (input?.requestId ?? -1) >= 0 ? input!.requestId! : 0,
+        code: null as unknown as string,
+      }));
+    }
   };
 }
