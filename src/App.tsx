@@ -1416,7 +1416,7 @@ function App() {
         aria-label="Playground workspace"
         aria-busy={interactionsBlocked}
         aria-disabled={interactionsBlocked || undefined}
-        inert={interactionsBlocked ? '' : undefined}
+        inert={interactionsBlocked || undefined}
         data-bootstrap-state={bootstrapPhase}
       >
         <Suspense fallback={<aside className="sidebar component-loading" role="status">Loading sidebar…</aside>}>

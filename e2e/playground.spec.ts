@@ -123,7 +123,14 @@ test('gates the workspace while bootstrap is loading and releases it at the firs
 });
 
 test('follows system theme by default and persists explicit light/dark overrides', async ({ page }) => {
-  await page.addInitScript(() => localStorage.removeItem('relgeo_playground_theme'));
+  await page.addInitScript(() => {
+    // Init scripts run on every navigation, including reload. Clear the
+    // preference only for the first document so reload can test persistence.
+    if (sessionStorage.getItem('relgeo_theme_test_initialized') !== '1') {
+      localStorage.removeItem('relgeo_playground_theme');
+      sessionStorage.setItem('relgeo_theme_test_initialized', '1');
+    }
+  });
   await openPlayground(page);
 
   await page.getByText('More', { exact: true }).click();

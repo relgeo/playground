@@ -158,7 +158,7 @@ export function Navbar({
       aria-busy={interactionsBlocked}
       aria-disabled={interactionsBlocked || undefined}
       data-interaction-state={interactionsBlocked ? 'blocked' : 'ready'}
-      inert={interactionsBlocked ? '' : undefined}
+      inert={interactionsBlocked || undefined}
     >
       <div className="navbar-left">
         <div className="navbar-brand">

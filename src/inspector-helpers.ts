@@ -18,6 +18,7 @@ export interface DiagnosticTargetInput {
   } | null;
   firstViolation?: {
     objectId?: string | null;
+    involvedObjects?: readonly string[];
   } | null;
 }
 
@@ -37,6 +38,8 @@ export function getFirstDiagnosticTarget({
 }: DiagnosticTargetInput): DiagnosticTarget | null {
   if (error?.objectId) return { kind: 'object', value: error.objectId };
   if (firstViolation?.objectId) return { kind: 'object', value: firstViolation.objectId };
+  const firstInvolvedObject = firstViolation?.involvedObjects?.[0];
+  if (firstInvolvedObject) return { kind: 'object', value: firstInvolvedObject };
   if (error?.path) return { kind: 'path', value: error.path };
   const dependencyNode = error?.dependencyChain?.[0];
   if (dependencyNode) return { kind: 'dependency', value: dependencyNode };

@@ -14,6 +14,10 @@ describe('first diagnostic navigation', () => {
     })).toEqual({ kind: 'object', value: 'violation-object' });
 
     expect(getFirstDiagnosticTarget({
+      firstViolation: { involvedObjects: ['constraint-target', 'constraint-peer'] },
+    })).toEqual({ kind: 'object', value: 'constraint-target' });
+
+    expect(getFirstDiagnosticTarget({
       error: { path: 'objects.error' },
     })).toEqual({ kind: 'path', value: 'objects.error' });
 
