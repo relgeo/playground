@@ -79,6 +79,19 @@ function clampPreviewZoom(value: number): number {
   return Math.min(MAX_PREVIEW_ZOOM, Math.max(MIN_PREVIEW_ZOOM, Math.round(value * 100) / 100));
 }
 
+function triggerBlobDownload(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.hidden = true;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  // Keep the object URL alive through the browser's download dispatch.
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
 function getSidebarMaxWidth(viewportWidth = typeof window === 'undefined' ? 1280 : window.innerWidth): number {
   return viewportWidth <= 1280
     ? Math.max(240, Math.min(320, viewportWidth * 0.3))
@@ -1007,12 +1020,7 @@ function App() {
   const handleBackupWorkspace = () => {
     try {
       const blob = new Blob([serializeWorkspaceBackup(localWorkspace)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = `relgeo-playground-workspace-${new Date().toISOString().slice(0, 10)}.json`;
-      anchor.click();
-      URL.revokeObjectURL(url);
+      triggerBlobDownload(blob, `relgeo-playground-workspace-${new Date().toISOString().slice(0, 10)}.json`);
       setActionFeedback({ tone: 'success', message: 'Workspace backup downloaded.' });
     } catch (error) {
       console.error('Failed to download workspace backup', error);
@@ -1099,12 +1107,10 @@ function App() {
   const handleDownloadFile = () => {
     try {
       const blob = new Blob([code], { type: 'application/yaml' });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = `${activeSourceName.replace(/[^a-z0-9._-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'untitled'}.yaml`;
-      anchor.click();
-      URL.revokeObjectURL(url);
+      triggerBlobDownload(
+        blob,
+        `${activeSourceName.replace(/[^a-z0-9._-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'untitled'}.yaml`,
+      );
       setActionFeedback({ tone: 'success', message: 'Source downloaded as YAML.' });
     } catch (error) {
       console.error('Failed to download source', error);
@@ -1146,12 +1152,7 @@ function App() {
     }
     try {
       const blob = new Blob([displaySvgContent], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = getExportFileName(selectedExample, effectiveSheetId, isPrintMode);
-      a.click();
-      URL.revokeObjectURL(url);
+      triggerBlobDownload(blob, getExportFileName(selectedExample, effectiveSheetId, isPrintMode));
       setActionFeedback({ tone: 'success', message: 'SVG exported.' });
     } catch (e) {
       console.error('Failed to export SVG', e);

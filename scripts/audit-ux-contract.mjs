@@ -84,7 +84,7 @@ for (const target of [
   'data-bootstrap-state={bootstrapPhase}',
   'setBootstrapPhase((phase) => phase === \'empty\' ? \'ready\' : phase)',
   'aria-busy={interactionsBlocked}',
-  "inert={interactionsBlocked ? '' : undefined}",
+  'inert={interactionsBlocked || undefined}',
   'isEmpty: bootstrapPhase === \'empty\'',
 ]) {
   if (!appSource.includes(target)) fail(`missing application command/bootstrap contract: ${target}`);
@@ -157,7 +157,7 @@ const editorSource = await readFile(resolve(root, 'src/components/Editor.tsx'), 
 for (const target of [
   'aria-label="RelGeo DSL source editor"',
   'aria-multiline',
-  'aria-readonly={readOnly}',
+  "aria-readonly={readOnly ? 'true' : 'false'}",
   'acceptCurrentDocumentAnalysis',
 ]) {
   if (!editorSource.includes(target)) fail(`missing editor accessibility contract: ${target}`);

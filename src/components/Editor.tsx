@@ -162,7 +162,10 @@ export function Editor({ code, onChange, editorRef, readOnly = false }: EditorPr
           value={code}
           readOnly={readOnly}
           aria-label="RelGeo DSL source editor"
-          aria-readonly={readOnly}
+          // Keep the ARIA state explicit in both modes. CodeMirror omits a
+          // false boolean attribute, but assistive technology and our
+          // browser contract need to distinguish editable from unavailable.
+          aria-readonly={readOnly ? 'true' : 'false'}
           height="100%"
           indentWithTab={false}
           theme="none" // We use our own CSS for styling
@@ -175,6 +178,7 @@ export function Editor({ code, onChange, editorRef, readOnly = false }: EditorPr
             EditorView.contentAttributes.of({
               'aria-label': 'RelGeo DSL source editor',
               'aria-multiline': 'true',
+              'aria-readonly': readOnly ? 'true' : 'false',
             }),
           ]}
           onChange={(value) => onChange(value)}

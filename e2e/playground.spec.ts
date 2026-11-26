@@ -39,6 +39,12 @@ async function openPlayground(page: Page) {
   await expect(page.locator('main[data-bootstrap-state="ready"]')).toHaveAttribute('aria-busy', 'false');
 }
 
+async function openPlaygroundWithoutRequiringReady(page: Page) {
+  await page.goto('./');
+  await expect(page.getByRole('textbox', { name: 'RelGeo DSL source editor' })).toBeVisible();
+  await expect(page.locator('main')).not.toHaveAttribute('aria-busy', 'true', { timeout: 20_000 });
+}
+
 async function hasIndexedDbDocument(page: Page, documentId: string, contentFragment: string) {
   return page.evaluate(async ({ documentId: expectedId, contentFragment: expectedContent }) => {
     return new Promise<boolean>((resolve) => {
@@ -93,7 +99,9 @@ test('exposes the keyboard command surface and camera-only viewport reset', asyn
 
 test('gates the workspace while bootstrap is loading and releases it at the first interactive point', async ({ page }) => {
   await page.addInitScript(() => {
-    window.__RELGeoPlaygroundTestHooks = { bootstrapDelayMs: 750 };
+    // Keep the bootstrap phase observable after page.goto() has completed.
+    // A shorter delay can elapse while Vite loads the application bundle.
+    window.__RELGeoPlaygroundTestHooks = { bootstrapDelayMs: 5_000 };
   });
 
   await page.goto('./');
@@ -190,7 +198,7 @@ test('resolves source, keeps preview visible, and exposes runtime diagnostics', 
 
   await editor.fill('version: 0.5\nobjects:\n  broken:\n    type: rect\n    size: [missingWidth, 80mm]\n');
   await expect(page.getByRole('status', { name: /^ERROR/ })).toBeVisible();
-  await expect(page.getByRole('alert')).toBeVisible();
+  await expect(page.getByRole('alert', { name: /Error Code: UNKNOWN_IDENTIFIER/ })).toBeVisible();
 
   await editor.fill(runtimeDiagnosticSource);
   await expect(page.getByRole('status', { name: /^READY/ })).toBeVisible();
@@ -344,7 +352,7 @@ test('keeps a new file in memory when workspace storage fails', async ({ page })
       return nativeTransaction.apply(this, args as any);
     };
   });
-  await openPlayground(page);
+  await openPlaygroundWithoutRequiringReady(page);
 
   await page.getByRole('button', { name: 'New', exact: true }).click();
   await expect(page.getByRole('combobox', { name: 'Choose source file' })).toHaveValue(/^local:/);
@@ -371,7 +379,7 @@ test('keeps the editor available when an IndexedDB transaction aborts', async ({
       return result;
     };
   });
-  await openPlayground(page);
+  await openPlaygroundWithoutRequiringReady(page);
 
   await page.getByRole('button', { name: 'New', exact: true }).click();
   await expect(page.getByRole('combobox', { name: 'Choose source file' })).toHaveValue(/^local:/);
@@ -403,7 +411,7 @@ test('keeps the editor available when the IndexedDB record is corrupt', async ({
     });
   });
 
-  await openPlayground(page);
+  await openPlaygroundWithoutRequiringReady(page);
   await expect(page.locator('.action-feedback'))
     .toContainText('Could not open browser file storage');
   await expect(page.getByRole('textbox', { name: 'RelGeo DSL source editor' })).toBeVisible();
@@ -441,7 +449,7 @@ test('reports a blocked upgrade when another tab holds the old IndexedDB connect
   });
 
   try {
-    await openPlayground(secondPage);
+    await openPlaygroundWithoutRequiringReady(secondPage);
     await expect(secondPage.locator('.action-feedback'))
       .toContainText('Could not open browser file storage');
   } finally {
