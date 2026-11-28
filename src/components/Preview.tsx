@@ -910,18 +910,6 @@ export function Preview({
           </span>
         </div>
         <div className="preview-overlay-groups" role="group" aria-label="Preview overlays and line mode">
-          <div className="preview-toolset" role="group" aria-label="View controls">
-            <button
-              type="button"
-              onClick={onFitAll}
-              title="Fit and recenter preview"
-              aria-label="Fit and recenter preview"
-              className="preview-fit-button"
-            >
-              {ICONS.Recenter}
-              <span>Fit view</span>
-            </button>
-          </div>
           {toolbarMode === 'model' && (
             <>
               <div className="preview-toolset" role="group" aria-label="Model overlays">

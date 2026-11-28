@@ -546,3 +546,148 @@ test('keeps file actions keyboard reachable and traps delete confirmation focus'
   await expect(dialog).toBeHidden();
   await expect(page.getByRole('button', { name: 'Delete', exact: true })).toBeFocused();
 });
+
+test('supports two-space editor indentation for single and multiple selections', async ({ page }) => {
+  await openPlayground(page);
+
+  const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
+  await editor.fill('first:\nsecond:\nthird:');
+  await editor.focus();
+  await page.keyboard.press('Control+Home');
+  await page.keyboard.press('Tab');
+  await expect(editor).toHaveText('  first:\nsecond:\nthird:');
+
+  await page.keyboard.press('Control+Home');
+  await page.keyboard.press('Shift+ArrowDown');
+  await page.keyboard.press('Tab');
+  await expect(editor).toHaveText('    first:\n  second:\nthird:');
+
+  await page.keyboard.press('Shift+Tab');
+  await expect(editor).toHaveText('  first:\nsecond:\nthird:');
+});
+
+test('toggles word wrap without changing source and keeps the narrow editor within the viewport', async ({ page }) => {
+  await openPlayground(page);
+
+  const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
+  const toggle = page.getByRole('button', { name: 'Toggle word wrap' });
+  const sourceBeforeToggle = await editor.textContent();
+
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('.cm-content')).not.toHaveClass(/cm-lineWrapping/);
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.cm-content')).toHaveClass(/cm-lineWrapping/);
+  await expect(editor).toHaveText(sourceBeforeToggle ?? '');
+
+  await page.setViewportSize({ width: 360, height: 800 });
+  await expect.poll(() => page.evaluate(() => ({
+    documentWidth: document.documentElement.scrollWidth,
+    viewportWidth: window.innerWidth,
+  }))).toEqual({ documentWidth: 360, viewportWidth: 360 });
+
+  await page.reload();
+  await expect(page.getByRole('textbox', { name: 'RelGeo DSL source editor' })).toBeVisible();
+  await waitForReady(page);
+  await expect(page.getByRole('button', { name: 'Toggle word wrap' })).toHaveAttribute('aria-pressed', 'false');
+  const persistedWordWrap = await page.evaluate(() => localStorage.getItem('relgeo_playground_word_wrap'));
+  expect(persistedWordWrap).toBeNull();
+});
+
+test('renders numeric parameter metadata and preserves invalid drafts outside preview state', async ({ page }) => {
+  await openPlayground(page);
+
+  const sourcePicker = page.getByRole('combobox', { name: 'Choose source file' });
+  const widthInput = page.getByRole('spinbutton', { name: 'Building Width (m)' });
+  await expect(widthInput).not.toHaveAttribute('min');
+  await expect(widthInput).not.toHaveAttribute('max');
+  await expect(widthInput).toHaveAttribute('step', '0.1');
+
+  await sourcePicker.selectOption('example:v04_flange');
+  await waitForReady(page);
+
+  const radiusInput = page.getByRole('spinbutton', { name: 'Bolt Hole Radius' });
+  await expect(radiusInput).toHaveAttribute('min', '1');
+  await expect(radiusInput).toHaveAttribute('max', '6');
+  await expect(radiusInput).toHaveAttribute('step', '0.5');
+
+  await radiusInput.fill('3.7');
+  await expect(radiusInput).toHaveValue('3.7');
+  await expect(radiusInput).toHaveAttribute('aria-invalid', 'false');
+
+  const radiusRow = radiusInput.locator('..');
+  await expect.poll(() => radiusRow.locator('.param-value').textContent()).toContain('3.70');
+
+  await radiusInput.fill('');
+  await expect(radiusInput).toHaveAttribute('aria-invalid', 'true');
+  await expect(radiusInput).toHaveAttribute('aria-describedby', /-error$/);
+  await expect(radiusInput.locator('..').getByRole('alert')).toHaveText('Enter a value.');
+  await expect(radiusInput).toHaveValue('');
+});
+
+test('resets parameter drafts to the active profile and keeps the panel controls accessible', async ({ page }) => {
+  await openPlayground(page);
+
+  const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
+  await editor.fill(`version: "0.5"
+parameters:
+  width: { default: 10, min: 1, max: 20, step: 1 }
+profiles:
+  wide:
+    width: 15
+objects:
+  box:
+    type: rect
+    size: [width, width]`);
+  await waitForReady(page);
+
+  await page.getByRole('button', { name: 'Parameter Profiles' }).click();
+  await page.getByRole('button', { name: 'wide', exact: true }).click();
+
+  const widthInput = page.getByRole('spinbutton', { name: 'width' });
+  await expect(widthInput).toHaveValue('15');
+  const reset = page.getByRole('button', { name: 'Reset parameters' });
+  await expect(reset).toBeDisabled();
+
+  await widthInput.fill('');
+  await expect(widthInput).toHaveAttribute('aria-invalid', 'true');
+  await expect(reset).toBeEnabled();
+  await reset.click();
+  await expect(widthInput).toHaveValue('15');
+  await expect(widthInput).toHaveAttribute('aria-invalid', 'false');
+  await expect(reset).toBeDisabled();
+
+  await page.getByRole('button', { name: 'Default', exact: true }).click();
+  await widthInput.fill('12');
+  await expect(reset).toBeEnabled();
+  await reset.click();
+  await expect(widthInput).toHaveValue('10');
+  await expect(reset).toBeDisabled();
+});
+
+test('keeps read-only source unchanged and gives Escape two stages', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__RELGeoPlaygroundTestHooks = { bootstrapDelayMs: 5_000 };
+  });
+  await page.goto('./');
+
+  const editor = page.getByRole('textbox', { name: 'RelGeo DSL source editor' });
+  await expect(editor).toHaveAttribute('aria-readonly', 'true');
+  const source = await editor.textContent();
+  await editor.focus();
+  await page.keyboard.press('Tab');
+  await expect(editor).toHaveText(source ?? '');
+
+  await waitForReady(page);
+  await expect(editor).toHaveAttribute('aria-readonly', 'false');
+  await editor.focus();
+  await page.keyboard.press('Control+Space');
+  const autocomplete = page.locator('.cm-tooltip-autocomplete');
+  await expect(autocomplete).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(autocomplete).toBeHidden();
+  await expect(editor).toBeFocused();
+
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('separator', { name: 'Resize editor and preview horizontally' })).toBeFocused();
+});

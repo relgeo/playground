@@ -64,7 +64,7 @@ Validasi baseline:
 - ESLint: **lulus**.
 - Preview produksi lokal dibuka pada `http://127.0.0.1:4325/playground/`.
 - Sweep browser viewport 390×844 dengan reduced-motion: 37 kontrol DOM terlihat, seluruhnya memiliki accessible name, seluruhnya tercapai dengan Tab, dan `scrollWidth` tetap 390.
-- AX tree standalone playground: kontrol yang terdeteksi memiliki nama, termasuk editor, combobox, slider, button, dan checkbox.
+- AX tree standalone playground: kontrol yang terdeteksi memiliki nama, termasuk editor, combobox, number input, button, dan checkbox.
 - Baseline screenshot persisted untuk first open/READY, error/recovery, Inspector, Graph, dan handset 410px di `docs/screenshots/ux-baseline-2026-09-15/`; manifest dan SHA-256 tercatat di folder tersebut.
 - Workflow `Deploy RelGeo website` run #19 pada commit website `dc3f772` sukses: build, Pages artifact, deploy, dan smoke-test job semuanya hijau.
 - Smoke browser publik setelah deploy baru lulus untuk `/`, `/en/`, `/id/`, `/docs/`, `/docs/language-spec/`, dan `/playground/`; semua route terbaca tanpa alert dan Playground memiliki judul `RelGeo Playground`.

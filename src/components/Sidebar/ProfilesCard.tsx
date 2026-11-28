@@ -1,4 +1,5 @@
 import type { RelGeoDocument } from '@relgeo/core';
+import { getProfileOverrides } from '../../parameter-controls';
 
 interface ProfilesCardProps {
   doc: RelGeoDocument | null | undefined;
@@ -35,13 +36,12 @@ export function ProfilesCard({
           Default
         </button>
         {Object.entries(doc.profiles).map(([name, profile]) => {
-          const p = profile as unknown as { overrides?: Record<string, number> };
           return (
             <button
               key={name}
               type="button"
               className={`profile-item ${selectedProfile === name ? 'active' : ''}`}
-              onClick={() => handleSelect(name, p.overrides || {})}
+              onClick={() => handleSelect(name, getProfileOverrides(profile))}
               aria-pressed={selectedProfile === name}
             >
               {name}

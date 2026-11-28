@@ -1,4 +1,4 @@
-import { useRef, type ChangeEvent } from 'react';
+import { useEffect, useRef, type ChangeEvent } from 'react';
 import type { LocalDocument } from '../persistence';
 import { EXAMPLES } from '../examples';
 
@@ -33,9 +33,32 @@ export function FileWorkspacePicker({
 }: FileWorkspacePickerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const backupInputRef = useRef<HTMLInputElement>(null);
+  const actionsMenuRef = useRef<HTMLDetailsElement>(null);
   const sortedDocuments = [...localDocuments].sort((a, b) => b.updatedAt - a.updatedAt);
 
+  useEffect(() => {
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!actionsMenuRef.current?.contains(event.target as Node)) {
+        if (actionsMenuRef.current) actionsMenuRef.current.open = false;
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      const menu = actionsMenuRef.current;
+      if (event.key !== 'Escape' || !menu?.open) return;
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    };
+
+    document.addEventListener('pointerdown', closeOnOutsidePointer);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointer);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, []);
+
   const runFileAction = (action: () => void) => {
+    if (actionsMenuRef.current) actionsMenuRef.current.open = false;
     action();
   };
 
@@ -86,8 +109,9 @@ export function FileWorkspacePicker({
         </optgroup>
       </select>
 
-      <div className="file-actions-menu" role="group" aria-label="File actions">
-        <div className="file-actions-popup">
+      <details className="file-actions-menu" ref={actionsMenuRef}>
+        <summary aria-label="Open file actions">Menu</summary>
+        <div className="file-actions-popup" role="group" aria-label="File actions">
           <button type="button" onClick={() => runFileAction(onNewFile)} title="Create a new local file" aria-keyshortcuts="Control+Alt+N Meta+Alt+N">
             New
           </button>
@@ -117,7 +141,7 @@ export function FileWorkspacePicker({
             Restore
           </button>
         </div>
-      </div>
+      </details>
       <input
         ref={fileInputRef}
         className="visually-hidden"

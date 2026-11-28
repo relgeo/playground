@@ -20,6 +20,7 @@ interface SidebarProps {
   children: {
     profiles: ReactNode;
     parameters: ReactNode;
+    parametersActions?: ReactNode;
     metaPresets: ReactNode;
     inspector: ReactNode;
     layers: ReactNode;
@@ -52,7 +53,7 @@ export function Sidebar({
     if (!window.matchMedia('(max-width: 840px)').matches) return;
 
     const frame = window.requestAnimationFrame(() => {
-      sidebarRef.current?.querySelector<HTMLElement>('.sidebar-panel-header')?.focus();
+      sidebarRef.current?.querySelector<HTMLElement>('.sidebar-panel-toggle')?.focus();
     });
     return () => window.cancelAnimationFrame(frame);
   }, [visible, onClose]);
@@ -119,6 +120,7 @@ export function Sidebar({
             title="Parameters" 
             isExpanded={panelState.parameters} 
             onToggle={() => togglePanel('parameters')}
+            actions={children.parametersActions}
             large
           >
             {children.parameters}
@@ -196,27 +198,31 @@ interface SidebarPanelProps {
   isExpanded: boolean;
   onToggle: () => void;
   children: ReactNode;
+  actions?: ReactNode;
   large?: boolean;
 }
 
-function SidebarPanel({ panelId, title, isExpanded, onToggle, children, large }: SidebarPanelProps) {
+function SidebarPanel({ panelId, title, isExpanded, onToggle, children, actions, large }: SidebarPanelProps) {
   const headerId = `sidebar-panel-header-${panelId}`;
   const bodyId = `sidebar-panel-body-${panelId}`;
   return (
     <div className="sidebar-panel">
-      <button
-        id={headerId}
-        type="button"
-        className="sidebar-panel-header"
-        onClick={onToggle}
-        aria-expanded={isExpanded}
-        aria-controls={bodyId}
-      >
-        <h3>{title}</h3>
-        <span className="sidebar-panel-chevron">
-          {isExpanded ? ICONS.ChevronUp : ICONS.ChevronDown}
-        </span>
-      </button>
+      <div className="sidebar-panel-header">
+        {actions && <div className="sidebar-panel-actions">{actions}</div>}
+        <button
+          id={headerId}
+          type="button"
+          className="sidebar-panel-toggle"
+          onClick={onToggle}
+          aria-expanded={isExpanded}
+          aria-controls={bodyId}
+        >
+          <h3>{title}</h3>
+          <span className="sidebar-panel-chevron">
+            {isExpanded ? ICONS.ChevronUp : ICONS.ChevronDown}
+          </span>
+        </button>
+      </div>
       <div
         id={bodyId}
         className={`sidebar-panel-body ${!isExpanded ? 'is-collapsed' : ''} ${large ? 'is-large' : ''}`}

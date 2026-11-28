@@ -4,6 +4,7 @@ import { DEFAULT_EXAMPLE_KEY, EXAMPLES } from './examples';
 
 // Components
 import { Navbar } from './components/Navbar';
+import { ICONS } from './components/Icons';
 import type { FileSourceValue } from './components/FileWorkspacePicker';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import {
@@ -48,6 +49,7 @@ import {
   getNextWorkerRequestId,
 } from './worker-sequencing';
 import { WorkerLifecycle, type WorkerLifecycleFailure } from './worker-lifecycle';
+import { getProfileOverrides } from './parameter-controls';
 
 import type { RelGeoDocument, ResolvedScene, RelGeoError } from '@relgeo/core';
 
@@ -178,6 +180,13 @@ function App() {
     useState<PlaygroundRenderSnapshot | null>(null);
   const [lastSuccessfulCode, setLastSuccessfulCode] = useState<string | null>(null);
   const [paramOverrides, setParamOverrides] = useState<Record<string, number>>({});
+  const [parameterResetSignal, setParameterResetSignal] = useState(0);
+  const [parameterResetState, setParameterResetState] = useState({
+    hasValueChanges: false,
+    hasDraftChanges: false,
+    hasInvalidDrafts: false,
+  });
+  const [wordWrap, setWordWrap] = useState(false);
   const [zoom, setZoom] = useState(100);
   const [showDimensions, setShowDimensions] = useState(true);
   const [showAnnotations, setShowAnnotations] = useState(true);
@@ -578,6 +587,13 @@ function App() {
     (displayDoc?.metaPresets && Object.keys(displayDoc.metaPresets).length > 0)
     || (displayDoc?.styles && Object.keys(displayDoc.styles).length > 0)
   );
+  const parameterBaselineOverrides = useMemo(() => {
+    if (!selectedProfile || !displayDoc?.profiles) return {};
+    return getProfileOverrides(displayDoc.profiles[selectedProfile]);
+  }, [displayDoc, selectedProfile]);
+  const hasParameterResettableChange = parameterResetState.hasValueChanges
+    || parameterResetState.hasDraftChanges
+    || parameterResetState.hasInvalidDrafts;
   const resolvedObjectCount = displayResolvedData?.objects
     ? Object.keys(displayResolvedData.objects).length
     : 0;
@@ -1119,8 +1135,28 @@ function App() {
   };
 
   const handleParamChange = (key: string, value: number) => {
+    if (!Number.isFinite(value)) return;
     setParamOverrides((prev) => ({ ...prev, [key]: value }));
   };
+
+  const handleParameterResetStateChange = useCallback((next: {
+    hasValueChanges: boolean;
+    hasDraftChanges: boolean;
+    hasInvalidDrafts: boolean;
+  }) => {
+    setParameterResetState((previous) => (
+      previous.hasValueChanges === next.hasValueChanges
+      && previous.hasDraftChanges === next.hasDraftChanges
+      && previous.hasInvalidDrafts === next.hasInvalidDrafts
+        ? previous
+        : next
+    ));
+  }, []);
+
+  const handleResetParameters = useCallback(() => {
+    setParamOverrides(parameterBaselineOverrides);
+    setParameterResetSignal((signal) => signal + 1);
+  }, [parameterBaselineOverrides]);
 
   const applyRestoreLastSuccessful = (codeToRestore: string) => {
     setCode(codeToRestore);
@@ -1275,6 +1311,9 @@ function App() {
       }
 
       const target = event.target as HTMLElement | null;
+      // CodeMirror owns Escape while its contenteditable is focused: its
+      // local keymap closes autocomplete first and then moves focus out of
+      // the editor. Keep the app-level cancel command out of that sequence.
       if (command === 'cancel' && target?.closest('input, textarea, [contenteditable="true"]')) return;
 
       if (command === 'cancel') {
@@ -1447,16 +1486,29 @@ function App() {
                 />
               </Suspense>
             ),
+            parametersActions: (
+              <button
+                type="button"
+                className="parameters-reset"
+                onClick={handleResetParameters}
+                disabled={!hasParameterResettableChange}
+                aria-label="Reset parameters"
+                title={selectedProfile ? `Reset parameters to ${selectedProfile} profile` : 'Reset parameters to document defaults'}
+              >
+                {ICONS.Reset}
+              </button>
+            ),
             parameters: (
               <Suspense fallback={<div className="component-loading" role="status">Loading parameters…</div>}>
                 <ParametersCard
                   doc={displayDoc}
                   paramOverrides={paramOverrides}
                   onParamChange={handleParamChange}
-                  onReset={() => setParamOverrides({})}
-                  collapsed={false}
-                  setCollapsed={() => {}}
+                  baselineOverrides={parameterBaselineOverrides}
+                  resetSignal={parameterResetSignal}
+                  onResetStateChange={handleParameterResetStateChange}
                   resolvedValues={displayResolvedData?.values ?? {}}
+                  baselineKey={`${activeDocumentId ?? `example:${selectedExample}`}:${selectedProfile ?? 'default'}:${code}`}
                 />
               </Suspense>
             ),
@@ -1507,7 +1559,14 @@ function App() {
               style={viewMode === 'editor-only' ? undefined : { flex: `0 0 ${splitRatio}%` }}
             >
               <Suspense fallback={<div className="editor-loading" role="status">Loading editor…</div>}>
-                <Editor code={code} onChange={handleEditorChange} editorRef={editorRef} readOnly={interactionsBlocked} />
+                <Editor
+                  code={code}
+                  onChange={handleEditorChange}
+                  editorRef={editorRef}
+                  readOnly={interactionsBlocked}
+                  wordWrap={wordWrap}
+                  onToggleWordWrap={() => setWordWrap((enabled) => !enabled)}
+                />
               </Suspense>
             </div>
           )}

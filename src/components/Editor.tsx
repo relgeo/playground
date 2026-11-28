@@ -1,7 +1,8 @@
 import CodeMirror from '@uiw/react-codemirror';
 import { yaml } from '@codemirror/lang-yaml';
 import { linter } from '@codemirror/lint';
-import { autocompletion } from '@codemirror/autocomplete';
+import { autocompletion, closeCompletion, completionStatus } from '@codemirror/autocomplete';
+import { EditorSelection } from '@codemirror/state';
 import {
   acceptCurrentDocumentAnalysis,
   RelGeoLanguageService,
@@ -12,8 +13,9 @@ import type {
   DocumentAnalysisRequest,
   HoverResult,
 } from '@relgeo/language-service';
-import { EditorView, hoverTooltip } from '@codemirror/view';
+import { EditorView, hoverTooltip, keymap } from '@codemirror/view';
 import React from 'react';
+import { getEditorEscapeAction, getEditorIndentationChanges } from '../editor-keyboard';
 
 const langService = new RelGeoLanguageService();
 type EditorRequest = DocumentAnalysisRequest;
@@ -146,14 +148,91 @@ interface EditorProps {
   onChange: (code: string) => void;
   editorRef?: React.RefObject<EditorView | null>;
   readOnly?: boolean;
+  wordWrap: boolean;
+  onToggleWordWrap: () => void;
 }
 
-export function Editor({ code, onChange, editorRef, readOnly = false }: EditorProps) {
+function focusNextControl(view: EditorView): boolean {
+  const panel = view.dom.closest('.editor-panel');
+  if (!panel) return false;
+
+  const focusableSelector = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[contenteditable="true"]',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(',');
+  const next = Array.from(document.querySelectorAll<HTMLElement>(focusableSelector))
+    .find((element) => Boolean(panel.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING));
+
+  if (!next) return false;
+  next.focus();
+  return document.activeElement === next;
+}
+
+function indentEditorSelection(view: EditorView, direction: 'indent' | 'dedent'): boolean {
+  if (view.state.readOnly) return false;
+
+  const changes = getEditorIndentationChanges(
+    view.state.doc.toString(),
+    view.state.selection.ranges,
+    direction,
+  );
+  if (changes.length === 0) return true;
+
+  const changeSet = view.state.changes(changes);
+  const selection = EditorSelection.create(view.state.selection.ranges.map((range) => (
+    EditorSelection.range(
+      changeSet.mapPos(range.anchor, 1),
+      changeSet.mapPos(range.head, 1),
+    )
+  )));
+  view.dispatch({ changes: changeSet, selection });
+  return true;
+}
+
+function handleEditorEscape(view: EditorView): boolean {
+  if (getEditorEscapeAction(completionStatus(view.state) === 'active') === 'close-autocomplete') {
+    closeCompletion(view);
+    return true;
+  }
+  return focusNextControl(view);
+}
+
+const editorKeyboard = keymap.of([
+  { key: 'Tab', run: (view) => indentEditorSelection(view, 'indent') },
+  { key: 'Shift-Tab', run: (view) => indentEditorSelection(view, 'dedent') },
+  { key: 'Escape', run: handleEditorEscape },
+]);
+
+export function Editor({
+  code,
+  onChange,
+  editorRef,
+  readOnly = false,
+  wordWrap,
+  onToggleWordWrap,
+}: EditorProps) {
   return (
     <section className="editor-panel">
       <div className="panel-head compact">
         <div>
           <p className="section-kicker">RelGeo DSL Editor</p>
+        </div>
+        <div className="panel-head-actions editor-panel-actions">
+          <button
+            type="button"
+            className={`editor-wrap-toggle${wordWrap ? ' is-active' : ''}`}
+            aria-label="Toggle word wrap"
+            aria-pressed={wordWrap}
+            title={wordWrap ? 'Disable word wrap' : 'Enable word wrap'}
+            onClick={onToggleWordWrap}
+          >
+            Wrap lines
+          </button>
         </div>
       </div>
       <div className="editor-surface cm-wrapper">
@@ -167,13 +246,17 @@ export function Editor({ code, onChange, editorRef, readOnly = false }: EditorPr
           // browser contract need to distinguish editable from unavailable.
           aria-readonly={readOnly ? 'true' : 'false'}
           height="100%"
+          // Keep Tab in the editor while it is editable. The local keymap
+          // returns false in read-only mode so browser focus navigation is
+          // preserved for the loading/locked editor state.
           indentWithTab={false}
           theme="none" // We use our own CSS for styling
           extensions={[
             yaml(),
+            editorKeyboard,
             relgeoLinter,
             relgeoAutocompletion,
-            EditorView.lineWrapping,
+            ...(wordWrap ? [EditorView.lineWrapping] : []),
             relgeoHover,
             EditorView.contentAttributes.of({
               'aria-label': 'RelGeo DSL source editor',

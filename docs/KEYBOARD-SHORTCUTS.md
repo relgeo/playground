@@ -17,8 +17,33 @@ Control on Windows/Linux and Command on macOS.
 | Show diagnostics | `Ctrl+Alt+D` | `Cmd+Alt+D` | Open the Inspector Errors view. |
 | Toggle sidebar | `Ctrl+Alt+B` | `Cmd+Alt+B` | Open or close the workspace drawer. |
 | Both / Source / Preview | `Ctrl+Alt+1/2/3` | `Cmd+Alt+1/2/3` | Switch the main workspace surface. |
-| Cancel | `Escape` | `Escape` | Close confirmation/drawer or clear selection when focus is not in an editor control. |
+| Cancel | `Escape` | `Escape` | Close confirmation/drawer or clear selection when focus is not in an editor control. In the DSL editor, Escape is owned by the editor keymap: first close autocomplete, then move focus to the next control. |
 
 The command map is implemented in `src/keyboard-commands.ts` and is covered
 by focused unit tests. Commands are not handled while an unmodified editing
 key is being used; editor content remains owned by CodeMirror.
+
+## DSL editor authoring
+
+- `Tab` indents the current line or all selected lines by two spaces in the
+  editable editor. `Shift+Tab` removes one two-space indentation level where
+  possible.
+- `Tab` remains an editing key while the editable CodeMirror surface is
+  focused; it does not move focus out of the editor. In read-only mode the
+  document is preserved and normal browser focus navigation remains available.
+- `Escape` closes an open completion list without leaving the editor. A second
+  `Escape`, after completion is closed, moves focus to the next available
+  control.
+- The `Wrap lines` button is a session-only editor control. It starts off on a
+  new page, exposes `aria-pressed`, and does not change source text.
+
+## Parameter-entry keyboard behavior
+
+Parameter controls use number inputs rather than range sliders. Users can type
+integer or decimal drafts directly; spinner `step` metadata controls the
+increment only and does not reject a finite manual value that is not a step
+multiple. Empty, incomplete, non-finite, or out-of-range drafts stay visible
+and are announced through the field's validation state without reaching the
+preview worker. `Reset parameters` is immediately before the Parameters
+collapse control and restores the active profile baseline, or document defaults
+when no profile is selected.
