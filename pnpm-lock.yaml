@@ -25,10 +25,10 @@ importers:
         version: 6.43.11
       '@relgeo/core':
         specifier: ^0.5.0
-        version: 0.5.2
+        version: 0.5.3
       '@relgeo/language-service':
-        specifier: ^0.5.2
-        version: 0.5.2(@relgeo/core@0.5.2)
+        specifier: ^0.5.0
+        version: 0.5.2(@relgeo/core@0.5.3)
       '@relgeo/renderer-svg':
         specifier: ^0.5.0
         version: 0.5.0
@@ -459,8 +459,8 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
-  '@relgeo/core@0.5.2':
-    resolution: {integrity: sha512-p6m8SFNwvYyPjN32AIX4cHtm0+bHfkPSf72H3AcIKzzpHFoLwdbvkMV2jOnIAFiHrWurvCIlpYm2SK+3pwyysg==}
+  '@relgeo/core@0.5.3':
+    resolution: {integrity: sha512-N6bCrM1ZBL+VD0jYTFT0NU1BoP5DY27ltOO7RkiSvtCJ+8hAEdOvHLHMllrVyo25f4AEhvSogtHNwDUulDH68w==}
 
   '@relgeo/geometry@0.5.0':
     resolution: {integrity: sha512-Y6O+Ul+bfMItbTy/67mOOBMu6LAislVZJVd1qrA3qhEHEmk5UqgLQiq/uOWT/u9udRgLl5rQme0ZBknKwPCHBg==}
@@ -1753,7 +1753,7 @@ snapshots:
     dependencies:
       playwright: 1.63.0
 
-  '@relgeo/core@0.5.2':
+  '@relgeo/core@0.5.3':
     dependencies:
       '@relgeo/geometry': 0.5.0
       js-yaml: 4.3.2
@@ -1762,9 +1762,9 @@ snapshots:
     dependencies:
       polygon-clipping: 0.15.7
 
-  '@relgeo/language-service@0.5.2(@relgeo/core@0.5.2)':
+  '@relgeo/language-service@0.5.2(@relgeo/core@0.5.3)':
     dependencies:
-      '@relgeo/core': 0.5.2
+      '@relgeo/core': 0.5.3
       js-yaml: 4.3.2
       vscode-languageserver-types: 3.18.3
 
