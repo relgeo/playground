@@ -27,8 +27,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.2
       '@relgeo/language-service':
-        specifier: ^0.5.0
-        version: 0.5.0(@relgeo/core@0.5.2)
+        specifier: ^0.5.2
+        version: 0.5.2(@relgeo/core@0.5.2)
       '@relgeo/renderer-svg':
         specifier: ^0.5.0
         version: 0.5.0
@@ -465,8 +465,8 @@ packages:
   '@relgeo/geometry@0.5.0':
     resolution: {integrity: sha512-Y6O+Ul+bfMItbTy/67mOOBMu6LAislVZJVd1qrA3qhEHEmk5UqgLQiq/uOWT/u9udRgLl5rQme0ZBknKwPCHBg==}
 
-  '@relgeo/language-service@0.5.0':
-    resolution: {integrity: sha512-uuLgB9UnPigvePqEtV8Sy0onSQtyA9kXu/O1xL+siR82cqwOFtE/OvDyQHg5GGBzB8169ND+7lKInXyOBPVyFw==}
+  '@relgeo/language-service@0.5.2':
+    resolution: {integrity: sha512-VsqtYY4BaWvMHW/4ZCo7Zl63bfwZ2GrdRy0wqDQ4Lud8YVth2Jpw+sX/KkRrMrAJDGnyPLdo3eRDRA2dUdR+bQ==}
     peerDependencies:
       '@relgeo/core': ^0.5.0
 
@@ -1762,7 +1762,7 @@ snapshots:
     dependencies:
       polygon-clipping: 0.15.7
 
-  '@relgeo/language-service@0.5.0(@relgeo/core@0.5.2)':
+  '@relgeo/language-service@0.5.2(@relgeo/core@0.5.2)':
     dependencies:
       '@relgeo/core': 0.5.2
       js-yaml: 4.3.2
