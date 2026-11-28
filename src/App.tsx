@@ -1651,7 +1651,6 @@ function App() {
                 staticPreviewStrokePx={DEFAULT_STATIC_PREVIEW_STROKE_PX}
                 hiddenRoles={hiddenRoles}
                 fitAllTrigger={fitAllTrigger}
-                onFitAll={requestFitAll}
                 selectedSheetId={effectiveSheetId}
                 selectedObjectId={visibleSelectedObjectId}
                 relatedObjectIds={selectedRelatedObjectIds}

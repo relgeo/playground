@@ -58,7 +58,6 @@ interface PreviewProps {
   staticPreviewStrokePx: number;
   hiddenRoles?: Set<string>;
   fitAllTrigger: number;
-  onFitAll: () => void;
   selectedSheetId: string | null;
   selectedObjectId?: string | null;
   relatedObjectIds?: string[];
@@ -99,7 +98,6 @@ export function Preview({
   staticPreviewStrokePx,
   hiddenRoles,
   fitAllTrigger,
-  onFitAll,
   selectedSheetId,
   selectedObjectId = null,
   relatedObjectIds = [],
